@@ -20,6 +20,10 @@ def create_app(config_name=None):
     cache.init_app(app)
     limiter.init_app(app)
 
+    # CORS
+    from flask_cors import CORS
+    CORS(app, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS', '*')}}, supports_credentials=True)
+
     from app.api import register_blueprints
     register_blueprints(app)
 
@@ -45,19 +49,23 @@ def create_app(config_name=None):
             'status': 'operational'
         }), 200
 
+    # Initialize database tables (non-blocking)
     with app.app_context():
-        from app.models.user import User, Session, AuditLog, UserRole, UserStatus
-        from app.models.ship import Ship, ShipStatus, VesselType
-        from app.models.container import Container, ContainerStatus, ContainerType, ContainerHistory
-        from app.models.truck import Truck, TruckStatus, TruckType
-        from app.models.security import SecurityIncident, IncidentType, IncidentSeverity, IncidentStatus, Alert, AlertType, SecurityZone, AccessLog, Camera, SecurityOfficer
-        from app.models.maintenance import Equipment, EquipmentType, EquipmentStatus, MaintenanceType, MaintenancePriority, MaintenanceStatus, ServiceLog
-        from app.models.environment import (
-            MonitoringStation, AirQualityReading, WaterQualityReading, NoiseReading,
-            WeatherReading, EmissionReading, EnvironmentalAlert, ComplianceThreshold,
-            WaterQualityParameter, AirQualityParameter, NoiseParameter, WeatherParameter
-        )
-        from app.models.reports import Report, ReportType, ReportFormat, ReportStatus, ReportSchedule, ReportTemplate, DashboardWidget, UserDashboard
-        db.create_all()
+        try:
+            from app.models.user import User, Session, AuditLog, UserRole, UserStatus
+            from app.models.ship import Ship, ShipStatus, VesselType
+            from app.models.container import Container, ContainerStatus, ContainerType, ContainerHistory
+            from app.models.truck import Truck, TruckStatus, TruckType
+            from app.models.security import SecurityIncident, IncidentType, IncidentSeverity, IncidentStatus, Alert, AlertType, SecurityZone, AccessLog, Camera, SecurityOfficer
+            from app.models.maintenance import Equipment, EquipmentType, EquipmentStatus, MaintenanceType, MaintenancePriority, MaintenanceStatus, ServiceLog
+            from app.models.environment import (
+                MonitoringStation, AirQualityReading, WaterQualityReading, NoiseReading,
+                WeatherReading, EmissionReading, EnvironmentalAlert, ComplianceThreshold,
+                WaterQualityParameter, AirQualityParameter, NoiseParameter, WeatherParameter
+            )
+            from app.models.reports import Report, ReportType, ReportFormat, ReportStatus, ReportSchedule, ReportTemplate, DashboardWidget, UserDashboard
+            db.create_all()
+        except Exception as e:
+            app.logger.warning(f"Database initialization skipped: {e}")
 
     return app
