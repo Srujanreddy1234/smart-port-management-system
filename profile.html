@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile — Smart Port Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/variables.css" rel="stylesheet">
+  <link href="css/main.css" rel="stylesheet">
+  <link href="css/layout.css" rel="stylesheet">
+  <link href="css/components.css" rel="stylesheet">
+  <link href="css/pages.css" rel="stylesheet">
+  <link href="css/responsive.css" rel="stylesheet">
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon"><i class="fas fa-anchor"></i></div>
+      <div class="sidebar-brand-text">
+        <h5>Smart Port</h5>
+        <small>Thoothukudi</small>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <div class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-th-large"></i><span>Dashboard</span></a></div>
+      <div class="nav-section">Operations</div>
+      <div class="nav-item"><a href="ships.html" class="nav-link"><i class="fas fa-ship"></i><span>Ship Management</span><span class="badge badge-primary">24</span></a></div>
+      <div class="nav-item"><a href="containers.html" class="nav-link"><i class="fas fa-boxes-stacked"></i><span>Container Ops</span><span class="badge badge-info">1.2K</span></a></div>
+      <div class="nav-item"><a href="trucks.html" class="nav-link"><i class="fas fa-truck"></i><span>Truck Operations</span><span class="badge badge-warning">18</span></a></div>
+      <div class="nav-section">Management</div>
+      <div class="nav-item"><a href="security.html" class="nav-link"><i class="fas fa-shield-halved"></i><span>Security Center</span><span class="badge badge-danger">3</span></a></div>
+      <div class="nav-item"><a href="maintenance.html" class="nav-link"><i class="fas fa-wrench"></i><span>Equipment Maint.</span></a></div>
+      <div class="nav-item"><a href="environment.html" class="nav-link"><i class="fas fa-leaf"></i><span>Environmental</span></a></div>
+      <div class="nav-section">Analytics</div>
+      <div class="nav-item"><a href="reports.html" class="nav-link"><i class="fas fa-chart-line"></i><span>Reports &amp; Analytics</span></a></div>
+      <div class="nav-item"><a href="profile.html" class="nav-link active"><i class="fas fa-user-circle"></i><span>User Profile</span></a></div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">RA</div>
+        <div class="sidebar-user-info">
+          <h6>Rajesh Admin</h6>
+          <small>Port Director</small>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        <div>
+          <div class="page-title">User Profile</div>
+          <div class="breadcrumb">
+            <a href="dashboard.html">Home</a>
+            <span class="separator">/</span>
+            <span>User Profile</span>
+          </div>
+        </div>
+      </div>
+      <div class="topbar-center">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search ships, containers, trucks...">
+          <span class="search-shortcut">Ctrl+K</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span id="liveClock" style="font-size:0.82rem;color:var(--text-muted);font-family:monospace;margin-right:8px;"></span>
+        <button class="topbar-btn"><i class="fas fa-expand"></i></button>
+        <button class="topbar-btn" id="notifBtn">
+          <i class="fas fa-bell"></i>
+          <span class="badge-count">5</span>
+        </button>
+        <div class="notification-dropdown" id="notifDropdown">
+          <div class="dropdown-header">
+            <h6>Notifications</h6>
+            <a href="#" id="markAllRead" style="font-size:0.78rem;">Mark all read</a>
+          </div>
+          <div class="notification-list">
+            <div class="notification-item unread">
+              <div class="notification-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
+              <div class="notification-body">
+                <h6>Security Alert — Zone B</h6>
+                <p>Unauthorized access detected near Berth 7</p>
+                <small>2 min ago</small>
+              </div>
+            </div>
+            <div class="notification-item unread">
+              <div class="notification-icon warning"><i class="fas fa-clock"></i></div>
+              <div class="notification-body">
+                <h6>Vessel Delay</h6>
+                <p>MV Chennai Express delayed by 2.5 hours</p>
+                <small>15 min ago</small>
+              </div>
+            </div>
+            <div class="notification-item unread">
+              <div class="notification-icon success"><i class="fas fa-check-circle"></i></div>
+              <div class="notification-body">
+                <h6>Container Discharged</h6>
+                <p>450 containers unloaded from MV Pacific Star</p>
+                <small>1 hour ago</small>
+              </div>
+            </div>
+            <div class="notification-item">
+              <div class="notification-icon info"><i class="fas fa-info-circle"></i></div>
+              <div class="notification-body">
+                <h6>Maintenance Scheduled</h6>
+                <p>Crane #3 maintenance at 14:00 today</p>
+                <small>3 hours ago</small>
+              </div>
+            </div>
+            <div class="notification-item">
+              <div class="notification-icon success"><i class="fas fa-leaf"></i></div>
+              <div class="notification-body">
+                <h6>AQI Normal</h6>
+                <p>Air quality index returned to safe levels</p>
+                <small>5 hours ago</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="topbar-btn"><i class="fas fa-cog"></i></button>
+        <a href="profile.html" class="topbar-btn" style="text-decoration:none;">
+          <div class="avatar avatar-sm" style="background:var(--gradient-primary);font-size:0.7rem;">RA</div>
+        </a>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="profile-header">
+        <div class="profile-info">
+          <div class="profile-avatar">RA</div>
+          <div class="profile-details">
+            <h3>Rajesh Admin</h3>
+            <div class="role">Port Director</div>
+            <div class="meta">
+              <span><i class="fas fa-location-dot"></i> Thoothukudi, Tamil Nadu</span>
+              <span><i class="fas fa-envelope"></i> rajesh.admin@smartport.gov.in</span>
+              <span><i class="fas fa-phone"></i> +91 98765 43210</span>
+              <span><i class="fas fa-calendar"></i> Member since Jan 2023</span>
+            </div>
+          </div>
+          <div class="profile-actions">
+            <button class="btn btn-primary" onclick="App.showToast('Profile edit mode enabled','info')"><i class="fas fa-pen"></i> Edit Profile</button>
+            <button class="btn btn-secondary" onclick="App.showToast('Opening settings...','info')"><i class="fas fa-cog"></i> Settings</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-tabs">
+        <button class="profile-tab active" data-tab="overview"><i class="fas fa-user"></i> Overview</button>
+        <button class="profile-tab" data-tab="activity"><i class="fas fa-clock-rotate-left"></i> Activity Log</button>
+        <button class="profile-tab" data-tab="settings"><i class="fas fa-cog"></i> Settings</button>
+        <button class="profile-tab" data-tab="security"><i class="fas fa-shield-halved"></i> Security</button>
+      </div>
+
+      <div id="tab-overview" class="tab-content">
+        <div class="profile-grid">
+          <div class="card">
+            <div class="card-header">
+              <h6><i class="fas fa-user" style="color:var(--primary-light);margin-right:8px;"></i>Personal Information</h6>
+              <button class="btn btn-sm btn-secondary" onclick="App.showToast('Edit mode enabled','info')"><i class="fas fa-pen"></i> Edit</button>
+            </div>
+            <div class="card-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div>
+                  <small style="color:var(--text-muted);display:block;margin-bottom:4px;">Full Name</small>
+                  <span style="font-weight:500;">Rajesh Admin</span>
+                </div>
+                <div>
+                  <small style="color:var(--text-muted);display:block;margin-bottom:4px;">Email</small>
+                  <span style="font-weight:500;">rajesh.admin@smartport.gov.in</span>
+                </div>
+                <div>
+                  <small style="color:var(--text-muted);display:block;margin-bottom:4px;">Phone</small>
+                  <span style="font-weight:500;">+91 98765 43210</span>
+                </div>
+                <div>
+                  <small style="color:var(--text-muted);display:block;margin-bottom:4px;">Department</small>
+                  <span style="font-weight:500;">Port Operations</span>
+                </div>
+                <div>
+                  <small style="color:var(--text-muted);display:block;margin-bottom:4px;">Role</small>
+                  <span style="font-weight:500;">Port Director</span>
+                </div>
+                <div>
+                  <small style="color:var(--text-muted);display:block;margin-bottom:4px;">Employee ID</small>
+                  <span style="font-weight:500;">SPK-2023-001</span>
+                </div>
+                <div>
+                  <small style="color:var(--text-muted);display:block;margin-bottom:4px;">Shift</small>
+                  <span style="font-weight:500;">Morning (06:00 – 14:00)</span>
+                </div>
+                <div>
+                  <small style="color:var(--text-muted);display:block;margin-bottom:4px;">Reports To</small>
+                  <span style="font-weight:500;">District Collector</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h6><i class="fas fa-chart-bar" style="color:var(--warning);margin-right:8px;"></i>Work Statistics</h6>
+              <span style="font-size:0.75rem;color:var(--text-muted);">Last 30 days</span>
+            </div>
+            <div class="card-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                <div style="text-align:center;padding:20px;background:var(--lighter);border-radius:var(--radius-md);">
+                  <div style="font-size:1.6rem;font-weight:700;color:var(--primary-light);">12</div>
+                  <small style="color:var(--text-muted);">Projects</small>
+                </div>
+                <div style="text-align:center;padding:20px;background:var(--lighter);border-radius:var(--radius-md);">
+                  <div style="font-size:1.6rem;font-weight:700;color:var(--success);">348</div>
+                  <small style="color:var(--text-muted);">Tasks Completed</small>
+                </div>
+                <div style="text-align:center;padding:20px;background:var(--lighter);border-radius:var(--radius-md);">
+                  <div style="font-size:1.6rem;font-weight:700;color:var(--warning);">56</div>
+                  <small style="color:var(--text-muted);">Reports Generated</small>
+                </div>
+                <div style="text-align:center;padding:20px;background:var(--lighter);border-radius:var(--radius-md);">
+                  <div style="font-size:1.6rem;font-weight:700;color:var(--info);">99.7%</div>
+                  <small style="color:var(--text-muted);">Uptime</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:24px;">
+          <div class="card-header">
+            <h6><i class="fas fa-clock-rotate-left" style="color:var(--info);margin-right:8px;"></i>Recent Activity</h6>
+            <button class="btn btn-sm btn-secondary">View All</button>
+          </div>
+          <div class="card-body" style="max-height:400px;overflow-y:auto;">
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(13,110,253,0.12);color:#6ea8fe;"><i class="fas fa-right-to-bracket"></i></div>
+              <div class="activity-body"><h6>Logged in to the system</h6><p>Session started from admin workstation</p><small>Today, 06:12 AM</small></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(25,135,84,0.12);color:#75b798;"><i class="fas fa-file-lines"></i></div>
+              <div class="activity-body"><h6>Generated Monthly Throughput Report</h6><p>Report covers Jun 2026 — all berths and terminals</p><small>Yesterday, 03:45 PM</small></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(255,193,7,0.12);color:#ffda6a;"><i class="fas fa-check-circle"></i></div>
+              <div class="activity-body"><h6>Approved vessel arrival — MV Pacific Star</h6><p>Berth allocation confirmed at Berth 3</p><small>Yesterday, 11:20 AM</small></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(220,53,69,0.12);color:#ea868f;"><i class="fas fa-exclamation-triangle"></i></div>
+              <div class="activity-body"><h6>Acknowledged security alert in Zone B</h6><p>Response team dispatched — incident resolved</p><small>2 days ago</small></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(102,16,242,0.12);color:#a98eda;"><i class="fas fa-calendar-check"></i></div>
+              <div class="activity-body"><h6>Scheduled safety meeting with department heads</h6><p>Quarterly review — all department leads invited</p><small>3 days ago</small></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(13,202,240,0.12);color:#66d9f0;"><i class="fas fa-gear"></i></div>
+              <div class="activity-body"><h6>System updated to v4.2.1</h6><p>Applied security patches and performance improvements</p><small>5 days ago</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-settings" class="tab-content" style="display:none;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+          <div class="card">
+            <div class="settings-section">
+              <h5><i class="fas fa-bell" style="color:var(--primary-light);margin-right:8px;"></i>Notification Settings</h5>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h6>Email Notifications</h6>
+                  <p>Receive alerts and updates via email</p>
+                </div>
+                <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h6>Push Notifications</h6>
+                  <p>In-browser real-time push alerts</p>
+                </div>
+                <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h6>SMS Alerts</h6>
+                  <p>Critical alerts sent via SMS</p>
+                </div>
+                <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h6>Weekly Digest</h6>
+                  <p>Summary of operations every Monday</p>
+                </div>
+                <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="settings-section">
+              <h5><i class="fas fa-palette" style="color:var(--warning);margin-right:8px;"></i>Appearance</h5>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h6>Dark Mode</h6>
+                  <p>Use dark theme across the dashboard</p>
+                </div>
+                <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h6>Compact Sidebar</h6>
+                  <p>Show icons only in sidebar navigation</p>
+                </div>
+                <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h6>Animations</h6>
+                  <p>Enable transitions and motion effects</p>
+                </div>
+                <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:24px;">
+          <div class="settings-section">
+            <h5><i class="fas fa-globe" style="color:var(--success);margin-right:8px;"></i>Language &amp; Region</h5>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;padding-top:8px;">
+              <div>
+                <label style="font-size:0.82rem;font-weight:500;display:block;margin-bottom:8px;">Language</label>
+                <select class="form-select" style="background:var(--lighter);color:var(--text-primary);border-color:var(--border-color);">
+                  <option selected>English</option>
+                  <option>Tamil</option>
+                  <option>Hindi</option>
+                  <option>Telugu</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:0.82rem;font-weight:500;display:block;margin-bottom:8px;">Timezone</label>
+                <select class="form-select" style="background:var(--lighter);color:var(--text-primary);border-color:var(--border-color);">
+                  <option selected>IST (UTC +5:30)</option>
+                  <option>UTC (UTC +0:00)</option>
+                  <option>EST (UTC -5:00)</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:0.82rem;font-weight:500;display:block;margin-bottom:8px;">Date Format</label>
+                <select class="form-select" style="background:var(--lighter);color:var(--text-primary);border-color:var(--border-color);">
+                  <option selected>DD/MM/YYYY</option>
+                  <option>MM/DD/YYYY</option>
+                  <option>YYYY-MM-DD</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-security" class="tab-content" style="display:none;">
+        <div class="card" style="margin-bottom:24px;">
+          <div class="settings-section">
+            <h5><i class="fas fa-key" style="color:var(--danger);margin-right:8px;"></i>Password</h5>
+            <div class="setting-item">
+              <div class="setting-info">
+                <h6>Change Password</h6>
+                <p>Last changed 45 days ago</p>
+              </div>
+              <button class="btn btn-primary" onclick="App.showToast('Password change dialog opened','info')"><i class="fas fa-pen"></i> Change Password</button>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:24px;">
+          <div class="settings-section">
+            <h5><i class="fas fa-shield-halved" style="color:var(--success);margin-right:8px;"></i>Two-Factor Authentication</h5>
+            <div class="setting-item">
+              <div class="setting-info">
+                <h6>Two-Factor Auth (2FA)</h6>
+                <p>Add an extra layer of security to your account</p>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <span style="font-size:0.78rem;color:var(--success);font-weight:500;"><i class="fas fa-check-circle"></i> Enabled</span>
+                <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h6><i class="fas fa-desktop" style="color:var(--info);margin-right:8px;"></i>Active Sessions</h6>
+          </div>
+          <div class="card-body" style="overflow-x:auto;">
+            <table class="table" style="color:var(--text-primary);margin:0;">
+              <thead>
+                <tr style="border-bottom:1px solid var(--border-color);">
+                  <th style="font-size:0.78rem;font-weight:600;color:var(--text-muted);padding:12px 16px;">Device</th>
+                  <th style="font-size:0.78rem;font-weight:600;color:var(--text-muted);padding:12px 16px;">IP Address</th>
+                  <th style="font-size:0.78rem;font-weight:600;color:var(--text-muted);padding:12px 16px;">Last Active</th>
+                  <th style="font-size:0.78rem;font-weight:600;color:var(--text-muted);padding:12px 16px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid var(--border-color);">
+                  <td style="padding:12px 16px;font-size:0.85rem;"><i class="fas fa-desktop" style="color:var(--primary-light);margin-right:8px;"></i>Windows PC — Chrome</td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.102</td>
+                  <td style="padding:12px 16px;font-size:0.85rem;color:var(--success);">Active now</td>
+                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(25,135,84,0.12);color:var(--success);font-size:0.72rem;">Current</span></td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border-color);">
+                  <td style="padding:12px 16px;font-size:0.85rem;"><i class="fas fa-mobile-screen" style="color:var(--warning);margin-right:8px;"></i>iPhone — Safari</td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.118</td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">2 hours ago</td>
+                  <td style="padding:12px 16px;"><button class="btn btn-sm" style="background:rgba(220,53,69,0.12);color:var(--danger);font-size:0.75rem;" onclick="App.showToast('Session terminated','danger')"><i class="fas fa-right-from-bracket"></i> Revoke</button></td>
+                </tr>
+                <tr>
+                  <td style="padding:12px 16px;font-size:0.85rem;"><i class="fas fa-tablet-screen-button" style="color:var(--info);margin-right:8px;"></i>iPad — Safari</td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">10.0.0.55</td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">Yesterday, 11:42 PM</td>
+                  <td style="padding:12px 16px;"><button class="btn btn-sm" style="background:rgba(220,53,69,0.12);color:var(--danger);font-size:0.75rem;" onclick="App.showToast('Session terminated','danger')"><i class="fas fa-right-from-bracket"></i> Revoke</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-activity" class="tab-content" style="display:none;">
+        <div class="card">
+          <div class="card-header">
+            <h6><i class="fas fa-clock-rotate-left" style="color:var(--info);margin-right:8px;"></i>Activity Log</h6>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-sm btn-secondary"><i class="fas fa-download"></i> Export</button>
+            </div>
+          </div>
+          <div class="card-body" style="overflow-x:auto;">
+            <table class="table" style="color:var(--text-primary);margin:0;">
+              <thead>
+                <tr style="border-bottom:1px solid var(--border-color);">
+                  <th style="font-size:0.78rem;font-weight:600;color:var(--text-muted);padding:12px 16px;">Date</th>
+                  <th style="font-size:0.78rem;font-weight:600;color:var(--text-muted);padding:12px 16px;">Action</th>
+                  <th style="font-size:0.78rem;font-weight:600;color:var(--text-muted);padding:12px 16px;">Details</th>
+                  <th style="font-size:0.78rem;font-weight:600;color:var(--text-muted);padding:12px 16px;">IP Address</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid var(--border-color);">
+                  <td style="padding:12px 16px;font-size:0.85rem;">Jul 24, 2026 — 06:12 AM</td>
+                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(13,110,253,0.12);color:var(--primary-light);font-size:0.75rem;">Login</span></td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">System login — session started</td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.102</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border-color);">
+                  <td style="padding:12px 16px;font-size:0.85rem;">Jul 23, 2026 — 03:45 PM</td>
+                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(25,135,84,0.12);color:var(--success);font-size:0.75rem;">Report</span></td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">Generated Monthly Throughput Report for Jun 2026</td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.102</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border-color);">
+                  <td style="padding:12px 16px;font-size:0.85rem;">Jul 23, 2026 — 11:20 AM</td>
+                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(255,193,7,0.12);color:var(--warning);font-size:0.75rem;">Approval</span></td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">Approved vessel arrival — MV Pacific Star, Berth 3</td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.102</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border-color);">
+                  <td style="padding:12px 16px;font-size:0.85rem;">Jul 22, 2026 — 02:15 PM</td>
+                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(220,53,69,0.12);color:var(--danger);font-size:0.75rem;">Alert</span></td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">Acknowledged security alert in Zone B — incident resolved</td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.102</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border-color);">
+                  <td style="padding:12px 16px;font-size:0.85rem;">Jul 21, 2026 — 10:00 AM</td>
+                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(102,16,242,0.12);color:#a98eda;font-size:0.75rem;">Meeting</span></td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">Scheduled safety meeting with all department heads</td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.102</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border-color);">
+                  <td style="padding:12px 16px;font-size:0.85rem;">Jul 19, 2026 — 08:30 PM</td>
+                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(13,202,240,0.12);color:#66d9f0;font-size:0.75rem;">System</span></td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">System updated to v4.2.1 — security patches applied</td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.102</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--border-color);">
+                  <td style="padding:12px 16px;font-size:0.85rem;">Jul 18, 2026 — 01:42 PM</td>
+                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(255,193,7,0.12);color:var(--warning);font-size:0.75rem;">Approval</span></td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">Approved truck fleet expansion — 6 new vehicles registered</td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.118</td>
+                </tr>
+                <tr>
+                  <td style="padding:12px 16px;font-size:0.85rem;">Jul 16, 2026 — 09:05 AM</td>
+                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(13,110,253,0.12);color:var(--primary-light);font-size:0.75rem;">Login</span></td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">System login — mobile device session</td>
+                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.118</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabs = document.querySelectorAll('.profile-tab');
+      const tabContents = {
+        overview: document.getElementById('tab-overview'),
+        activity: document.getElementById('tab-activity'),
+        settings: document.getElementById('tab-settings'),
+        security: document.getElementById('tab-security')
+      };
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          Object.values(tabContents).forEach(el => el.style.display = 'none');
+          tabContents[tab.dataset.tab].style.display = '';
+        });
+      });
+    });
+  </script>
+</body>
+</html>

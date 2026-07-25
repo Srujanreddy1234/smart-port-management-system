@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Smart Port Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/variables.css" rel="stylesheet">
+  <link href="css/main.css" rel="stylesheet">
+  <link href="css/login.css" rel="stylesheet">
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-left">
+      <div class="login-brand">
+        <div class="login-brand-icon">
+          <i class="fas fa-anchor"></i>
+        </div>
+        <h1>Smart Port <span>Mgmt System</span></h1>
+        <p class="subtitle">AI-Powered Digital Command &amp; Control Center for Thoothukudi Smart Port</p>
+        <div class="login-features">
+          <div class="login-feature">
+            <i class="fas fa-ship" style="background:rgba(13,110,253,0.12);color:#6ea8fe;"></i>
+            <div>
+              <h6>Ship Tracking</h6>
+              <p>Real-time vessel monitoring</p>
+            </div>
+          </div>
+          <div class="login-feature">
+            <i class="fas fa-boxes-stacked" style="background:rgba(25,135,84,0.12);color:#75b798;"></i>
+            <div>
+              <h6>Container Ops</h6>
+              <p>Smart container management</p>
+            </div>
+          </div>
+          <div class="login-feature">
+            <i class="fas fa-shield-halved" style="background:rgba(220,53,69,0.12);color:#ea868f;"></i>
+            <div>
+              <h6>Security AI</h6>
+              <p>AI-powered threat detection</p>
+            </div>
+          </div>
+          <div class="login-feature">
+            <i class="fas fa-leaf" style="background:rgba(255,193,7,0.12);color:#ffda6a;"></i>
+            <div>
+              <h6>Eco Monitor</h6>
+              <p>Environmental compliance</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="login-right">
+      <div class="login-form-container">
+        <div class="login-form-header">
+          <h2>Welcome back</h2>
+          <p>Sign in to your command center</p>
+        </div>
+        <form class="login-form" id="loginForm">
+          <div class="form-group">
+            <label>Email Address</label>
+            <div class="input-icon-group">
+              <i class="fas fa-envelope"></i>
+              <input type="email" id="email" placeholder="you@smartport.gov.in" value="admin@smartport.gov.in">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-icon-group">
+              <i class="fas fa-lock"></i>
+              <input type="password" id="password" placeholder="Enter your password" value="admin123">
+              <button type="button" class="toggle-password">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="form-options">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="remember" checked>
+              <label for="remember">Remember me</label>
+            </div>
+            <a href="#" class="forgot-link">Forgot password?</a>
+          </div>
+          <button type="submit" class="btn-login">
+            <i class="fas fa-right-to-bracket"></i> Sign In
+          </button>
+          <div class="divider"><span>Quick access demo</span></div>
+          <div class="demo-accounts">
+            <button type="button" class="demo-btn" data-role="admin">
+              <i class="fas fa-user-shield" style="color:#6ea8fe;"></i>
+              <div class="demo-info">
+                <h6>Admin Access</h6>
+                <small>Full system access &amp; configuration</small>
+              </div>
+            </button>
+            <button type="button" class="demo-btn" data-role="operator">
+              <i class="fas fa-user-gear" style="color:#75b798;"></i>
+              <div class="demo-info">
+                <h6>Port Operator</h6>
+                <small>Operations &amp; vessel management</small>
+              </div>
+            </button>
+            <button type="button" class="demo-btn" data-role="viewer">
+              <i class="fas fa-eye" style="color:#ffda6a;"></i>
+              <div class="demo-info">
+                <h6>Viewer Access</h6>
+                <small>Read-only dashboard view</small>
+              </div>
+            </button>
+          </div>
+        </form>
+        <div class="login-footer">
+          <p>&copy; 2026 Smart Port Management System, Thoothukudi. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="js/login.js"></script>
+</body>
+</html>

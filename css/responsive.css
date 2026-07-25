@@ -1,0 +1,134 @@
+@media (max-width: 1199px) {
+  .sidebar {
+    width: var(--sidebar-collapsed);
+  }
+  .sidebar .sidebar-brand-text,
+  .sidebar .nav-section,
+  .sidebar .nav-link span,
+  .sidebar .nav-link .badge,
+  .sidebar .sidebar-user-info {
+    display: none;
+  }
+  .sidebar .nav-link {
+    justify-content: center;
+    padding: 10px;
+  }
+  .sidebar .nav-link.active::before {
+    left: -12px;
+  }
+  .sidebar .sidebar-user {
+    justify-content: center;
+  }
+  .main-content {
+    margin-left: var(--sidebar-collapsed);
+  }
+}
+
+@media (max-width: 991px) {
+  .sidebar {
+    width: var(--sidebar-width);
+    transform: translateX(-100%);
+  }
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  .sidebar .sidebar-brand-text,
+  .sidebar .nav-section,
+  .sidebar .nav-link span,
+  .sidebar .nav-link .badge,
+  .sidebar .sidebar-user-info {
+    display: block;
+  }
+  .sidebar .nav-link {
+    justify-content: flex-start;
+    padding: 10px 12px;
+  }
+  .sidebar .sidebar-user {
+    justify-content: flex-start;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .sidebar.collapsed ~ .main-content {
+    margin-left: 0;
+  }
+  .topbar-center {
+    display: none;
+  }
+  .page-content {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 767px) {
+  html {
+    font-size: 13px;
+  }
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .page-header h2 {
+    font-size: 1.25rem;
+  }
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .filter-bar .form-control,
+  .filter-bar .form-select {
+    width: 100%;
+    min-width: 100%;
+  }
+  .kpi-card .kpi-value {
+    font-size: 1.4rem;
+  }
+  .topbar {
+    padding: 0 12px;
+  }
+  .notification-dropdown {
+    width: 300px;
+    right: -50px;
+  }
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .table th, .table td {
+    padding: 10px 12px;
+    font-size: 0.78rem;
+  }
+  .modal-content {
+    margin: 16px;
+    max-height: calc(100vh - 32px);
+  }
+  .btn-group-mobile {
+    flex-direction: column;
+    width: 100%;
+  }
+  .btn-group-mobile .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 575px) {
+  .page-content {
+    padding: 12px;
+  }
+  .card-body {
+    padding: 14px;
+  }
+  .card-header {
+    padding: 12px 14px;
+  }
+  .kpi-card {
+    padding: 14px;
+  }
+  .topbar-left .page-title {
+    display: none;
+  }
+}

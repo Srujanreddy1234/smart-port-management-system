@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Smart Port Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/variables.css" rel="stylesheet">
+  <link href="css/main.css" rel="stylesheet">
+  <link href="css/layout.css" rel="stylesheet">
+  <link href="css/components.css" rel="stylesheet">
+  <link href="css/dashboard.css" rel="stylesheet">
+  <link href="css/pages.css" rel="stylesheet">
+  <link href="css/responsive.css" rel="stylesheet">
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon"><i class="fas fa-anchor"></i></div>
+      <div class="sidebar-brand-text">
+        <h5>Smart Port</h5>
+        <small>Thoothukudi</small>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <div class="nav-item"><a href="dashboard.html" class="nav-link active"><i class="fas fa-th-large"></i><span>Dashboard</span></a></div>
+      <div class="nav-section">Operations</div>
+      <div class="nav-item"><a href="ships.html" class="nav-link"><i class="fas fa-ship"></i><span>Ship Management</span><span class="badge badge-primary">24</span></a></div>
+      <div class="nav-item"><a href="containers.html" class="nav-link"><i class="fas fa-boxes-stacked"></i><span>Container Ops</span><span class="badge badge-info">1.2K</span></a></div>
+      <div class="nav-item"><a href="trucks.html" class="nav-link"><i class="fas fa-truck"></i><span>Truck Operations</span><span class="badge badge-warning">18</span></a></div>
+      <div class="nav-section">Management</div>
+      <div class="nav-item"><a href="security.html" class="nav-link"><i class="fas fa-shield-halved"></i><span>Security Center</span><span class="badge badge-danger">3</span></a></div>
+      <div class="nav-item"><a href="maintenance.html" class="nav-link"><i class="fas fa-wrench"></i><span>Equipment Maint.</span></a></div>
+      <div class="nav-item"><a href="environment.html" class="nav-link"><i class="fas fa-leaf"></i><span>Environmental</span></a></div>
+      <div class="nav-section">Analytics</div>
+      <div class="nav-item"><a href="reports.html" class="nav-link"><i class="fas fa-chart-line"></i><span>Reports &amp; Analytics</span></a></div>
+      <div class="nav-item"><a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i><span>User Profile</span></a></div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">RA</div>
+        <div class="sidebar-user-info">
+          <h6>Rajesh Admin</h6>
+          <small>Port Director</small>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="breadcrumb">
+            <a href="dashboard.html">Home</a>
+            <span class="separator">/</span>
+            <span>Dashboard</span>
+          </div>
+        </div>
+      </div>
+      <div class="topbar-center">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search ships, containers, trucks...">
+          <span class="search-shortcut">Ctrl+K</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span id="liveClock" style="font-size:0.82rem;color:var(--text-muted);font-family:monospace;margin-right:8px;"></span>
+        <button class="topbar-btn"><i class="fas fa-expand"></i></button>
+        <button class="topbar-btn" id="notifBtn">
+          <i class="fas fa-bell"></i>
+          <span class="badge-count">5</span>
+        </button>
+        <div class="notification-dropdown" id="notifDropdown">
+          <div class="dropdown-header">
+            <h6>Notifications</h6>
+            <a href="#" id="markAllRead" style="font-size:0.78rem;">Mark all read</a>
+          </div>
+          <div class="notification-list">
+            <div class="notification-item unread">
+              <div class="notification-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
+              <div class="notification-body">
+                <h6>Security Alert — Zone B</h6>
+                <p>Unauthorized access detected near Berth 7</p>
+                <small>2 min ago</small>
+              </div>
+            </div>
+            <div class="notification-item unread">
+              <div class="notification-icon warning"><i class="fas fa-clock"></i></div>
+              <div class="notification-body">
+                <h6>Vessel Delay</h6>
+                <p>MV Chennai Express delayed by 2.5 hours</p>
+                <small>15 min ago</small>
+              </div>
+            </div>
+            <div class="notification-item unread">
+              <div class="notification-icon success"><i class="fas fa-check-circle"></i></div>
+              <div class="notification-body">
+                <h6>Container Discharged</h6>
+                <p>450 containers unloaded from MV Pacific Star</p>
+                <small>1 hour ago</small>
+              </div>
+            </div>
+            <div class="notification-item">
+              <div class="notification-icon info"><i class="fas fa-info-circle"></i></div>
+              <div class="notification-body">
+                <h6>Maintenance Scheduled</h6>
+                <p>Crane #3 maintenance at 14:00 today</p>
+                <small>3 hours ago</small>
+              </div>
+            </div>
+            <div class="notification-item">
+              <div class="notification-icon success"><i class="fas fa-leaf"></i></div>
+              <div class="notification-body">
+                <h6>AQI Normal</h6>
+                <p>Air quality index returned to safe levels</p>
+                <small>5 hours ago</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="topbar-btn"><i class="fas fa-cog"></i></button>
+        <a href="profile.html" class="topbar-btn" style="text-decoration:none;">
+          <div class="avatar avatar-sm" style="background:var(--gradient-primary);font-size:0.7rem;">RA</div>
+        </a>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="page-header">
+        <div>
+          <h2>Command Center</h2>
+          <p>Real-time overview of Thoothukudi Port operations</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span id="liveDate" style="font-size:0.82rem;color:var(--text-muted);"></span>
+          <button class="btn btn-primary" onclick="App.showToast('Dashboard refreshed','success')"><i class="fas fa-sync-alt"></i> Refresh</button>
+          <button class="btn btn-secondary" onclick="App.showToast('Export started','success')"><i class="fas fa-download"></i> Export</button>
+        </div>
+      </div>
+
+      <div class="dashboard-kpi-grid">
+        <div class="card kpi-card glow-card">
+          <div class="kpi-icon" style="background:rgba(13,110,253,0.12);color:#6ea8fe;"><i class="fas fa-ship"></i></div>
+          <div class="kpi-value" id="kpiShips">24</div>
+          <div class="kpi-label">Active Vessels</div>
+          <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> 12% from last week</div>
+          <div class="kpi-bg"><i class="fas fa-ship"></i></div>
+        </div>
+        <div class="card kpi-card glow-card">
+          <div class="kpi-icon" style="background:rgba(25,135,84,0.12);color:#75b798;"><i class="fas fa-boxes-stacked"></i></div>
+          <div class="kpi-value">1,247</div>
+          <div class="kpi-label">Containers Handled</div>
+          <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> 8% from last week</div>
+          <div class="kpi-bg"><i class="fas fa-boxes-stacked"></i></div>
+        </div>
+        <div class="card kpi-card glow-card">
+          <div class="kpi-icon" style="background:rgba(255,193,7,0.12);color:#ffda6a;"><i class="fas fa-truck"></i></div>
+          <div class="kpi-value">156</div>
+          <div class="kpi-label">Trucks In Transit</div>
+          <div class="kpi-change negative"><i class="fas fa-arrow-down"></i> 3% from yesterday</div>
+          <div class="kpi-bg"><i class="fas fa-truck"></i></div>
+        </div>
+        <div class="card kpi-card glow-card">
+          <div class="kpi-icon" style="background:rgba(220,53,69,0.12);color:#ea868f;"><i class="fas fa-shield-halved"></i></div>
+          <div class="kpi-value">3</div>
+          <div class="kpi-label">Active Alerts</div>
+          <div class="kpi-change negative"><i class="fas fa-arrow-up"></i> 2 new today</div>
+          <div class="kpi-bg"><i class="fas fa-shield-halved"></i></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-bottom:24px;">
+        <div class="card">
+          <div class="card-header">
+            <h6><i class="fas fa-chart-area" style="color:var(--primary-light);margin-right:8px;"></i>Port Throughput — Last 7 Days</h6>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-sm btn-secondary">Daily</button>
+              <button class="btn btn-sm btn-primary">Weekly</button>
+            </div>
+          </div>
+          <div class="card-body"><div style="height:280px;"><canvas id="throughputChart"></canvas></div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:24px;">
+          <div class="card weather-widget">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <h6 style="margin:0;font-size:0.88rem;font-weight:600;">Weather</h6>
+              <span style="font-size:0.72rem;color:var(--text-muted);">Thoothukudi</span>
+            </div>
+            <div class="weather-main">
+              <div class="weather-icon"><i class="fas fa-cloud-sun"></i></div>
+              <div>
+                <div class="weather-temp">32°C</div>
+                <div class="weather-desc">Partly Cloudy</div>
+              </div>
+            </div>
+            <div class="weather-details">
+              <div class="weather-detail">
+                <i class="fas fa-wind"></i>
+                <span>18 km/h</span>
+                <small>Wind</small>
+              </div>
+              <div class="weather-detail">
+                <i class="fas fa-droplet"></i>
+                <span>72%</span>
+                <small>Humidity</small>
+              </div>
+              <div class="weather-detail">
+                <i class="fas fa-eye"></i>
+                <span>8 km</span>
+                <small>Visibility</small>
+              </div>
+            </div>
+          </div>
+          <div class="card aqi-widget">
+            <h6 style="font-size:0.88rem;font-weight:600;margin-bottom:16px;">Air Quality Index</h6>
+            <div class="aqi-circle" style="border-color:var(--success);">
+              <div class="aqi-value" style="color:var(--success);">42</div>
+              <div class="aqi-label" style="color:var(--success);">Good</div>
+            </div>
+            <div class="aqi-details">
+              <div class="aqi-detail"><i class="fas fa-smog" style="color:var(--info);"></i><div><small>PM2.5</small><span>18 µg/m³</span></div></div>
+              <div class="aqi-detail"><i class="fas fa-wind" style="color:var(--warning);"></i><div><small>PM10</small><span>32 µg/m³</span></div></div>
+              <div class="aqi-detail"><i class="fas fa-flask" style="color:var(--success);"></i><div><small>NO₂</small><span>12 ppb</span></div></div>
+              <div class="aqi-detail"><i class="fas fa-fire" style="color:var(--danger);"></i><div><small>CO</small><span>0.8 ppm</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;">
+        <div class="card">
+          <div class="card-header">
+            <h6><i class="fas fa-chart-pie" style="color:var(--info);margin-right:8px;"></i>Container Distribution</h6>
+            <button class="btn btn-sm btn-secondary">View All</button>
+          </div>
+          <div class="card-body">
+            <div style="height:240px;display:flex;align-items:center;justify-content:center;"><canvas id="containerDistChart"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h6><i class="fas fa-chart-bar" style="color:var(--warning);margin-right:8px;"></i>Truck Traffic — Hourly</h6>
+          </div>
+          <div class="card-body"><div style="height:240px;"><canvas id="truckTrafficChart"></canvas></div></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;margin-bottom:24px;">
+        <div class="card">
+          <div class="card-header"><h6><i class="fas fa-ship" style="color:var(--primary-light);margin-right:8px;"></i>Vessel Status</h6></div>
+          <div class="card-body">
+            <div class="ship-stat-row"><div class="label"><i class="fas fa-circle" style="color:var(--success);"></i>At Berth</div><div class="value">8</div></div>
+            <div class="ship-stat-row"><div class="label"><i class="fas fa-circle" style="color:var(--warning);"></i>Anchored</div><div class="value">6</div></div>
+            <div class="ship-stat-row"><div class="label"><i class="fas fa-circle" style="color:var(--info);"></i>In Channel</div><div class="value">4</div></div>
+            <div class="ship-stat-row"><div class="label"><i class="fas fa-circle" style="color:var(--primary);"></i>Approaching</div><div class="value">4</div></div>
+            <div class="ship-stat-row"><div class="label"><i class="fas fa-circle" style="color:var(--text-muted);"></i>Departed</div><div class="value">2</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h6><i class="fas fa-bolt" style="color:var(--warning);margin-right:8px;"></i>Quick Actions</h6></div>
+          <div class="card-body">
+            <div class="quick-actions-grid">
+              <a href="ships.html" class="quick-action-btn"><i class="fas fa-ship" style="color:var(--primary-light);"></i><span>Register Ship</span></a>
+              <a href="containers.html" class="quick-action-btn"><i class="fas fa-box" style="color:var(--success);"></i><span>Track Container</span></a>
+              <a href="trucks.html" class="quick-action-btn"><i class="fas fa-truck" style="color:var(--warning);"></i><span>Dispatch Truck</span></a>
+              <a href="security.html" class="quick-action-btn"><i class="fas fa-video" style="color:var(--danger);"></i><span>View Cameras</span></a>
+              <a href="reports.html" class="quick-action-btn"><i class="fas fa-file-pdf" style="color:#ea868f;"></i><span>Gen. Report</span></a>
+              <a href="environment.html" class="quick-action-btn"><i class="fas fa-leaf" style="color:#75b798;"></i><span>Env. Data</span></a>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h6><i class="fas fa-clock-rotate-left" style="color:var(--info);margin-right:8px;"></i>Recent Activity</h6></div>
+          <div class="card-body" style="max-height:300px;overflow-y:auto;">
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(25,135,84,0.12);color:#75b798;"><i class="fas fa-check"></i></div>
+              <div class="activity-body"><h6>MV Pacific Star berthed at Berth 3</h6><p>Container discharge in progress</p><small>5 min ago</small></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(13,110,253,0.12);color:#6ea8fe;"><i class="fas fa-truck"></i></div>
+              <div class="activity-body"><h6>Truck TK-4521 loaded with 2 containers</h6><p>Heading to Chennai warehouse</p><small>18 min ago</small></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(220,53,69,0.12);color:#ea868f;"><i class="fas fa-exclamation"></i></div>
+              <div class="activity-body"><h6>Zone B security breach detected</h6><p>AI flagged unauthorized movement</p><small>32 min ago</small></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(255,193,7,0.12);color:#ffda6a;"><i class="fas fa-wrench"></i></div>
+              <div class="activity-body"><h6>Crane #3 maintenance completed</h6><p>Now operational</p><small>1 hour ago</small></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(102,16,242,0.12);color:#a98eda;"><i class="fas fa-leaf"></i></div>
+              <div class="activity-body"><h6>Water quality test passed</h6><p>All parameters within limits</p><small>2 hours ago</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-bottom:24px;">
+        <div class="card">
+          <div class="card-header"><h6><i class="fas fa-map-location-dot" style="color:var(--success);margin-right:8px;"></i>Port Map Overview</h6></div>
+          <div class="card-body">
+            <div class="map-placeholder">
+              <i class="fas fa-map-location-dot"></i>
+              <span>Interactive Port Map — Thoothukudi</span>
+              <div style="position:absolute;top:20%;left:30%;width:12px;height:12px;background:var(--success);border-radius:50%;animation:pulse 2s infinite;"></div>
+              <div style="position:absolute;top:40%;left:55%;width:12px;height:12px;background:var(--primary);border-radius:50%;animation:pulse 2s infinite 0.5s;"></div>
+              <div style="position:absolute;top:60%;left:40%;width:12px;height:12px;background:var(--warning);border-radius:50%;animation:pulse 2s infinite 1s;"></div>
+              <div style="position:absolute;top:35%;left:70%;width:12px;height:12px;background:var(--danger);border-radius:50%;animation:pulse 2s infinite 1.5s;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h6><i class="fas fa-ranking-star" style="color:var(--warning);margin-right:8px;"></i>Top Berths</h6></div>
+          <div class="card-body">
+            <div style="margin-bottom:14px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:0.82rem;">Berth 3</span><span style="font-size:0.82rem;font-weight:600;">94%</span></div>
+              <div class="progress"><div class="progress-bar bg-primary" style="width:94%"></div></div>
+            </div>
+            <div style="margin-bottom:14px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:0.82rem;">Berth 1</span><span style="font-size:0.82rem;font-weight:600;">87%</span></div>
+              <div class="progress"><div class="progress-bar bg-success" style="width:87%"></div></div>
+            </div>
+            <div style="margin-bottom:14px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:0.82rem;">Berth 7</span><span style="font-size:0.82rem;font-weight:600;">72%</span></div>
+              <div class="progress"><div class="progress-bar bg-warning" style="width:72%"></div></div>
+            </div>
+            <div style="margin-bottom:14px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:0.82rem;">Berth 5</span><span style="font-size:0.82rem;font-weight:600;">58%</span></div>
+              <div class="progress"><div class="progress-bar bg-info" style="width:58%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:0.82rem;">Berth 9</span><span style="font-size:0.82rem;font-weight:600;">35%</span></div>
+              <div class="progress"><div class="progress-bar bg-danger" style="width:35%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <style>
+    @keyframes pulse { 0%,100% { transform:scale(1); opacity:1; } 50% { transform:scale(1.5); opacity:0.5; } }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/charts.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      ChartFactory.createLineChart('throughputChart',
+        ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+        [
+          { label: 'Containers', data: [1200,1350,1100,1450,1380,980,1247], fill: true },
+          { label: 'Bulk Cargo (tons)', data: [800,920,750,1050,980,600,850], fill: true }
+        ]
+      );
+      ChartFactory.createDoughnutChart('containerDistChart',
+        ['Loaded', 'Empty', 'Reefer', 'Hazmat', 'Tank'],
+        [520, 310, 180, 140, 97]
+      );
+      ChartFactory.createBarChart('truckTrafficChart',
+        ['6AM','8AM','10AM','12PM','2PM','4PM','6PM','8PM'],
+        [{ label: 'Trucks', data: [12,34,56,48,62,45,28,15], backgroundColor: 'rgba(255,193,7,0.7)' }]
+      );
+    });
+  </script>
+</body>
+</html>

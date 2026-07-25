@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ship Management — Smart Port Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/variables.css" rel="stylesheet">
+  <link href="css/main.css" rel="stylesheet">
+  <link href="css/layout.css" rel="stylesheet">
+  <link href="css/components.css" rel="stylesheet">
+  <link href="css/pages.css" rel="stylesheet">
+  <link href="css/responsive.css" rel="stylesheet">
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon"><i class="fas fa-anchor"></i></div>
+      <div class="sidebar-brand-text">
+        <h5>Smart Port</h5>
+        <small>Thoothukudi</small>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <div class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-th-large"></i><span>Dashboard</span></a></div>
+      <div class="nav-section">Operations</div>
+      <div class="nav-item"><a href="ships.html" class="nav-link active"><i class="fas fa-ship"></i><span>Ship Management</span><span class="badge badge-primary">24</span></a></div>
+      <div class="nav-item"><a href="containers.html" class="nav-link"><i class="fas fa-boxes-stacked"></i><span>Container Ops</span><span class="badge badge-info">1.2K</span></a></div>
+      <div class="nav-item"><a href="trucks.html" class="nav-link"><i class="fas fa-truck"></i><span>Truck Operations</span><span class="badge badge-warning">18</span></a></div>
+      <div class="nav-section">Management</div>
+      <div class="nav-item"><a href="security.html" class="nav-link"><i class="fas fa-shield-halved"></i><span>Security Center</span><span class="badge badge-danger">3</span></a></div>
+      <div class="nav-item"><a href="maintenance.html" class="nav-link"><i class="fas fa-wrench"></i><span>Equipment Maint.</span></a></div>
+      <div class="nav-item"><a href="environment.html" class="nav-link"><i class="fas fa-leaf"></i><span>Environmental</span></a></div>
+      <div class="nav-section">Analytics</div>
+      <div class="nav-item"><a href="reports.html" class="nav-link"><i class="fas fa-chart-line"></i><span>Reports &amp; Analytics</span></a></div>
+      <div class="nav-item"><a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i><span>User Profile</span></a></div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">RA</div>
+        <div class="sidebar-user-info">
+          <h6>Rajesh Admin</h6>
+          <small>Port Director</small>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        <div>
+          <div class="page-title">Ship Management</div>
+          <div class="breadcrumb">
+            <a href="dashboard.html">Home</a>
+            <span class="separator">/</span>
+            <span>Ship Management</span>
+          </div>
+        </div>
+      </div>
+      <div class="topbar-center">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search ships, containers, trucks...">
+          <span class="search-shortcut">Ctrl+K</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span id="liveClock" style="font-size:0.82rem;color:var(--text-muted);font-family:monospace;margin-right:8px;"></span>
+        <button class="topbar-btn"><i class="fas fa-expand"></i></button>
+        <button class="topbar-btn" id="notifBtn">
+          <i class="fas fa-bell"></i>
+          <span class="badge-count">5</span>
+        </button>
+        <div class="notification-dropdown" id="notifDropdown">
+          <div class="dropdown-header">
+            <h6>Notifications</h6>
+            <a href="#" id="markAllRead" style="font-size:0.78rem;">Mark all read</a>
+          </div>
+          <div class="notification-list">
+            <div class="notification-item unread">
+              <div class="notification-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
+              <div class="notification-body">
+                <h6>Security Alert — Zone B</h6>
+                <p>Unauthorized access detected near Berth 7</p>
+                <small>2 min ago</small>
+              </div>
+            </div>
+            <div class="notification-item unread">
+              <div class="notification-icon warning"><i class="fas fa-clock"></i></div>
+              <div class="notification-body">
+                <h6>Vessel Delay</h6>
+                <p>MV Chennai Express delayed by 2.5 hours</p>
+                <small>15 min ago</small>
+              </div>
+            </div>
+            <div class="notification-item unread">
+              <div class="notification-icon success"><i class="fas fa-check-circle"></i></div>
+              <div class="notification-body">
+                <h6>Container Discharged</h6>
+                <p>450 containers unloaded from MV Pacific Star</p>
+                <small>1 hour ago</small>
+              </div>
+            </div>
+            <div class="notification-item">
+              <div class="notification-icon info"><i class="fas fa-info-circle"></i></div>
+              <div class="notification-body">
+                <h6>Maintenance Scheduled</h6>
+                <p>Crane #3 maintenance at 14:00 today</p>
+                <small>3 hours ago</small>
+              </div>
+            </div>
+            <div class="notification-item">
+              <div class="notification-icon success"><i class="fas fa-leaf"></i></div>
+              <div class="notification-body">
+                <h6>AQI Normal</h6>
+                <p>Air quality index returned to safe levels</p>
+                <small>5 hours ago</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="topbar-btn"><i class="fas fa-cog"></i></button>
+        <a href="profile.html" class="topbar-btn" style="text-decoration:none;">
+          <div class="avatar avatar-sm" style="background:var(--gradient-primary);font-size:0.7rem;">RA</div>
+        </a>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="page-header">
+        <div>
+          <h2>Ship Management</h2>
+          <p>Track and manage all vessels at Thoothukudi Port</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button class="btn btn-secondary" onclick="App.showToast('Ship list refreshed','success')"><i class="fas fa-sync-alt"></i> Refresh</button>
+          <button class="btn btn-primary" onclick="App.showToast('Registration form opened','info')"><i class="fas fa-plus"></i> Register Ship</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:12px;align-items:end;">
+            <div>
+              <label style="font-size:0.78rem;font-weight:500;color:var(--text-muted);margin-bottom:4px;display:block;">Search Vessels</label>
+              <div style="position:relative;">
+                <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.82rem;"></i>
+                <input type="text" class="form-control" id="shipSearch" placeholder="Search by name, ID, or agent..." style="padding-left:36px;">
+              </div>
+            </div>
+            <div>
+              <label style="font-size:0.78rem;font-weight:500;color:var(--text-muted);margin-bottom:4px;display:block;">Status</label>
+              <select class="form-select" id="statusFilter">
+                <option value="">All Statuses</option>
+                <option value="At Berth">At Berth</option>
+                <option value="Anchored">Anchored</option>
+                <option value="In Channel">In Channel</option>
+                <option value="Approaching">Approaching</option>
+                <option value="Departed">Departed</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:0.78rem;font-weight:500;color:var(--text-muted);margin-bottom:4px;display:block;">Vessel Type</label>
+              <select class="form-select" id="typeFilter">
+                <option value="">All Types</option>
+                <option value="Bulk Carrier">Bulk Carrier</option>
+                <option value="Container Ship">Container Ship</option>
+                <option value="Tanker">Tanker</option>
+                <option value="RoRo">RoRo</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:0.78rem;font-weight:500;color:var(--text-muted);margin-bottom:4px;display:block;">Berth</label>
+              <select class="form-select" id="berthFilter">
+                <option value="">All Berths</option>
+                <option value="Berth 1">Berth 1</option>
+                <option value="Berth 2">Berth 2</option>
+                <option value="Berth 3">Berth 3</option>
+                <option value="Berth 5">Berth 5</option>
+                <option value="Berth 7">Berth 7</option>
+                <option value="Berth 9">Berth 9</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px;">
+        <div class="card kpi-card glow-card">
+          <div class="kpi-icon" style="background:rgba(13,110,253,0.12);color:#6ea8fe;"><i class="fas fa-ship"></i></div>
+          <div class="kpi-value">24</div>
+          <div class="kpi-label">Total Ships</div>
+          <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> 3 arriving today</div>
+          <div class="kpi-bg"><i class="fas fa-ship"></i></div>
+        </div>
+        <div class="card kpi-card glow-card">
+          <div class="kpi-icon" style="background:rgba(25,135,84,0.12);color:#75b798;"><i class="fas fa-ship"></i></div>
+          <div class="kpi-value">8</div>
+          <div class="kpi-label">At Berth</div>
+          <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> 2 unloading</div>
+          <div class="kpi-bg"><i class="fas fa-ship"></i></div>
+        </div>
+        <div class="card kpi-card glow-card">
+          <div class="kpi-icon" style="background:rgba(255,193,7,0.12);color:#ffda6a;"><i class="fas fa-anchor"></i></div>
+          <div class="kpi-value">6</div>
+          <div class="kpi-label">Anchored</div>
+          <div class="kpi-change neutral"><i class="fas fa-clock"></i> Awaiting berth</div>
+          <div class="kpi-bg"><i class="fas fa-anchor"></i></div>
+        </div>
+        <div class="card kpi-card glow-card">
+          <div class="kpi-icon" style="background:rgba(13,110,253,0.12);color:#6ea8fe;"><i class="fas fa-water"></i></div>
+          <div class="kpi-value">4</div>
+          <div class="kpi-label">In Channel</div>
+          <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> Navigating</div>
+          <div class="kpi-bg"><i class="fas fa-water"></i></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-header">
+          <h6><i class="fas fa-ship" style="color:var(--primary-light);margin-right:8px;"></i>Vessel Registry</h6>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-sm btn-secondary" onclick="App.showToast('Export started','success')"><i class="fas fa-download"></i> Export</button>
+            <button class="btn btn-sm btn-secondary" onclick="App.showToast('Print dialog opened','info')"><i class="fas fa-print"></i> Print</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0;overflow-x:auto;">
+          <table class="table" id="shipsTable">
+            <thead>
+              <tr>
+                <th>Ship ID</th>
+                <th>Vessel Name</th>
+                <th>Type</th>
+                <th>Flag</th>
+                <th>Status</th>
+                <th>Berth</th>
+                <th>ETA</th>
+                <th>Containers</th>
+                <th>Agent</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="shipsTableBody">
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer" style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;">
+          <span style="font-size:0.82rem;color:var(--text-muted);">Showing 1-10 of 24 vessels</span>
+          <div style="display:flex;gap:4px;">
+            <button class="btn btn-sm btn-secondary" disabled><i class="fas fa-chevron-left"></i></button>
+            <button class="btn btn-sm btn-primary">1</button>
+            <button class="btn btn-sm btn-secondary">2</button>
+            <button class="btn btn-sm btn-secondary">3</button>
+            <button class="btn btn-sm btn-secondary"><i class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h6><i class="fas fa-chart-line" style="color:var(--primary-light);margin-right:8px;"></i>Vessel Arrivals — Last 30 Days</h6>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-sm btn-secondary">Daily</button>
+            <button class="btn btn-sm btn-primary">30 Days</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="height:300px;"><canvas id="vesselArrivalsChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    const shipsData = [
+      { id: 'SHP-001', name: 'MV Pacific Star', type: 'Container Ship', flag: '🇮🇳', flagName: 'India', status: 'At Berth', berth: 'Berth 3', eta: '2026-07-20', containers: 1450, agent: 'Maersk Line' },
+      { id: 'SHP-002', name: 'MV Chennai Express', type: 'Bulk Carrier', flag: '🇮🇳', flagName: 'India', status: 'At Berth', berth: 'Berth 1', eta: '2026-07-21', containers: 0, agent: 'SCI Logistics' },
+      { id: 'SHP-003', name: 'MV Thoothukudi Pride', type: 'Container Ship', flag: '🇮🇳', flagName: 'India', status: 'Anchored', berth: '—', eta: '2026-07-24', containers: 820, agent: 'CMA CGM' },
+      { id: 'SHP-004', name: 'MV Blue Horizon', type: 'RoRo', flag: '🇱🇰', flagName: 'Sri Lanka', status: 'In Channel', berth: '—', eta: '2026-07-24', containers: 0, agent: 'SW Shipping' },
+      { id: 'SHP-005', name: 'MT Rameswaram', type: 'Tanker', flag: '🇮🇳', flagName: 'India', status: 'At Berth', berth: 'Berth 7', eta: '2026-07-19', containers: 0, agent: 'BPCL Marine' },
+      { id: 'SHP-006', name: 'MV Dhanushkodi', type: 'Bulk Carrier', flag: '🇮🇳', flagName: 'India', status: 'Anchored', berth: '—', eta: '2026-07-25', containers: 0, agent: 'Adani Ports' },
+      { id: 'SHP-007', name: 'MV Coromandel', type: 'Container Ship', flag: '🇩🇪', flagName: 'Germany', status: 'Approaching', berth: '—', eta: '2026-07-24', containers: 2100, agent: 'Hapag-Lloyd' },
+      { id: 'SHP-008', name: 'MT Kerala Star', type: 'Tanker', flag: '🇦🇪', flagName: 'UAE', status: 'At Berth', berth: 'Berth 9', eta: '2026-07-18', containers: 0, agent: 'Emarat Marine' },
+      { id: 'SHP-009', name: 'MV Southern Crown', type: 'RoRo', flag: '🇸🇬', flagName: 'Singapore', status: 'Departed', berth: '—', eta: '2026-07-17', containers: 0, agent: 'EUKOR Car Carriers' },
+      { id: 'SHP-010', name: 'MV Bay of Bengal', type: 'Bulk Carrier', flag: '🇮🇳', flagName: 'India', status: 'In Channel', berth: '—', eta: '2026-07-24', containers: 0, agent: 'The Shipping Corp.' }
+    ];
+
+    let currentPage = 1;
+    const rowsPerPage = 10;
+    let filteredData = [...shipsData];
+
+    function getStatusBadgeClass(status) {
+      const map = { 'At Berth': 'success', 'Anchored': 'warning', 'In Channel': 'info', 'Approaching': 'primary', 'Departed': 'secondary' };
+      return map[status] || 'secondary';
+    }
+
+    function renderShips(data) {
+      filteredData = data;
+      const totalPages = Math.ceil(data.length / rowsPerPage);
+      if (currentPage > totalPages) currentPage = totalPages || 1;
+      const start = (currentPage - 1) * rowsPerPage;
+      const pageData = data.slice(start, start + rowsPerPage);
+
+      const tbody = document.getElementById('shipsTableBody');
+      tbody.innerHTML = pageData.map(s => `
+        <tr>
+          <td><strong>${s.id}</strong></td>
+          <td>${s.name}</td>
+          <td>${s.type}</td>
+          <td><span title="${s.flagName}">${s.flag}</span> ${s.flagName}</td>
+          <td><span class="badge badge-${getStatusBadgeClass(s.status)}">${s.status}</span></td>
+          <td>${s.berth}</td>
+          <td>${s.eta}</td>
+          <td>${s.containers > 0 ? s.containers.toLocaleString() : '—'}</td>
+          <td>${s.agent}</td>
+          <td>
+            <div style="display:flex;gap:4px;">
+              <button class="btn btn-sm btn-secondary" title="View Details" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
+              <button class="btn btn-sm btn-secondary" title="Edit" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-pen"></i></button>
+              <button class="btn btn-sm btn-secondary" title="Track" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-location-dot"></i></button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      const infoEl = document.querySelector('.card-footer span');
+      if (infoEl) {
+        const totalItems = data.length;
+        const end = Math.min(start + rowsPerPage, totalItems);
+        infoEl.textContent = totalItems === 0 ? 'No vessels found' : `Showing ${start + 1}-${end} of ${totalItems} vessels`;
+      }
+
+      const paginationContainer = document.querySelector('.card-footer div:last-child');
+      if (paginationContainer) {
+        let btns = '';
+        btns += `<button class="btn btn-sm btn-secondary" ${currentPage <= 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})"><i class="fas fa-chevron-left"></i></button>`;
+        for (let p = 1; p <= totalPages; p++) {
+          btns += `<button class="btn btn-sm ${p === currentPage ? 'btn-primary' : 'btn-secondary'}" onclick="goToPage(${p})">${p}</button>`;
+        }
+        btns += `<button class="btn btn-sm btn-secondary" ${currentPage >= totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})"><i class="fas fa-chevron-right"></i></button>`;
+        paginationContainer.innerHTML = btns;
+      }
+    }
+
+    function goToPage(page) {
+      currentPage = page;
+      renderShips(filteredData);
+    }
+
+    function filterShips() {
+      const search = document.getElementById('shipSearch').value.toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+      const type = document.getElementById('typeFilter').value;
+      const berth = document.getElementById('berthFilter').value;
+      const data = shipsData.filter(s => {
+        const matchSearch = !search || s.name.toLowerCase().includes(search) || s.id.toLowerCase().includes(search) || s.agent.toLowerCase().includes(search);
+        const matchStatus = !status || s.status === status;
+        const matchType = !type || s.type === type;
+        const matchBerth = !berth || s.berth === berth;
+        return matchSearch && matchStatus && matchType && matchBerth;
+      });
+      currentPage = 1;
+      renderShips(data);
+    }
+
+    document.getElementById('shipSearch').addEventListener('input', filterShips);
+    document.getElementById('statusFilter').addEventListener('change', filterShips);
+    document.getElementById('typeFilter').addEventListener('change', filterShips);
+    document.getElementById('berthFilter').addEventListener('change', filterShips);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderShips(shipsData);
+
+      const labels = Array.from({length: 30}, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (29 - i));
+        return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+      });
+
+      const arrivals = [3,5,2,7,4,6,3,8,5,4,6,3,9,7,5,4,8,6,3,7,5,9,4,6,8,3,5,7,4,6];
+      const departures = [2,4,3,5,3,5,2,6,4,3,5,2,7,5,4,3,6,5,2,6,4,7,3,5,6,2,4,5,3,5];
+
+      const ctx = document.getElementById('vesselArrivalsChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Arrivals',
+              data: arrivals,
+              borderColor: 'rgba(13,110,253,1)',
+              backgroundColor: 'rgba(13,110,253,0.1)',
+              fill: true,
+              tension: 0.4,
+              pointRadius: 3,
+              pointBackgroundColor: 'rgba(13,110,253,1)'
+            },
+            {
+              label: 'Departures',
+              data: departures,
+              borderColor: 'rgba(25,135,84,1)',
+              backgroundColor: 'rgba(25,135,84,0.1)',
+              fill: true,
+              tension: 0.4,
+              pointRadius: 3,
+              pointBackgroundColor: 'rgba(25,135,84,1)'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top', labels: { usePointStyle: true, padding: 20 } }
+          },
+          scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } }
+          },
+          interaction: { mode: 'index', intersect: false }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
