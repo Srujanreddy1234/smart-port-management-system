@@ -38,6 +38,7 @@ def create_app(config_name=None):
 
     @app.route('/health')
     def health_check():
+        # This must work WITHOUT database connection
         return jsonify({'status': 'healthy', 'service': 'Smart Port Management System'}), 200
 
     @app.route('/api')
@@ -49,23 +50,27 @@ def create_app(config_name=None):
             'status': 'operational'
         }), 200
 
-    # Initialize database tables (non-blocking)
-    with app.app_context():
-        try:
-            from app.models.user import User, Session, AuditLog, UserRole, UserStatus
-            from app.models.ship import Ship, ShipStatus, VesselType
-            from app.models.container import Container, ContainerStatus, ContainerType, ContainerHistory
-            from app.models.truck import Truck, TruckStatus, TruckType
-            from app.models.security import SecurityIncident, IncidentType, IncidentSeverity, IncidentStatus, Alert, AlertType, SecurityZone, AccessLog, Camera, SecurityOfficer
-            from app.models.maintenance import Equipment, EquipmentType, EquipmentStatus, MaintenanceType, MaintenancePriority, MaintenanceStatus, ServiceLog
-            from app.models.environment import (
-                MonitoringStation, AirQualityReading, WaterQualityReading, NoiseReading,
-                WeatherReading, EmissionReading, EnvironmentalAlert, ComplianceThreshold,
-                WaterQualityParameter, AirQualityParameter, NoiseParameter, WeatherParameter
-            )
-            from app.models.reports import Report, ReportType, ReportFormat, ReportStatus, ReportSchedule, ReportTemplate, DashboardWidget, UserDashboard
-            db.create_all()
-        except Exception as e:
-            app.logger.warning(f"Database initialization skipped: {e}")
+    # Initialize database tables LAZILY (not at startup)
+    @app.before_request
+    def initialize_database():
+        if not hasattr(app, '_db_initialized'):
+            app._db_initialized = True
+            with app.app_context():
+                try:
+                    from app.models.user import User, Session, AuditLog, UserRole, UserStatus
+                    from app.models.ship import Ship, ShipStatus, VesselType
+                    from app.models.container import Container, ContainerStatus, ContainerType, ContainerHistory
+                    from app.models.truck import Truck, TruckStatus, TruckType
+                    from app.models.security import SecurityIncident, IncidentType, IncidentSeverity, IncidentStatus, Alert, AlertType, SecurityZone, AccessLog, Camera, SecurityOfficer
+                    from app.models.maintenance import Equipment, EquipmentType, EquipmentStatus, MaintenanceType, MaintenancePriority, MaintenanceStatus, ServiceLog
+                    from app.models.environment import (
+                        MonitoringStation, AirQualityReading, WaterQualityReading, NoiseReading,
+                        WeatherReading, EmissionReading, EnvironmentalAlert, ComplianceThreshold,
+                        WaterQualityParameter, AirQualityParameter, NoiseParameter, WeatherParameter
+                    )
+                    from app.models.reports import Report, ReportType, ReportFormat, ReportStatus, ReportSchedule, ReportTemplate, DashboardWidget, UserDashboard
+                    db.create_all()
+                except Exception:
+                    pass  # DB not ready yet, will retry on next request
 
     return app
