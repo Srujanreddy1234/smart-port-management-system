@@ -69,7 +69,7 @@ def login():
     try:
         data = schema.load(request.get_json() or {})
     except ValidationError as err:
-        return error_response('Validation failed', errors=err.messages), 400
+        return error_response('Validation failed', errors=err.messages, status_code=400)
 
     user = User.query.filter_by(email=data['email'].lower()).first()
 
@@ -213,7 +213,7 @@ def change_password():
     try:
         data = schema.load(request.get_json() or {})
     except ValidationError as err:
-        return error_response('Validation failed', errors=err.messages), 400
+        return error_response('Validation failed', errors=err.messages, status_code=400)
 
     if data['new_password'] != data['confirm_password']:
         raise AppValidationError('New passwords do not match')
@@ -245,7 +245,7 @@ def forgot_password():
     try:
         data = schema.load(request.get_json() or {})
     except ValidationError as err:
-        return error_response('Validation failed', errors=err.messages), 400
+        return error_response('Validation failed', errors=err.messages, status_code=400)
 
     user = User.query.filter_by(email=data['email'].lower()).first()
     
@@ -267,7 +267,7 @@ def reset_password():
     try:
         data = schema.load(request.get_json() or {})
     except ValidationError as err:
-        return error_response('Validation failed', errors=err.messages), 400
+        return error_response('Validation failed', errors=err.messages, status_code=400)
 
     if data['password'] != data['confirm_password']:
         raise AppValidationError('Passwords do not match')
@@ -312,7 +312,7 @@ def revoke_session(session_id):
     session = Session.query.filter_by(id=session_id, user_id=current_user_id).first()
     
     if not session:
-        return error_response('Session not found'), 404
+        return error_response('Session not found', status_code=404)
 
     session.revoke('Revoked by user')
     db.session.commit()

@@ -12,7 +12,7 @@ def register_jwt_handlers(jwt: JWTManager):
         
         session = Session.query.filter_by(token=jti).first()
         if session is None:
-            return True
+            return False
         return session.is_revoked
 
     @jwt.expired_token_loader

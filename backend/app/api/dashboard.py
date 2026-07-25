@@ -58,7 +58,7 @@ def get_kpis():
     trucks_in_transit = Truck.query.filter(Truck.status == TruckStatus.IN_TRANSIT).count()
     trucks_loading = Truck.query.filter(Truck.status == TruckStatus.LOADING).count()
 
-    active_alerts = SecurityIncident.query.filter(IncidentStatus.ACTIVE).count()
+    active_alerts = SecurityIncident.query.filter(SecurityIncident.status == IncidentStatus.ACTIVE).count()
     critical_alerts = SecurityIncident.query.filter(
         SecurityIncident.severity == 'Critical',
         SecurityIncident.status == IncidentStatus.ACTIVE

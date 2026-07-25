@@ -92,7 +92,7 @@ class User(db.Model):
     }
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
         self.password_changed_at = datetime.utcnow()
         self.must_change_password = False
 
