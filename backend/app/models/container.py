@@ -63,7 +63,7 @@ class Container(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     ship = relationship('Ship', backref='containers')
-    truck = relationship('Truck', backref='containers')
+    truck = relationship('Truck', foreign_keys=[truck_id], backref='containers')
 
     __table_args__ = (
         Index('ix_container_ship_status', 'ship_id', 'status'),
