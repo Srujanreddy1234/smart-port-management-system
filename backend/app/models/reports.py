@@ -65,7 +65,7 @@ class Report(db.Model):
     expires_at = db.Column(db.DateTime)
     is_scheduled = db.Column(db.Boolean, default=False)
     next_generation_at = db.Column(db.DateTime)
-    metadata = db.Column(db.JSON)
+    report_metadata = db.Column(db.JSON)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
@@ -100,7 +100,7 @@ class Report(db.Model):
             'expires_at': self.expires_at.isoformat() if self.expires_at else None,
             'is_scheduled': self.is_scheduled,
             'next_generation_at': self.next_generation_at.isoformat() if self.next_generation_at else None,
-            'metadata': self.metadata,
+            'metadata': self.report_metadata,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }

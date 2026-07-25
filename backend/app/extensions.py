@@ -1,6 +1,3 @@
-import os
-from datetime import timedelta
-from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
@@ -25,12 +22,7 @@ limiter = Limiter(
 )
 
 
-def create_app(config_name=None):
-    app = Flask(__name__)
-    
-    config_name = config_name or os.getenv('FLASK_ENV', 'development')
-    app.config.from_object(f'config.{config_name.capitalize()}Config')
-    
+def init_extensions(app):
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
@@ -39,21 +31,3 @@ def create_app(config_name=None):
     cache.init_app(app)
     limiter.init_app(app)
     CORS(app, resources={r"/api/*": {"origins": app.config.get('CORS_ORIGINS', '*')}}, supports_credentials=True)
-    
-    from app.api import register_blueprints
-    register_blueprints(app)
-    
-    from app.utils.error_handlers import register_error_handlers
-    register_error_handlers(app)
-    
-    from app.utils.jwt_handlers import register_jwt_handlers
-    register_jwt_handlers(jwt)
-    
-    with app.app_context():
-        db.create_all()
-    
-    @app.shell_context_processor
-    def make_shell_context():
-        return {'db': db, 'app': app}
-    
-    return app

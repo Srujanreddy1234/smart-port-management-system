@@ -1,8 +1,11 @@
-from app.models.user import User, UserRole
+from app.models.user import User, UserRole, UserStatus, Session, AuditLog
 from app.models.ship import Ship, ShipStatus, VesselType
-from app.models.container import Container, ContainerStatus, ContainerType
+from app.models.container import Container, ContainerStatus, ContainerType, ContainerHistory
 from app.models.truck import Truck, TruckStatus, TruckType
-from app.models.security import SecurityAlert, SecurityAlertType, SecurityAlertSeverity, SecurityAlertStatus, AccessLog, Camera
+from app.models.security import (
+    SecurityIncident, IncidentType, IncidentSeverity, IncidentStatus,
+    Alert, AlertType, SecurityZone, AccessLog, Camera, SecurityOfficer
+)
 from app.models.maintenance import Equipment, EquipmentType, EquipmentStatus, MaintenanceType, MaintenancePriority, MaintenanceStatus, ServiceLog
 from app.models.environment import (
     MonitoringStation,
@@ -22,11 +25,12 @@ from app.models.reports import Report, ReportType, ReportFormat, ReportStatus, R
 
 
 __all__ = [
-    'User', 'UserRole',
+    'User', 'UserRole', 'UserStatus', 'Session', 'AuditLog',
     'Ship', 'ShipStatus', 'VesselType',
-    'Container', 'ContainerStatus', 'ContainerType',
+    'Container', 'ContainerStatus', 'ContainerType', 'ContainerHistory',
     'Truck', 'TruckStatus', 'TruckType',
-    'SecurityAlert', 'SecurityAlertType', 'SecurityAlertSeverity', 'SecurityAlertStatus', 'AccessLog', 'Camera',
+    'SecurityIncident', 'IncidentType', 'IncidentSeverity', 'IncidentStatus',
+    'Alert', 'AlertType', 'SecurityZone', 'AccessLog', 'Camera', 'SecurityOfficer',
     'Equipment', 'EquipmentType', 'EquipmentStatus', 'MaintenanceType', 'MaintenancePriority', 'MaintenanceStatus', 'ServiceLog',
     'MonitoringStation', 'AirQualityReading', 'WaterQualityReading', 'NoiseReading', 'WeatherReading', 'EmissionReading', 'EnvironmentalAlert', 'ComplianceThreshold',
     'WaterQualityParameter', 'AirQualityParameter', 'NoiseParameter', 'WeatherParameter',

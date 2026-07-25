@@ -84,7 +84,7 @@ class MonitoringStation(db.Model):
     elevation = db.Column(db.Float)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     parameters = db.Column(db.JSON)
-    metadata = db.Column(db.JSON)
+    station_reading_alert_compliance_metadata = db.Column(db.JSON)
     last_reading_at = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
@@ -107,7 +107,7 @@ class MonitoringStation(db.Model):
             'elevation': self.elevation,
             'is_active': self.is_active,
             'parameters': self.parameters,
-            'metadata': self.metadata,
+            'metadata': self.station_metadata,
             'last_reading_at': self.last_reading_at.isoformat() if self.last_reading_at else None,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
@@ -133,7 +133,7 @@ class AirQualityReading(db.Model):
     wind_speed = db.Column(db.Float)
     wind_direction = db.Column(db.Float)
     pressure = db.Column(db.Float)
-    metadata = db.Column(db.JSON)
+    station_reading_alert_compliance_metadata = db.Column(db.JSON)
     recorded_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
@@ -162,7 +162,7 @@ class AirQualityReading(db.Model):
             'wind_speed': self.wind_speed,
             'wind_direction': self.wind_direction,
             'pressure': self.pressure,
-            'metadata': self.metadata,
+            'metadata': self.station_metadata,
             'recorded_at': self.recorded_at.isoformat() if self.recorded_at else None,
             'created_at': self.created_at.isoformat()
         }
@@ -193,7 +193,7 @@ class WaterQualityReading(db.Model):
     phenols = db.Column(db.Float)
     cyanide = db.Column(db.Float)
     sulfide = db.Column(db.Float)
-    metadata = db.Column(db.JSON)
+    station_reading_alert_compliance_metadata = db.Column(db.JSON)
     recorded_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
@@ -227,7 +227,7 @@ class WaterQualityReading(db.Model):
             'phenols': self.phenols,
             'cyanide': self.cyanide,
             'sulfide': self.sulfide,
-            'metadata': self.metadata,
+            'metadata': self.station_metadata,
             'recorded_at': self.recorded_at.isoformat() if self.recorded_at else None,
             'created_at': self.created_at.isoformat()
         }
@@ -247,7 +247,7 @@ class NoiseReading(db.Model):
     ldn = db.Column(db.Float)
     cnel = db.Column(db.Float)
     frequency_data = db.Column(db.JSON)
-    metadata = db.Column(db.JSON)
+    station_reading_alert_compliance_metadata = db.Column(db.JSON)
     recorded_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
@@ -271,7 +271,7 @@ class NoiseReading(db.Model):
             'ldn': self.ldn,
             'cnel': self.cnel,
             'frequency_data': self.frequency_data,
-            'metadata': self.metadata,
+            'metadata': self.station_metadata,
             'recorded_at': self.recorded_at.isoformat() if self.recorded_at else None,
             'created_at': self.created_at.isoformat()
         }
@@ -299,7 +299,7 @@ class WeatherReading(db.Model):
     solar_radiation = db.Column(db.Float)
     weather_condition = db.Column(db.String(100))
     weather_description = db.Column(db.String(255))
-    metadata = db.Column(db.JSON)
+    station_reading_alert_compliance_metadata = db.Column(db.JSON)
     recorded_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
@@ -330,7 +330,7 @@ class WeatherReading(db.Model):
             'solar_radiation': self.solar_radiation,
             'weather_condition': self.weather_condition,
             'weather_description': self.weather_description,
-            'metadata': self.metadata,
+            'metadata': self.station_metadata,
             'recorded_at': self.recorded_at.isoformat() if self.recorded_at else None,
             'created_at': self.created_at.isoformat()
         }
@@ -354,7 +354,7 @@ class EmissionReading(db.Model):
     fuel_consumed = db.Column(db.Float)
     fuel_type = db.Column(db.String(50))
     operating_hours = db.Column(db.Float)
-    metadata = db.Column(db.JSON)
+    station_reading_alert_compliance_metadata = db.Column(db.JSON)
     recorded_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
@@ -383,7 +383,7 @@ class EmissionReading(db.Model):
             'fuel_consumed': self.fuel_consumed,
             'fuel_type': self.fuel_type,
             'operating_hours': self.operating_hours,
-            'metadata': self.metadata,
+            'metadata': self.station_metadata,
             'recorded_at': self.recorded_at.isoformat() if self.recorded_at else None,
             'created_at': self.created_at.isoformat()
         }
@@ -408,7 +408,7 @@ class EnvironmentalAlert(db.Model):
     resolved_by_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     resolved_at = db.Column(db.DateTime)
     resolution_notes = db.Column(db.Text)
-    metadata = db.Column(db.JSON)
+    station_reading_alert_compliance_metadata = db.Column(db.JSON)
     triggered_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
@@ -440,7 +440,7 @@ class EnvironmentalAlert(db.Model):
             'resolved_by_id': self.resolved_by_id,
             'resolved_at': self.resolved_at.isoformat() if self.resolved_at else None,
             'resolution_notes': self.resolution_notes,
-            'metadata': self.metadata,
+            'metadata': self.station_metadata,
             'triggered_at': self.triggered_at.isoformat() if self.triggered_at else None,
             'created_at': self.created_at.isoformat()
         }
@@ -466,7 +466,7 @@ class ComplianceThreshold(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     effective_from = db.Column(db.DateTime)
     effective_to = db.Column(db.DateTime)
-    metadata = db.Column(db.JSON)
+    station_reading_alert_compliance_metadata = db.Column(db.JSON)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
@@ -494,7 +494,7 @@ class ComplianceThreshold(db.Model):
             'is_active': self.is_active,
             'effective_from': self.effective_from.isoformat() if self.effective_from else None,
             'effective_to': self.effective_to.isoformat() if self.effective_to else None,
-            'metadata': self.metadata,
+            'metadata': self.station_metadata,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }

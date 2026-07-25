@@ -1,8 +1,8 @@
+import os
 from flask import Flask, jsonify
 from flask_migrate import Migrate
 from config import config
-from app.extensions import init_extensions
-import os
+from app.extensions import db, migrate, jwt, bcrypt, mail, cache, limiter
 
 
 def create_app(config_name=None):
@@ -12,13 +12,22 @@ def create_app(config_name=None):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
 
-    init_extensions(app)
+    db.init_app(app)
+    migrate.init_app(app, db)
+    jwt.init_app(app)
+    bcrypt.init_app(app)
+    mail.init_app(app)
+    cache.init_app(app)
+    limiter.init_app(app)
 
     from app.api import register_blueprints
     register_blueprints(app)
 
-    from app.utils.exceptions import register_error_handlers
+    from app.utils.error_handlers import register_error_handlers
     register_error_handlers(app)
+
+    from app.utils.jwt_handlers import register_jwt_handlers
+    register_jwt_handlers(jwt)
 
     from app.utils.helpers import register_cli_commands
     register_cli_commands(app)
@@ -37,7 +46,18 @@ def create_app(config_name=None):
         }), 200
 
     with app.app_context():
-        from app.models import *
+        from app.models.user import User, Session, AuditLog, UserRole, UserStatus
+        from app.models.ship import Ship, ShipStatus, VesselType
+        from app.models.container import Container, ContainerStatus, ContainerType, ContainerHistory
+        from app.models.truck import Truck, TruckStatus, TruckType
+        from app.models.security import SecurityIncident, IncidentType, IncidentSeverity, IncidentStatus, Alert, AlertType, SecurityZone, AccessLog, Camera, SecurityOfficer
+        from app.models.maintenance import Equipment, EquipmentType, EquipmentStatus, MaintenanceType, MaintenancePriority, MaintenanceStatus, ServiceLog
+        from app.models.environment import (
+            MonitoringStation, AirQualityReading, WaterQualityReading, NoiseReading,
+            WeatherReading, EmissionReading, EnvironmentalAlert, ComplianceThreshold,
+            WaterQualityParameter, AirQualityParameter, NoiseParameter, WeatherParameter
+        )
+        from app.models.reports import Report, ReportType, ReportFormat, ReportStatus, ReportSchedule, ReportTemplate, DashboardWidget, UserDashboard
         db.create_all()
 
     return app

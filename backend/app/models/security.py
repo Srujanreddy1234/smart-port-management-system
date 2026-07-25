@@ -132,7 +132,7 @@ class Alert(db.Model):
     acknowledged_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), index=True)
     acknowledged_at = db.Column(db.DateTime)
     related_incident_id = db.Column(db.Integer, db.ForeignKey('security_incidents.id'), index=True)
-    metadata = db.Column(db.JSON)
+    alert_metadata = db.Column(db.JSON)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
 
     acknowledged_by = db.relationship('User', foreign_keys=[acknowledged_by_id], backref='acknowledged_alerts')
@@ -158,7 +158,7 @@ class Alert(db.Model):
             'acknowledged_by_id': self.acknowledged_by_id,
             'acknowledged_at': self.acknowledged_at.isoformat() if self.acknowledged_at else None,
             'related_incident_id': self.related_incident_id,
-            'metadata': self.metadata,
+            'metadata': self.alert_metadata,
             'created_at': self.created_at.isoformat()
         }
 
@@ -177,7 +177,7 @@ class Camera(db.Model):
     is_recording = db.Column(db.Boolean, default=False)
     last_motion_at = db.Column(db.DateTime)
     last_maintenance_at = db.Column(db.DateTime)
-    metadata = db.Column(db.JSON)
+    camera_metadata = db.Column(db.JSON)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
@@ -198,7 +198,7 @@ class Camera(db.Model):
             'is_recording': self.is_recording,
             'last_motion_at': self.last_motion_at.isoformat() if self.last_motion_at else None,
             'last_maintenance_at': self.last_maintenance_at.isoformat() if self.last_maintenance_at else None,
-            'metadata': self.metadata,
+            'metadata': self.camera_metadata,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }
@@ -215,7 +215,7 @@ class AccessLog(db.Model):
     status = db.Column(db.String(20), nullable=False, index=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
     device_id = db.Column(db.String(50))
-    metadata = db.Column(db.JSON)
+    access_metadata = db.Column(db.JSON)
 
     __table_args__ = (
         Index('ix_access_zone_timestamp', 'zone', 'timestamp'),
@@ -232,7 +232,7 @@ class AccessLog(db.Model):
             'status': self.status,
             'timestamp': self.timestamp.isoformat() if self.timestamp else None,
             'device_id': self.device_id,
-            'metadata': self.metadata
+            'metadata': self.access_metadata
         }
 
 
@@ -248,7 +248,7 @@ class SecurityOfficer(db.Model):
     radio_frequency = db.Column(db.String(50))
     is_on_duty = db.Column(db.Boolean, default=False)
     last_patrol_at = db.Column(db.DateTime)
-    metadata = db.Column(db.JSON)
+    officer_metadata = db.Column(db.JSON)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
@@ -265,7 +265,7 @@ class SecurityOfficer(db.Model):
             'radio_frequency': self.radio_frequency,
             'is_on_duty': self.is_on_duty,
             'last_patrol_at': self.last_patrol_at.isoformat() if self.last_patrol_at else None,
-            'metadata': self.metadata,
+            'metadata': self.officer_metadata,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }

@@ -4,7 +4,7 @@ from app.extensions import db
 from app.models import (
     User, Ship, ShipStatus, Container, ContainerStatus,
     Truck, TruckStatus, SecurityIncident, IncidentStatus,
-    Equipment, EquipmentStatus, MaintenanceSchedule, MaintenanceStatus,
+    Equipment, EquipmentStatus, MaintenanceStatus, MaintenanceType,
     AirQualityReading, WaterQualityReading, NoiseReading, WeatherReading,
     Report, ReportStatus
 )

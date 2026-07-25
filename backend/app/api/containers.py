@@ -5,7 +5,7 @@ from app.models import (
     User, Container, ContainerStatus, ContainerType, ContainerHistory,
     Ship, Truck
 )
-from app.utils.exceptions import AuthorizationError, NotFoundError, AppValidationError
+from app.utils.exceptions import AuthorizationError, NotFoundError, ValidationError as AppValidationError
 from app.utils.helpers import success_response, paginate_query
 from sqlalchemy import func, or_, and_, desc
 from datetime import datetime, timedelta

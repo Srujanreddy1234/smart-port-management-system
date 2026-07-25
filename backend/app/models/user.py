@@ -51,7 +51,7 @@ class User(db.Model):
     email_verified = db.Column(db.Boolean, default=False)
     email_verified_at = db.Column(db.DateTime)
     notification_preferences = db.Column(db.JSON)
-    metadata = db.Column(db.JSON)
+    user_metadata = db.Column(db.JSON)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
@@ -265,7 +265,7 @@ class AuditLog(db.Model):
     status = db.Column(db.String(20), default='success', index=True)
     error_message = db.Column(db.Text)
     duration_ms = db.Column(db.Integer)
-    metadata = db.Column(db.JSON)
+    audit_metadata = db.Column(db.JSON)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
 
     user = db.relationship('User', backref='audit_logs')
@@ -289,8 +289,8 @@ class AuditLog(db.Model):
             'new_values': self.new_values,
             'ip_address': self.ip_address,
             'status': self.status,
-            'error_message': self.error_message,
+'error_message': self.error_message,
             'duration_ms': self.duration_ms,
-            'metadata': self.metadata,
+            'metadata': self.audit_metadata,
             'created_at': self.created_at.isoformat()
         }

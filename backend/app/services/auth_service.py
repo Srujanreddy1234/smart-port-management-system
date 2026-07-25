@@ -422,7 +422,7 @@ class AuthService:
                 status=status,
                 error_message=error_message,
                 duration_ms=duration_ms,
-                metadata=metadata
+                audit_metadata=metadata
             )
             db.session.add(audit)
         except Exception:
