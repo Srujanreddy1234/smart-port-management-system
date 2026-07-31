@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signing in… — Smart Port Management System</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body { display:flex; align-items:center; justify-content:center; height:100vh; margin:0; background:#0f1117; color:#e4e7f1; font-family:sans-serif; }
+    .box { text-align:center; }
+    .box i { font-size:2rem; margin-bottom:12px; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p id="statusText">Completing sign-in…</p>
+  </div>
+  <script src="js/config.js"></script>
+  <script>
+    (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const accessToken = params.get('access_token');
+      const refreshToken = params.get('refresh_token');
+
+      if (!accessToken) {
+        window.location.href = 'login.html?error=oauth_failed';
+        return;
+      }
+
+      localStorage.setItem('access_token', accessToken);
+      localStorage.setItem('refresh_token', refreshToken || '');
+
+      try {
+        const res = await Api.request('/auth/me');
+        localStorage.setItem('user', JSON.stringify(res.data));
+        window.location.href = 'dashboard.html';
+      } catch (err) {
+        localStorage.clear();
+        window.location.href = 'login.html?error=oauth_failed';
+      }
+    })();
+  </script>
+</body>
+</html>

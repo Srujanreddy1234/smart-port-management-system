@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.extensions import db
 from app.models import (
     User, Ship, ShipStatus, Container, ContainerStatus,
-    Truck, TruckStatus, SecurityIncident, IncidentStatus,
+    Truck, TruckStatus, SecurityIncident, IncidentStatus, IncidentSeverity,
     Equipment, EquipmentStatus, MaintenanceStatus, MaintenanceType,
     AirQualityReading, WaterQualityReading, NoiseReading, WeatherReading,
     Report, ReportStatus
@@ -60,7 +60,7 @@ def get_kpis():
 
     active_alerts = SecurityIncident.query.filter(SecurityIncident.status == IncidentStatus.ACTIVE).count()
     critical_alerts = SecurityIncident.query.filter(
-        SecurityIncident.severity == 'Critical',
+        SecurityIncident.severity == IncidentSeverity.CRITICAL,
         SecurityIncident.status == IncidentStatus.ACTIVE
     ).count()
 
@@ -378,12 +378,12 @@ def get_truck_traffic_chart():
     start_time = end_time - timedelta(hours=hours)
 
     hourly_data = db.session.query(
-        func.strftime('%H', Truck.gate_in_time).label('hour'),
+        func.extract('hour', Truck.gate_in_time).label('hour'),
         func.count(Truck.id).label('count')
     ).filter(
         Truck.gate_in_time >= start_time,
         Truck.gate_in_time.isnot(None)
-    ).group_by(func.strftime('%H', Truck.gate_in_time)).all()
+    ).group_by(func.extract('hour', Truck.gate_in_time)).all()
 
     labels = []
     data = []

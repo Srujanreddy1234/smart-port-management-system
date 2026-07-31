@@ -1,5 +1,8 @@
 import os
 from datetime import timedelta
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class Config:
@@ -33,6 +36,10 @@ class Config:
     MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@smartport.gov.in')
     
     CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:3000,http://localhost:5000,http://127.0.0.1:5500').split(',')
+
+    FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5501')
+    GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
+    GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
     
     CACHE_TYPE = 'simple'
     CACHE_DEFAULT_TIMEOUT = 300
@@ -66,6 +73,7 @@ class Config:
             'dashboard.read', 'ships.read', 'ships.write', 'ships.delete',
             'containers.read', 'containers.write', 'containers.delete',
             'trucks.read', 'trucks.write', 'trucks.delete',
+            'maintenance.read', 'maintenance.write', 'maintenance.delete',
             'reports.read', 'reports.write'
         ],
         'security_officer': [

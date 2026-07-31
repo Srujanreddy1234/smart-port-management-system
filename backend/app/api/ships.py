@@ -6,7 +6,7 @@ from app.models import Ship, ShipStatus, VesselType, User
 from app.utils.exceptions import ValidationError as AppValidationError, NotFoundError, AuthorizationError
 from app.utils.helpers import success_response, paginate_query, apply_filters
 from sqlalchemy import func, or_, desc, asc
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 ships_bp = Blueprint('ships', __name__, url_prefix='/api/v1/ships')

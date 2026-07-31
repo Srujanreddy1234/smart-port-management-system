@@ -220,7 +220,7 @@
               <i class="fas fa-video"></i>
             </div>
             <div class="stat-content">
-              <h3 class="stat-value">48</h3>
+              <h3 class="stat-value" id="activeCamerasStat">48</h3>
               <p class="stat-label">Active Cameras</p>
             </div>
             <div class="stat-trend trend-up">
@@ -232,7 +232,7 @@
               <i class="fas fa-exclamation-circle"></i>
             </div>
             <div class="stat-content">
-              <h3 class="stat-value">3</h3>
+              <h3 class="stat-value" id="alertsTodayStat">3</h3>
               <p class="stat-label">Alerts Today</p>
             </div>
             <div class="stat-trend trend-down">
@@ -297,128 +297,7 @@
                     <th>Actions</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td><span class="container-id">SEC-2024-00891</span></td>
-                    <td><i class="fas fa-person-running text-danger me-1"></i>Intrusion</td>
-                    <td>Zone A - Berth 1-3</td>
-                    <td><span class="status-badge status-danger">Critical</span></td>
-                    <td>2024-12-15 02:34:12</td>
-                    <td><span class="status-badge status-danger">Active</span></td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-search"></i></button>
-                        <button class="btn btn-icon btn-track" title="Dispatch" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-location-dot"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">SEC-2024-00890</span></td>
-                    <td><i class="fas fa-person-walking text-warning me-1"></i>Perimeter</td>
-                    <td>Zone C - Gate 2</td>
-                    <td><span class="status-badge status-warning">High</span></td>
-                    <td>2024-12-15 01:52:08</td>
-                    <td><span class="status-badge status-warning">Investigating</span></td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-search"></i></button>
-                        <button class="btn btn-icon btn-track" title="Dispatch" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-location-dot"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">SEC-2024-00889</span></td>
-                    <td><i class="fas fa-user-lock text-info me-1"></i>Access</td>
-                    <td>Zone B - Yard North</td>
-                    <td><span class="status-badge status-info">Medium</span></td>
-                    <td>2024-12-15 00:17:45</td>
-                    <td><span class="status-badge status-success">Resolved</span></td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-search"></i></button>
-                        <button class="btn btn-icon btn-track" title="Dispatch" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-location-dot"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">SEC-2024-00888</span></td>
-                    <td><i class="fas fa-user-secret text-danger me-1"></i>Suspicious</td>
-                    <td>Zone A - Berth 4-6</td>
-                    <td><span class="status-badge status-danger">Critical</span></td>
-                    <td>2024-12-14 23:41:33</td>
-                    <td><span class="status-badge status-warning">Escalated</span></td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-search"></i></button>
-                        <button class="btn btn-icon btn-track" title="Dispatch" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-location-dot"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">SEC-2024-00887</span></td>
-                    <td><i class="fas fa-ban text-warning me-1"></i>Violation</td>
-                    <td>Zone B - Yard South</td>
-                    <td><span class="status-badge status-warning">High</span></td>
-                    <td>2024-12-14 22:18:56</td>
-                    <td><span class="status-badge status-success">Resolved</span></td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-search"></i></button>
-                        <button class="btn btn-icon btn-track" title="Dispatch" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-location-dot"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">SEC-2024-00886</span></td>
-                    <td><i class="fas fa-person-running text-danger me-1"></i>Intrusion</td>
-                    <td>Zone D - Warehouse Row</td>
-                    <td><span class="status-badge status-info">Medium</span></td>
-                    <td>2024-12-14 20:05:19</td>
-                    <td><span class="status-badge status-success">Resolved</span></td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-search"></i></button>
-                        <button class="btn btn-icon btn-track" title="Dispatch" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-location-dot"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">SEC-2024-00885</span></td>
-                    <td><i class="fas fa-person-walking text-warning me-1"></i>Perimeter</td>
-                    <td>Zone C - Gate 1</td>
-                    <td><span class="status-badge status-info">Low</span></td>
-                    <td>2024-12-14 18:42:07</td>
-                    <td><span class="status-badge status-success">Resolved</span></td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-search"></i></button>
-                        <button class="btn btn-icon btn-track" title="Dispatch" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-location-dot"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">SEC-2024-00884</span></td>
-                    <td><i class="fas fa-user-secret text-danger me-1"></i>Suspicious</td>
-                    <td>Zone A - Berth 1-3</td>
-                    <td><span class="status-badge status-warning">High</span></td>
-                    <td>2024-12-14 16:29:44</td>
-                    <td><span class="status-badge status-danger">Active</span></td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-search"></i></button>
-                        <button class="btn btn-icon btn-track" title="Dispatch" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-location-dot"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
+                <tbody id="securityAlertsBody"></tbody>
               </table>
             </div>
           </div>
@@ -443,6 +322,7 @@
         </div>
 
         <!-- Camera Grid -->
+        <!-- TODO: static camera feed cards (positions/thumbnails not backed by real stream data), only badge status kept illustrative -->
         <div class="card">
           <div class="card-header">
             <h5 class="card-title"><i class="fas fa-video me-2"></i>Camera Feeds</h5>
@@ -539,6 +419,7 @@
         <!-- Access Control & Chart Row -->
         <div class="charts-grid">
           <!-- Access Control Logs -->
+          <!-- TODO: no backend endpoint for access logs yet, stays illustrative -->
           <div class="card chart-card">
             <div class="card-header">
               <h5 class="card-title"><i class="fas fa-door-open me-2"></i>Access Control Logs</h5>
@@ -632,8 +513,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/utils.js"></script>
   <script>
+    // TODO: no backend endpoint for incidents-over-time series yet, chart stays illustrative
     // Security Incidents Line Chart
     const incidentCtx = document.getElementById('securityIncidentsChart').getContext('2d');
     const incidentLabels = [];
@@ -709,38 +592,55 @@
       }
     });
 
-    // Type Filter
+    // Incidents table — real data
     const typeFilter = document.getElementById('typeFilter');
-    const alertTable = document.querySelector('.data-table-card .table tbody');
-    const alertRows = alertTable ? Array.from(alertTable.querySelectorAll('tr')) : [];
     const ROWS_PER_PAGE = 10;
-    let filteredRows = [...alertRows];
+    let incidentsData = [];
+    let filteredIncidents = [];
     let currentPage = 1;
 
-    function getFilteredList() {
+    const SEVERITY_CLASS = { 'Critical': 'status-danger', 'High': 'status-warning', 'Medium': 'status-info', 'Low': 'status-info' };
+    const STATUS_CLASS = { 'Active': 'status-danger', 'Investigating': 'status-warning', 'Escalated': 'status-warning', 'Resolved': 'status-success', 'Closed': 'status-success', 'False Alarm': 'status-info' };
+    const TYPE_ICON = { 'Intrusion': 'fa-person-running text-danger', 'Perimeter Breach': 'fa-person-walking text-warning', 'Access Denied': 'fa-user-lock text-info', 'Suspicious Activity': 'fa-user-secret text-danger', 'Violation': 'fa-ban text-warning' };
+
+    function incidentRow(inc) {
+      const icon = TYPE_ICON[inc.incident_type] || 'fa-circle-info text-secondary';
+      return `<tr>
+        <td><span class="container-id">${inc.incident_id}</span></td>
+        <td><i class="fas ${icon} me-1"></i>${inc.incident_type}</td>
+        <td>${inc.zone}</td>
+        <td><span class="status-badge ${SEVERITY_CLASS[inc.severity] || 'status-info'}">${inc.severity}</span></td>
+        <td>${inc.detected_at ? Utils.formatDateTime(inc.detected_at) : '—'}</td>
+        <td><span class="status-badge ${STATUS_CLASS[inc.status] || 'status-info'}">${inc.status}</span></td>
+        <td>
+          <div class="action-btns">
+            <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
+            <button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-search"></i></button>
+            <button class="btn btn-icon btn-track" title="Dispatch" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-location-dot"></i></button>
+          </div>
+        </td>
+      </tr>`;
+    }
+
+    function applyTypeFilter() {
       const val = typeFilter.value.toLowerCase();
-      if (!val) return [...alertRows];
-      return alertRows.filter(row => {
-        const cells = row.querySelectorAll('td');
-        const typeText = cells[1] ? cells[1].textContent.trim().toLowerCase() : '';
-        return typeText.includes(val);
-      });
+      filteredIncidents = !val ? [...incidentsData] : incidentsData.filter(i => String(i.incident_type || '').toLowerCase().includes(val));
+      currentPage = 1;
+      renderPagination();
     }
 
     function renderPagination() {
-      const totalPages = Math.ceil(filteredRows.length / ROWS_PER_PAGE) || 1;
+      const totalPages = Math.ceil(filteredIncidents.length / ROWS_PER_PAGE) || 1;
       if (currentPage > totalPages) currentPage = totalPages;
       const start = (currentPage - 1) * ROWS_PER_PAGE;
       const end = start + ROWS_PER_PAGE;
-      alertRows.forEach(row => row.style.display = 'none');
-      filteredRows.forEach((row, i) => {
-        row.style.display = (i >= start && i < end) ? '' : 'none';
-      });
+      document.getElementById('securityAlertsBody').innerHTML = filteredIncidents.slice(start, end).map(incidentRow).join('');
+
       const info = document.querySelector('.pagination-info');
       if (info) {
-        const total = filteredRows.length;
+        const total = filteredIncidents.length;
         const showing = total === 0 ? 0 : Math.min(end, total);
-        info.textContent = `Showing ${start + 1}-${showing} of ${total} alerts`;
+        info.textContent = `Showing ${total === 0 ? 0 : start + 1}-${showing} of ${total} alerts`;
       }
       const pagination = document.querySelector('.pagination');
       if (!pagination) return;
@@ -760,21 +660,37 @@
         pagination.appendChild(li);
       };
       addPage('<i class="fas fa-chevron-left"></i>', currentPage - 1, currentPage === 1);
-      for (let i = 1; i <= totalPages; i++) {
-        addPage(String(i), i, false);
-      }
+      for (let i = 1; i <= totalPages; i++) addPage(String(i), i, false);
       addPage('<i class="fas fa-chevron-right"></i>', currentPage + 1, currentPage === totalPages);
     }
 
-    if (typeFilter) {
-      typeFilter.addEventListener('change', () => {
-        filteredRows = getFilteredList();
-        currentPage = 1;
-        renderPagination();
-      });
+    async function loadIncidents() {
+      try {
+        const res = await Api.request('/security?page=1&per_page=200');
+        incidentsData = res.data.items || [];
+      } catch (err) {
+        App.showToast('Failed to load incidents', 'danger');
+        incidentsData = [];
+      }
+      applyTypeFilter();
+
+      const today = new Date().toDateString();
+      const alertsToday = incidentsData.filter(i => i.detected_at && new Date(i.detected_at).toDateString() === today).length;
+      document.getElementById('alertsTodayStat').textContent = alertsToday;
     }
 
-    renderPagination();
+    async function loadCameraCount() {
+      try {
+        const res = await Api.request('/security/cameras?per_page=1');
+        document.getElementById('activeCamerasStat').textContent = res.data.total || 0;
+      } catch (err) {
+        // leave mock value
+      }
+    }
+
+    if (typeFilter) typeFilter.addEventListener('change', applyTypeFilter);
+    loadIncidents();
+    loadCameraCount();
   </script>
 </body>
 </html>

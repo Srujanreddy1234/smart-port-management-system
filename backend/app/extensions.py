@@ -7,6 +7,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_mail import Mail
 from flask_caching import Cache
+from authlib.integrations.flask_client import OAuth
 
 
 db = SQLAlchemy()
@@ -15,6 +16,7 @@ jwt = JWTManager()
 bcrypt = Bcrypt()
 mail = Mail()
 cache = Cache()
+oauth = OAuth()
 limiter = Limiter(
     key_func=get_remote_address,
     default_limits=["2000 per day", "500 per hour"],

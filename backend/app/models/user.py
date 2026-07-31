@@ -25,7 +25,7 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True, nullable=False, index=True)
-    password_hash = db.Column(db.String(255), nullable=False)
+    password_hash = db.Column(db.String(255), nullable=True)
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
     role = db.Column(Enum(UserRole), nullable=False, index=True)
@@ -97,6 +97,8 @@ class User(db.Model):
         self.must_change_password = False
 
     def check_password(self, password):
+        if not self.password_hash:
+            return False
         return check_password_hash(self.password_hash, password)
 
     def has_permission(self, permission):
@@ -204,8 +206,8 @@ class Session(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
-    token = db.Column(db.String(255), unique=True, nullable=False, index=True)
-    refresh_token = db.Column(db.String(255), unique=True, index=True)
+    token = db.Column(db.String(1024), unique=True, nullable=False, index=True)
+    refresh_token = db.Column(db.String(1024), unique=True, index=True)
     user_agent = db.Column(db.String(500))
     ip_address = db.Column(db.String(45))
     device_info = db.Column(db.JSON)

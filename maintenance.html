@@ -217,7 +217,7 @@
               <i class="fas fa-cogs"></i>
             </div>
             <div class="stat-content">
-              <h3 class="stat-value">86</h3>
+              <h3 class="stat-value" id="totalEquipmentStat">86</h3>
               <p class="stat-label">Total Equipment</p>
             </div>
             <div class="stat-trend trend-up">
@@ -229,7 +229,7 @@
               <i class="fas fa-tools"></i>
             </div>
             <div class="stat-content">
-              <h3 class="stat-value">12</h3>
+              <h3 class="stat-value" id="underMaintenanceStat">12</h3>
               <p class="stat-label">Under Maintenance</p>
             </div>
             <div class="stat-trend trend-up">
@@ -241,7 +241,7 @@
               <i class="fas fa-exclamation-triangle"></i>
             </div>
             <div class="stat-content">
-              <h3 class="stat-value">5</h3>
+              <h3 class="stat-value" id="needsServiceStat">5</h3>
               <p class="stat-label">Needs Service</p>
             </div>
             <div class="stat-trend trend-down">
@@ -253,7 +253,7 @@
               <i class="fas fa-check-circle"></i>
             </div>
             <div class="stat-content">
-              <h3 class="stat-value">69</h3>
+              <h3 class="stat-value" id="operationalStat">69</h3>
               <p class="stat-label">Operational</p>
             </div>
             <div class="stat-trend trend-up">
@@ -303,248 +303,7 @@
                     <th>Actions</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td><span class="container-id">EQ-CRN-001</span></td>
-                    <td>Ship-to-Shore Crane #1</td>
-                    <td><i class="fas fa-arrows-up-down text-primary me-1"></i>Crane</td>
-                    <td>Berth 1</td>
-                    <td><span class="status-badge status-success">Operational</span></td>
-                    <td>2024-11-28</td>
-                    <td>2025-02-28</td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <div class="progress flex-grow-1 me-2" style="height: 6px; width: 80px;">
-                          <div class="progress-bar bg-success" style="width: 92%"></div>
-                        </div>
-                        <small class="text-success fw-bold">92%</small>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Edit" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-pen"></i></button>
-                        <button class="btn btn-icon btn-track" title="Service History" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-history"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">EQ-CRN-002</span></td>
-                    <td>RTG Crane #2</td>
-                    <td><i class="fas fa-arrows-up-down text-primary me-1"></i>Crane</td>
-                    <td>Yard Block A</td>
-                    <td><span class="status-badge status-warning">Maintenance</span></td>
-                    <td>2024-12-10</td>
-                    <td>2025-01-10</td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <div class="progress flex-grow-1 me-2" style="height: 6px; width: 80px;">
-                          <div class="progress-bar bg-warning" style="width: 68%"></div>
-                        </div>
-                        <small class="text-warning fw-bold">68%</small>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Edit" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-pen"></i></button>
-                        <button class="btn btn-icon btn-track" title="Service History" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-history"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">EQ-RS-003</span></td>
-                    <td>Reach Stacker #3</td>
-                    <td><i class="fas fa-dolly text-info me-1"></i>Forklift</td>
-                    <td>Yard Block B</td>
-                    <td><span class="status-badge status-success">Operational</span></td>
-                    <td>2024-12-01</td>
-                    <td>2025-03-01</td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <div class="progress flex-grow-1 me-2" style="height: 6px; width: 80px;">
-                          <div class="progress-bar bg-success" style="width: 88%"></div>
-                        </div>
-                        <small class="text-success fw-bold">88%</small>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Edit" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-pen"></i></button>
-                        <button class="btn btn-icon btn-track" title="Service History" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-history"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">EQ-EH-004</span></td>
-                    <td>Empty Handler #1</td>
-                    <td><i class="fas fa-dolly text-info me-1"></i>Forklift</td>
-                    <td>Empty Yard</td>
-                    <td><span class="status-badge status-info">Scheduled</span></td>
-                    <td>2024-11-15</td>
-                    <td>2025-01-05</td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <div class="progress flex-grow-1 me-2" style="height: 6px; width: 80px;">
-                          <div class="progress-bar bg-warning" style="width: 72%"></div>
-                        </div>
-                        <small class="text-warning fw-bold">72%</small>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Edit" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-pen"></i></button>
-                        <button class="btn btn-icon btn-track" title="Service History" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-history"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">EQ-FKL-012</span></td>
-                    <td>Forklift Unit #12</td>
-                    <td><i class="fas fa-dolly text-info me-1"></i>Forklift</td>
-                    <td>Warehouse 2</td>
-                    <td><span class="status-badge status-success">Operational</span></td>
-                    <td>2024-12-05</td>
-                    <td>2025-03-05</td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <div class="progress flex-grow-1 me-2" style="height: 6px; width: 80px;">
-                          <div class="progress-bar bg-success" style="width: 95%"></div>
-                        </div>
-                        <small class="text-success fw-bold">95%</small>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Edit" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-pen"></i></button>
-                        <button class="btn btn-icon btn-track" title="Service History" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-history"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">EQ-CNV-A3</span></td>
-                    <td>Belt Conveyor A3</td>
-                    <td><i class="fas fa-gears text-warning me-1"></i>Conveyor</td>
-                    <td>Terminal A</td>
-                    <td><span class="status-badge status-danger">Out of Service</span></td>
-                    <td>2024-10-20</td>
-                    <td>2024-12-20</td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <div class="progress flex-grow-1 me-2" style="height: 6px; width: 80px;">
-                          <div class="progress-bar bg-danger" style="width: 45%"></div>
-                        </div>
-                        <small class="text-danger fw-bold">45%</small>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Edit" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-pen"></i></button>
-                        <button class="btn btn-icon btn-track" title="Service History" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-history"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">EQ-AGV-007</span></td>
-                    <td>AGV Unit #7</td>
-                    <td><i class="fas fa-robot text-success me-1"></i>AGV</td>
-                    <td>Yard Block C</td>
-                    <td><span class="status-badge status-success">Operational</span></td>
-                    <td>2024-12-12</td>
-                    <td>2025-04-12</td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <div class="progress flex-grow-1 me-2" style="height: 6px; width: 80px;">
-                          <div class="progress-bar bg-success" style="width: 97%"></div>
-                        </div>
-                        <small class="text-success fw-bold">97%</small>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Edit" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-pen"></i></button>
-                        <button class="btn btn-icon btn-track" title="Service History" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-history"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">EQ-MHC-001</span></td>
-                    <td>Mobile Harbor Crane #1</td>
-                    <td><i class="fas fa-arrows-up-down text-primary me-1"></i>Crane</td>
-                    <td>Berth 3</td>
-                    <td><span class="status-badge status-warning">Maintenance</span></td>
-                    <td>2024-12-08</td>
-                    <td>2025-01-08</td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <div class="progress flex-grow-1 me-2" style="height: 6px; width: 80px;">
-                          <div class="progress-bar bg-warning" style="width: 64%"></div>
-                        </div>
-                        <small class="text-warning fw-bold">64%</small>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Edit" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-pen"></i></button>
-                        <button class="btn btn-icon btn-track" title="Service History" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-history"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">EQ-TPL-004</span></td>
-                    <td>Top Loader #4</td>
-                    <td><i class="fas fa-dolly text-info me-1"></i>Forklift</td>
-                    <td>Yard Block D</td>
-                    <td><span class="status-badge status-success">Operational</span></td>
-                    <td>2024-12-14</td>
-                    <td>2025-03-14</td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <div class="progress flex-grow-1 me-2" style="height: 6px; width: 80px;">
-                          <div class="progress-bar bg-success" style="width: 85%"></div>
-                        </div>
-                        <small class="text-success fw-bold">85%</small>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Edit" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-pen"></i></button>
-                        <button class="btn btn-icon btn-track" title="Service History" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-history"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">EQ-EXC-002</span></td>
-                    <td>Excavator #2</td>
-                    <td><i class="fas fa-hard-hat text-danger me-1"></i>Excavator</td>
-                    <td>Berth 5</td>
-                    <td><span class="status-badge status-danger">Out of Service</span></td>
-                    <td>2024-09-30</td>
-                    <td>2024-12-30</td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <div class="progress flex-grow-1 me-2" style="height: 6px; width: 80px;">
-                          <div class="progress-bar bg-danger" style="width: 38%"></div>
-                        </div>
-                        <small class="text-danger fw-bold">38%</small>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Edit" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-pen"></i></button>
-                        <button class="btn btn-icon btn-track" title="Service History" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-history"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
+                <tbody id="equipmentTableBody"></tbody>
               </table>
             </div>
           </div>
@@ -593,64 +352,7 @@
                       <th>Status</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr>
-                      <td>2025-01-05</td>
-                      <td>Empty Handler #1</td>
-                      <td><span class="badge bg-info">Preventive</span></td>
-                      <td><span class="status-badge status-warning">High</span></td>
-                      <td>Arjun Mehta</td>
-                      <td><span class="status-badge status-info">Scheduled</span></td>
-                    </tr>
-                    <tr>
-                      <td>2025-01-08</td>
-                      <td>Mobile Harbor Crane #1</td>
-                      <td><span class="badge bg-warning">Corrective</span></td>
-                      <td><span class="status-badge status-danger">Critical</span></td>
-                      <td>Vikram Singh</td>
-                      <td><span class="status-badge status-warning">In Progress</span></td>
-                    </tr>
-                    <tr>
-                      <td>2025-01-10</td>
-                      <td>RTG Crane #2</td>
-                      <td><span class="badge bg-success">Predictive</span></td>
-                      <td><span class="status-badge status-warning">High</span></td>
-                      <td>Priya Nair</td>
-                      <td><span class="status-badge status-info">Scheduled</span></td>
-                    </tr>
-                    <tr>
-                      <td>2025-01-15</td>
-                      <td>Belt Conveyor A3</td>
-                      <td><span class="badge bg-warning">Corrective</span></td>
-                      <td><span class="status-badge status-danger">Critical</span></td>
-                      <td>Ravi Kumar</td>
-                      <td><span class="status-badge status-danger">Overdue</span></td>
-                    </tr>
-                    <tr>
-                      <td>2025-01-18</td>
-                      <td>Excavator #2</td>
-                      <td><span class="badge bg-warning">Corrective</span></td>
-                      <td><span class="status-badge status-danger">Critical</span></td>
-                      <td>Suresh Patel</td>
-                      <td><span class="status-badge status-danger">Overdue</span></td>
-                    </tr>
-                    <tr>
-                      <td>2025-01-22</td>
-                      <td>Ship-to-Shore Crane #1</td>
-                      <td><span class="badge bg-info">Preventive</span></td>
-                      <td><span class="status-badge status-info">Low</span></td>
-                      <td>Arjun Mehta</td>
-                      <td><span class="status-badge status-info">Scheduled</span></td>
-                    </tr>
-                    <tr>
-                      <td>2025-01-25</td>
-                      <td>Reach Stacker #3</td>
-                      <td><span class="badge bg-success">Predictive</span></td>
-                      <td><span class="status-badge status-info">Medium</span></td>
-                      <td>Priya Nair</td>
-                      <td><span class="status-badge status-info">Scheduled</span></td>
-                    </tr>
-                  </tbody>
+                  <tbody id="scheduleTableBody"></tbody>
                 </table>
               </div>
             </div>
@@ -679,6 +381,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/utils.js"></script>
   <script>
     // Notification dropdown toggle
@@ -703,38 +406,110 @@
       App.showToast('All notifications marked as read', 'success');
     });
 
-    // Filter by type and status
+    // Filter by type and status — real data
     const typeFilter = document.getElementById('typeFilter');
     const statusFilter = document.getElementById('statusFilter');
-    const tableBody = document.querySelector('.table tbody');
-    const allRows = Array.from(tableBody.querySelectorAll('tr'));
     const rowsPerPage = 10;
     let currentPage = 1;
+    let equipmentData = [];
+    let filteredEquipment = [];
+
+    const EQ_TYPE_GROUP = {
+      'Ship-to-Shore Crane': 'crane', 'RTG Crane': 'crane', 'RMG Crane': 'crane', 'Mobile Harbor Crane': 'crane',
+      'Reach Stacker': 'forklift', 'Empty Handler': 'forklift', 'Forklift': 'forklift', 'Top Loader': 'forklift', 'Side Loader': 'forklift',
+      'Conveyor': 'conveyor', 'AGV': 'agv',
+      'Straddle Carrier': 'excavator', 'Terminal Tractor': 'excavator', 'Chassis': 'excavator',
+      'Generator': 'excavator', 'Pump': 'excavator', 'Compressor': 'excavator', 'HVAC System': 'excavator', 'Other': 'excavator'
+    };
+    const EQ_TYPE_ICON = { crane: 'fa-arrows-up-down text-primary', forklift: 'fa-dolly text-info', conveyor: 'fa-gears text-warning', agv: 'fa-robot text-success', excavator: 'fa-hard-hat text-danger' };
+    const EQ_STATUS_BADGE = { 'Operational': 'status-success', 'Maintenance': 'status-warning', 'Scheduled': 'status-info', 'Out of Service': 'status-danger', 'Decommissioned': 'status-danger', 'Standby': 'status-info' };
+
+    function equipmentRow(eq) {
+      const group = EQ_TYPE_GROUP[eq.equipment_type] || 'excavator';
+      const health = eq.health_percentage ?? 0;
+      const barColor = health >= 80 ? 'success' : health >= 50 ? 'warning' : 'danger';
+      return `<tr>
+        <td><span class="container-id">${eq.equipment_id}</span></td>
+        <td>${eq.name}</td>
+        <td><i class="fas ${EQ_TYPE_ICON[group]} me-1"></i>${eq.equipment_type}</td>
+        <td>${eq.location || '—'}</td>
+        <td><span class="status-badge ${EQ_STATUS_BADGE[eq.status] || 'status-info'}">${eq.status}</span></td>
+        <td>${eq.last_service_date ? Utils.formatDate(eq.last_service_date) : '—'}</td>
+        <td>${eq.next_service_date ? Utils.formatDate(eq.next_service_date) : '—'}</td>
+        <td>
+          <div class="d-flex align-items-center">
+            <div class="progress flex-grow-1 me-2" style="height: 6px; width: 80px;">
+              <div class="progress-bar bg-${barColor}" style="width: ${health}%"></div>
+            </div>
+            <small class="text-${barColor} fw-bold">${health}%</small>
+          </div>
+        </td>
+        <td>
+          <div class="action-btns">
+            <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
+            <button class="btn btn-icon btn-edit" title="Edit" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-pen"></i></button>
+            <button class="btn btn-icon btn-track" title="Service History" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-history"></i></button>
+          </div>
+        </td>
+      </tr>`;
+    }
 
     function getFilteredRows() {
-      const typeVal = typeFilter.value.toLowerCase();
-      const statusVal = statusFilter.value.toLowerCase();
-      return allRows.filter(function(row) {
-        const cells = row.querySelectorAll('td');
-        const typeText = cells[2] ? cells[2].textContent.trim().toLowerCase() : '';
-        const statusEl = cells[4] ? cells[4].querySelector('.status-badge') : null;
-        const statusText = statusEl ? statusEl.textContent.trim().toLowerCase() : '';
-        const matchType = !typeVal || typeText.includes(typeVal);
-        const matchStatus = !statusVal || statusText.includes(statusVal);
+      const typeVal = typeFilter.value;
+      const statusVal = statusFilter.value.replace('-', ' ');
+      return equipmentData.filter(function(eq) {
+        const matchType = !typeVal || (EQ_TYPE_GROUP[eq.equipment_type] || '') === typeVal;
+        const matchStatus = !statusVal || String(eq.status).toLowerCase() === statusVal;
         return matchType && matchStatus;
       });
     }
 
     function renderTable() {
-      const filtered = getFilteredRows();
-      const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
+      filteredEquipment = getFilteredRows();
+      const totalPages = Math.max(1, Math.ceil(filteredEquipment.length / rowsPerPage));
       if (currentPage > totalPages) currentPage = totalPages;
       const start = (currentPage - 1) * rowsPerPage;
       const end = start + rowsPerPage;
-      allRows.forEach(function(row) { row.style.display = 'none'; });
-      filtered.slice(start, end).forEach(function(row) { row.style.display = ''; });
-      document.querySelector('.pagination-info').textContent = 'Showing ' + (filtered.length === 0 ? 0 : start + 1) + '-' + Math.min(end, filtered.length) + ' of ' + filtered.length + ' equipment';
-      renderPagination(totalPages, filtered.length);
+      document.getElementById('equipmentTableBody').innerHTML = filteredEquipment.slice(start, end).map(equipmentRow).join('');
+      document.querySelector('.pagination-info').textContent = 'Showing ' + (filteredEquipment.length === 0 ? 0 : start + 1) + '-' + Math.min(end, filteredEquipment.length) + ' of ' + filteredEquipment.length + ' equipment';
+      renderPagination(totalPages, filteredEquipment.length);
+    }
+
+    async function loadEquipment() {
+      try {
+        const res = await Api.request('/maintenance?page=1&per_page=200');
+        equipmentData = res.data.items || [];
+      } catch (err) {
+        App.showToast('Failed to load equipment', 'danger');
+        equipmentData = [];
+      }
+      document.getElementById('totalEquipmentStat').textContent = equipmentData.length;
+      document.getElementById('underMaintenanceStat').textContent = equipmentData.filter(e => e.status === 'Maintenance').length;
+      document.getElementById('needsServiceStat').textContent = equipmentData.filter(e => (e.health_percentage ?? 100) < 60).length;
+      document.getElementById('operationalStat').textContent = equipmentData.filter(e => e.status === 'Operational').length;
+      renderTable();
+    }
+
+    async function loadSchedule() {
+      try {
+        const res = await Api.request('/maintenance/schedules?page=1&per_page=20');
+        const items = res.data.items || [];
+        const PRIORITY_BADGE = { 'Low': 'status-info', 'Medium': 'status-info', 'High': 'status-warning', 'Critical': 'status-danger' };
+        const STATUS_BADGE = { 'Scheduled': 'status-info', 'In Progress': 'status-warning', 'On Hold': 'status-warning', 'Completed': 'status-success', 'Cancelled': 'status-info', 'Overdue': 'status-danger' };
+        const TYPE_BADGE = { 'Preventive': 'bg-info', 'Corrective': 'bg-warning', 'Predictive': 'bg-success', 'Emergency': 'bg-danger', 'Overhaul': 'bg-danger', 'Inspection': 'bg-info', 'Calibration': 'bg-info' };
+        document.getElementById('scheduleTableBody').innerHTML = items.map(s => `
+          <tr>
+            <td>${s.scheduled_date ? Utils.formatDate(s.scheduled_date) : '—'}</td>
+            <td>Equipment #${s.equipment_id}</td>
+            <td><span class="badge ${TYPE_BADGE[s.maintenance_type] || 'bg-info'}">${s.maintenance_type}</span></td>
+            <td><span class="status-badge ${PRIORITY_BADGE[s.priority] || 'status-info'}">${s.priority}</span></td>
+            <td>${s.assigned_technician_id ? 'Tech #' + s.assigned_technician_id : '—'}</td>
+            <td><span class="status-badge ${STATUS_BADGE[s.status] || 'status-info'}">${s.status}</span></td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        App.showToast('Failed to load schedule', 'danger');
+      }
     }
 
     function renderPagination(totalPages, totalItems) {
@@ -776,8 +551,10 @@
 
     typeFilter.addEventListener('change', function() { currentPage = 1; renderTable(); });
     statusFilter.addEventListener('change', function() { currentPage = 1; renderTable(); });
-    renderTable();
+    loadEquipment();
+    loadSchedule();
 
+    // TODO: no backend endpoint for cost aggregation by month yet, chart stays illustrative
     // Maintenance Costs Bar Chart
     const costCtx = document.getElementById('maintenanceCostChart').getContext('2d');
     const costLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];

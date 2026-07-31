@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up — Smart Port Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/variables.css" rel="stylesheet">
+  <link href="css/main.css" rel="stylesheet">
+  <link href="css/login.css" rel="stylesheet">
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-left">
+      <div class="login-brand">
+        <div class="login-brand-icon">
+          <i class="fas fa-anchor"></i>
+        </div>
+        <h1>Smart Port <span>Mgmt System</span></h1>
+        <p class="subtitle">AI-Powered Digital Command &amp; Control Center for Thoothukudi Smart Port</p>
+        <div class="login-features">
+          <div class="login-feature">
+            <i class="fas fa-ship" style="background:rgba(13,110,253,0.12);color:#6ea8fe;"></i>
+            <div>
+              <h6>Ship Tracking</h6>
+              <p>Real-time vessel monitoring</p>
+            </div>
+          </div>
+          <div class="login-feature">
+            <i class="fas fa-boxes-stacked" style="background:rgba(25,135,84,0.12);color:#75b798;"></i>
+            <div>
+              <h6>Container Ops</h6>
+              <p>Smart container management</p>
+            </div>
+          </div>
+          <div class="login-feature">
+            <i class="fas fa-shield-halved" style="background:rgba(220,53,69,0.12);color:#ea868f;"></i>
+            <div>
+              <h6>Security AI</h6>
+              <p>AI-powered threat detection</p>
+            </div>
+          </div>
+          <div class="login-feature">
+            <i class="fas fa-leaf" style="background:rgba(255,193,7,0.12);color:#ffda6a;"></i>
+            <div>
+              <h6>Eco Monitor</h6>
+              <p>Environmental compliance</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="login-right">
+      <div class="login-form-container">
+        <div class="login-form-header">
+          <h2>Create account</h2>
+          <p>Sign up for a viewer account</p>
+        </div>
+        <form class="login-form" id="signupForm">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label>First Name</label>
+              <div class="input-icon-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="firstName" placeholder="First name" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <div class="input-icon-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="lastName" placeholder="Last name" required>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <div class="input-icon-group">
+              <i class="fas fa-envelope"></i>
+              <input type="email" id="email" placeholder="you@smartport.gov.in" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-icon-group">
+              <i class="fas fa-lock"></i>
+              <input type="password" id="password" placeholder="At least 8 characters" minlength="8" required>
+              <button type="button" class="toggle-password">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <div class="input-icon-group">
+              <i class="fas fa-lock"></i>
+              <input type="password" id="confirmPassword" placeholder="Re-enter password" minlength="8" required>
+            </div>
+          </div>
+          <button type="submit" class="btn-login">
+            <i class="fas fa-user-plus"></i> Create Account
+          </button>
+        </form>
+        <p style="text-align:center;margin-top:16px;">
+          Already have an account? <a href="login.html" class="forgot-link">Sign in</a>
+        </p>
+        <div class="login-footer">
+          <p>&copy; 2026 Smart Port Management System, Thoothukudi. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="js/config.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('signupForm');
+      const togglePassword = document.querySelector('.toggle-password');
+
+      if (togglePassword) {
+        togglePassword.addEventListener('click', () => {
+          const input = togglePassword.closest('.input-icon-group').querySelector('input');
+          const icon = togglePassword.querySelector('i');
+          if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+          } else {
+            input.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+          }
+        });
+      }
+
+      function showError(message) {
+        let errorEl = form.querySelector('.signup-error');
+        if (!errorEl) {
+          errorEl = document.createElement('div');
+          errorEl.className = 'signup-error';
+          errorEl.style.cssText = 'color:#ea868f;font-size:0.875rem;margin-bottom:1rem;';
+          form.insertBefore(errorEl, form.querySelector('.btn-login'));
+        }
+        errorEl.textContent = message;
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('.btn-login');
+        const originalLabel = btn.innerHTML;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (password !== confirmPassword) {
+          showError('Passwords do not match');
+          return;
+        }
+
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+        btn.disabled = true;
+
+        try {
+          const result = await Api.register({
+            first_name: document.getElementById('firstName').value.trim(),
+            last_name: document.getElementById('lastName').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            password
+          });
+          Api.setSession(result.data);
+          window.location.href = 'dashboard.html';
+        } catch (err) {
+          btn.innerHTML = originalLabel;
+          btn.disabled = false;
+          showError(err.message || 'Sign up failed');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
