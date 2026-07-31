@@ -136,20 +136,21 @@
     <div class="page-content">
       <div class="profile-header">
         <div class="profile-info">
-          <div class="profile-avatar">RA</div>
+          <div class="profile-avatar" id="profileAvatar">RA</div>
           <div class="profile-details">
-            <h3>Rajesh Admin</h3>
-            <div class="role">Port Director</div>
+            <h3 id="profileName">Rajesh Admin</h3>
+            <div class="role" id="profileRole">Port Director</div>
             <div class="meta">
               <span><i class="fas fa-location-dot"></i> Thoothukudi, Tamil Nadu</span>
-              <span><i class="fas fa-envelope"></i> rajesh.admin@smartport.gov.in</span>
-              <span><i class="fas fa-phone"></i> +91 98765 43210</span>
-              <span><i class="fas fa-calendar"></i> Member since Jan 2023</span>
+              <span><i class="fas fa-envelope"></i> <span id="profileEmail">rajesh.admin@smartport.gov.in</span></span>
+              <span><i class="fas fa-phone"></i> <span id="profilePhone">+91 98765 43210</span></span>
+              <span><i class="fas fa-calendar"></i> <span id="profileMemberSince">Member since Jan 2023</span></span>
             </div>
           </div>
           <div class="profile-actions">
             <button class="btn btn-primary" onclick="App.showToast('Profile edit mode enabled','info')"><i class="fas fa-pen"></i> Edit Profile</button>
             <button class="btn btn-secondary" onclick="App.showToast('Opening settings...','info')"><i class="fas fa-cog"></i> Settings</button>
+            <button class="btn btn-outline-danger" onclick="Api.logout()"><i class="fas fa-right-from-bracket"></i> Sign Out</button>
           </div>
         </div>
       </div>
@@ -172,27 +173,27 @@
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                 <div>
                   <small style="color:var(--text-muted);display:block;margin-bottom:4px;">Full Name</small>
-                  <span style="font-weight:500;">Rajesh Admin</span>
+                  <span style="font-weight:500;" id="infoFullName">Rajesh Admin</span>
                 </div>
                 <div>
                   <small style="color:var(--text-muted);display:block;margin-bottom:4px;">Email</small>
-                  <span style="font-weight:500;">rajesh.admin@smartport.gov.in</span>
+                  <span style="font-weight:500;" id="infoEmail">rajesh.admin@smartport.gov.in</span>
                 </div>
                 <div>
                   <small style="color:var(--text-muted);display:block;margin-bottom:4px;">Phone</small>
-                  <span style="font-weight:500;">+91 98765 43210</span>
+                  <span style="font-weight:500;" id="infoPhone">+91 98765 43210</span>
                 </div>
                 <div>
                   <small style="color:var(--text-muted);display:block;margin-bottom:4px;">Department</small>
-                  <span style="font-weight:500;">Port Operations</span>
+                  <span style="font-weight:500;" id="infoDepartment">Port Operations</span>
                 </div>
                 <div>
                   <small style="color:var(--text-muted);display:block;margin-bottom:4px;">Role</small>
-                  <span style="font-weight:500;">Port Director</span>
+                  <span style="font-weight:500;" id="infoRole">Port Director</span>
                 </div>
                 <div>
                   <small style="color:var(--text-muted);display:block;margin-bottom:4px;">Employee ID</small>
-                  <span style="font-weight:500;">SPK-2023-001</span>
+                  <span style="font-weight:500;" id="infoEmployeeId">SPK-2023-001</span>
                 </div>
                 <div>
                   <small style="color:var(--text-muted);display:block;margin-bottom:4px;">Shift</small>
@@ -507,6 +508,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/utils.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -526,7 +528,35 @@
           tabContents[tab.dataset.tab].style.display = '';
         });
       });
+
+      loadProfile();
     });
+
+    async function loadProfile() {
+      try {
+        const res = await Api.request('/auth/me');
+        const u = res.data;
+        const fullName = `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email;
+        const initials = Utils.getInitials(fullName);
+        const roleLabel = (u.role || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+        document.getElementById('profileAvatar').textContent = initials;
+        document.getElementById('profileName').textContent = fullName;
+        document.getElementById('profileRole').textContent = roleLabel;
+        document.getElementById('profileEmail').textContent = u.email;
+        document.getElementById('profilePhone').textContent = u.phone || u.mobile || '—';
+        document.getElementById('profileMemberSince').textContent = u.created_at ? 'Member since ' + Utils.formatDate(u.created_at) : '—';
+
+        document.getElementById('infoFullName').textContent = fullName;
+        document.getElementById('infoEmail').textContent = u.email;
+        document.getElementById('infoPhone').textContent = u.phone || u.mobile || '—';
+        document.getElementById('infoDepartment').textContent = u.department || '—';
+        document.getElementById('infoRole').textContent = roleLabel;
+        document.getElementById('infoEmployeeId').textContent = u.employee_id || '—';
+      } catch (err) {
+        App.showToast('Failed to load profile', 'danger');
+      }
+    }
   </script>
 </body>
 </html>

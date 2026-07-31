@@ -107,7 +107,7 @@ class MonitoringStation(db.Model):
             'elevation': self.elevation,
             'is_active': self.is_active,
             'parameters': self.parameters,
-            'metadata': self.station_metadata,
+            'metadata': self.station_reading_alert_compliance_metadata,
             'last_reading_at': self.last_reading_at.isoformat() if self.last_reading_at else None,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
@@ -162,7 +162,7 @@ class AirQualityReading(db.Model):
             'wind_speed': self.wind_speed,
             'wind_direction': self.wind_direction,
             'pressure': self.pressure,
-            'metadata': self.station_metadata,
+            'metadata': self.station_reading_alert_compliance_metadata,
             'recorded_at': self.recorded_at.isoformat() if self.recorded_at else None,
             'created_at': self.created_at.isoformat()
         }
@@ -227,7 +227,7 @@ class WaterQualityReading(db.Model):
             'phenols': self.phenols,
             'cyanide': self.cyanide,
             'sulfide': self.sulfide,
-            'metadata': self.station_metadata,
+            'metadata': self.station_reading_alert_compliance_metadata,
             'recorded_at': self.recorded_at.isoformat() if self.recorded_at else None,
             'created_at': self.created_at.isoformat()
         }
@@ -271,7 +271,7 @@ class NoiseReading(db.Model):
             'ldn': self.ldn,
             'cnel': self.cnel,
             'frequency_data': self.frequency_data,
-            'metadata': self.station_metadata,
+            'metadata': self.station_reading_alert_compliance_metadata,
             'recorded_at': self.recorded_at.isoformat() if self.recorded_at else None,
             'created_at': self.created_at.isoformat()
         }
@@ -330,7 +330,7 @@ class WeatherReading(db.Model):
             'solar_radiation': self.solar_radiation,
             'weather_condition': self.weather_condition,
             'weather_description': self.weather_description,
-            'metadata': self.station_metadata,
+            'metadata': self.station_reading_alert_compliance_metadata,
             'recorded_at': self.recorded_at.isoformat() if self.recorded_at else None,
             'created_at': self.created_at.isoformat()
         }
@@ -383,7 +383,7 @@ class EmissionReading(db.Model):
             'fuel_consumed': self.fuel_consumed,
             'fuel_type': self.fuel_type,
             'operating_hours': self.operating_hours,
-            'metadata': self.station_metadata,
+            'metadata': self.station_reading_alert_compliance_metadata,
             'recorded_at': self.recorded_at.isoformat() if self.recorded_at else None,
             'created_at': self.created_at.isoformat()
         }
@@ -440,7 +440,7 @@ class EnvironmentalAlert(db.Model):
             'resolved_by_id': self.resolved_by_id,
             'resolved_at': self.resolved_at.isoformat() if self.resolved_at else None,
             'resolution_notes': self.resolution_notes,
-            'metadata': self.station_metadata,
+            'metadata': self.station_reading_alert_compliance_metadata,
             'triggered_at': self.triggered_at.isoformat() if self.triggered_at else None,
             'created_at': self.created_at.isoformat()
         }
@@ -494,7 +494,7 @@ class ComplianceThreshold(db.Model):
             'is_active': self.is_active,
             'effective_from': self.effective_from.isoformat() if self.effective_from else None,
             'effective_to': self.effective_to.isoformat() if self.effective_to else None,
-            'metadata': self.station_metadata,
+            'metadata': self.station_reading_alert_compliance_metadata,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }

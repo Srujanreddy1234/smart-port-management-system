@@ -280,24 +280,13 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/utils.js"></script>
   <script>
-    const shipsData = [
-      { id: 'SHP-001', name: 'MV Pacific Star', type: 'Container Ship', flag: '🇮🇳', flagName: 'India', status: 'At Berth', berth: 'Berth 3', eta: '2026-07-20', containers: 1450, agent: 'Maersk Line' },
-      { id: 'SHP-002', name: 'MV Chennai Express', type: 'Bulk Carrier', flag: '🇮🇳', flagName: 'India', status: 'At Berth', berth: 'Berth 1', eta: '2026-07-21', containers: 0, agent: 'SCI Logistics' },
-      { id: 'SHP-003', name: 'MV Thoothukudi Pride', type: 'Container Ship', flag: '🇮🇳', flagName: 'India', status: 'Anchored', berth: '—', eta: '2026-07-24', containers: 820, agent: 'CMA CGM' },
-      { id: 'SHP-004', name: 'MV Blue Horizon', type: 'RoRo', flag: '🇱🇰', flagName: 'Sri Lanka', status: 'In Channel', berth: '—', eta: '2026-07-24', containers: 0, agent: 'SW Shipping' },
-      { id: 'SHP-005', name: 'MT Rameswaram', type: 'Tanker', flag: '🇮🇳', flagName: 'India', status: 'At Berth', berth: 'Berth 7', eta: '2026-07-19', containers: 0, agent: 'BPCL Marine' },
-      { id: 'SHP-006', name: 'MV Dhanushkodi', type: 'Bulk Carrier', flag: '🇮🇳', flagName: 'India', status: 'Anchored', berth: '—', eta: '2026-07-25', containers: 0, agent: 'Adani Ports' },
-      { id: 'SHP-007', name: 'MV Coromandel', type: 'Container Ship', flag: '🇩🇪', flagName: 'Germany', status: 'Approaching', berth: '—', eta: '2026-07-24', containers: 2100, agent: 'Hapag-Lloyd' },
-      { id: 'SHP-008', name: 'MT Kerala Star', type: 'Tanker', flag: '🇦🇪', flagName: 'UAE', status: 'At Berth', berth: 'Berth 9', eta: '2026-07-18', containers: 0, agent: 'Emarat Marine' },
-      { id: 'SHP-009', name: 'MV Southern Crown', type: 'RoRo', flag: '🇸🇬', flagName: 'Singapore', status: 'Departed', berth: '—', eta: '2026-07-17', containers: 0, agent: 'EUKOR Car Carriers' },
-      { id: 'SHP-010', name: 'MV Bay of Bengal', type: 'Bulk Carrier', flag: '🇮🇳', flagName: 'India', status: 'In Channel', berth: '—', eta: '2026-07-24', containers: 0, agent: 'The Shipping Corp.' }
-    ];
-
+    let shipsData = [];
+    let filteredData = [];
     let currentPage = 1;
     const rowsPerPage = 10;
-    let filteredData = [...shipsData];
 
     function getStatusBadgeClass(status) {
       const map = { 'At Berth': 'success', 'Anchored': 'warning', 'In Channel': 'info', 'Approaching': 'primary', 'Departed': 'secondary' };
@@ -314,15 +303,15 @@
       const tbody = document.getElementById('shipsTableBody');
       tbody.innerHTML = pageData.map(s => `
         <tr>
-          <td><strong>${s.id}</strong></td>
+          <td><strong>${s.ship_id}</strong></td>
           <td>${s.name}</td>
-          <td>${s.type}</td>
-          <td><span title="${s.flagName}">${s.flag}</span> ${s.flagName}</td>
+          <td>${s.vessel_type}</td>
+          <td>${s.flag || '—'}</td>
           <td><span class="badge badge-${getStatusBadgeClass(s.status)}">${s.status}</span></td>
-          <td>${s.berth}</td>
-          <td>${s.eta}</td>
-          <td>${s.containers > 0 ? s.containers.toLocaleString() : '—'}</td>
-          <td>${s.agent}</td>
+          <td>${s.current_berth || '—'}</td>
+          <td>${s.eta ? Utils.formatDate(s.eta) : '—'}</td>
+          <td>${s.containers_onboard > 0 ? s.containers_onboard.toLocaleString() : '—'}</td>
+          <td>${s.agent || '—'}</td>
           <td>
             <div style="display:flex;gap:4px;">
               <button class="btn btn-sm btn-secondary" title="View Details" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
@@ -363,14 +352,75 @@
       const type = document.getElementById('typeFilter').value;
       const berth = document.getElementById('berthFilter').value;
       const data = shipsData.filter(s => {
-        const matchSearch = !search || s.name.toLowerCase().includes(search) || s.id.toLowerCase().includes(search) || s.agent.toLowerCase().includes(search);
+        const matchSearch = !search || String(s.name || '').toLowerCase().includes(search) || String(s.ship_id || '').toLowerCase().includes(search) || String(s.agent || '').toLowerCase().includes(search);
         const matchStatus = !status || s.status === status;
-        const matchType = !type || s.type === type;
-        const matchBerth = !berth || s.berth === berth;
+        const matchType = !type || String(s.vessel_type || '').replace(/[^A-Za-z]/g, '') === type.replace(/[^A-Za-z]/g, '');
+        const matchBerth = !berth || s.current_berth === berth;
         return matchSearch && matchStatus && matchType && matchBerth;
       });
       currentPage = 1;
       renderShips(data);
+    }
+
+    function updateKpiValue(label, value) {
+      document.querySelectorAll('.kpi-card').forEach(card => {
+        const lbl = card.querySelector('.kpi-label');
+        if (lbl && lbl.textContent.trim() === label) {
+          const val = card.querySelector('.kpi-value');
+          if (val) val.textContent = Number(value || 0).toLocaleString();
+        }
+      });
+    }
+
+    async function loadKpis() {
+      try {
+        const res = await Api.request('/ships/stats');
+        const stats = res.data;
+        updateKpiValue('Total Ships', stats.total);
+        updateKpiValue('At Berth', stats.by_status['At Berth']);
+        updateKpiValue('Anchored', stats.by_status['Anchored']);
+        updateKpiValue('In Channel', stats.by_status['In Channel']);
+      } catch (err) {
+        App.showToast('Failed to load data', 'danger');
+      }
+    }
+
+    async function loadShips() {
+      try {
+        const res = await Api.request('/ships?page=1&per_page=50');
+        shipsData = res.data.items || [];
+        filteredData = [...shipsData];
+        currentPage = 1;
+        renderShips(filteredData);
+      } catch (err) {
+        App.showToast('Failed to load data', 'danger');
+        renderShips([]);
+      }
+    }
+
+    async function loadArrivalsChart() {
+      try {
+        const res = await Api.request('/ships/arrivals-chart?days=30');
+        const ctx = document.getElementById('vesselArrivalsChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: res.data,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'top', labels: { usePointStyle: true, padding: 20 } }
+            },
+            scales: {
+              y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+              x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } }
+            },
+            interaction: { mode: 'index', intersect: false }
+          }
+        });
+      } catch (err) {
+        App.showToast('Failed to load data', 'danger');
+      }
     }
 
     document.getElementById('shipSearch').addEventListener('input', filterShips);
@@ -379,58 +429,9 @@
     document.getElementById('berthFilter').addEventListener('change', filterShips);
 
     document.addEventListener('DOMContentLoaded', () => {
-      renderShips(shipsData);
-
-      const labels = Array.from({length: 30}, (_, i) => {
-        const d = new Date();
-        d.setDate(d.getDate() - (29 - i));
-        return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
-      });
-
-      const arrivals = [3,5,2,7,4,6,3,8,5,4,6,3,9,7,5,4,8,6,3,7,5,9,4,6,8,3,5,7,4,6];
-      const departures = [2,4,3,5,3,5,2,6,4,3,5,2,7,5,4,3,6,5,2,6,4,7,3,5,6,2,4,5,3,5];
-
-      const ctx = document.getElementById('vesselArrivalsChart').getContext('2d');
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: 'Arrivals',
-              data: arrivals,
-              borderColor: 'rgba(13,110,253,1)',
-              backgroundColor: 'rgba(13,110,253,0.1)',
-              fill: true,
-              tension: 0.4,
-              pointRadius: 3,
-              pointBackgroundColor: 'rgba(13,110,253,1)'
-            },
-            {
-              label: 'Departures',
-              data: departures,
-              borderColor: 'rgba(25,135,84,1)',
-              backgroundColor: 'rgba(25,135,84,0.1)',
-              fill: true,
-              tension: 0.4,
-              pointRadius: 3,
-              pointBackgroundColor: 'rgba(25,135,84,1)'
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'top', labels: { usePointStyle: true, padding: 20 } }
-          },
-          scales: {
-            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
-            x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } }
-          },
-          interaction: { mode: 'index', intersect: false }
-        }
-      });
+      loadShips();
+      loadKpis();
+      loadArrivalsChart();
     });
   </script>
 </body>

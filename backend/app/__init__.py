@@ -2,7 +2,7 @@ import os
 from flask import Flask, jsonify
 from flask_migrate import Migrate
 from config import config
-from app.extensions import db, migrate, jwt, bcrypt, mail, cache, limiter
+from app.extensions import db, migrate, jwt, bcrypt, mail, cache, limiter, oauth
 
 
 def create_app(config_name=None):
@@ -19,6 +19,14 @@ def create_app(config_name=None):
     mail.init_app(app)
     cache.init_app(app)
     limiter.init_app(app)
+    oauth.init_app(app)
+    oauth.register(
+        name='google',
+        client_id=app.config.get('GOOGLE_CLIENT_ID'),
+        client_secret=app.config.get('GOOGLE_CLIENT_SECRET'),
+        server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+        client_kwargs={'scope': 'openid email profile'},
+    )
 
     # CORS
     from flask_cors import CORS

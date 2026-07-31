@@ -157,21 +157,21 @@
         </div>
         <div class="card kpi-card glow-card">
           <div class="kpi-icon" style="background:rgba(25,135,84,0.12);color:#75b798;"><i class="fas fa-boxes-stacked"></i></div>
-          <div class="kpi-value">1,247</div>
+          <div class="kpi-value" id="kpiContainers">1,247</div>
           <div class="kpi-label">Containers Handled</div>
           <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> 8% from last week</div>
           <div class="kpi-bg"><i class="fas fa-boxes-stacked"></i></div>
         </div>
         <div class="card kpi-card glow-card">
           <div class="kpi-icon" style="background:rgba(255,193,7,0.12);color:#ffda6a;"><i class="fas fa-truck"></i></div>
-          <div class="kpi-value">156</div>
+          <div class="kpi-value" id="kpiTrucks">156</div>
           <div class="kpi-label">Trucks In Transit</div>
           <div class="kpi-change negative"><i class="fas fa-arrow-down"></i> 3% from yesterday</div>
           <div class="kpi-bg"><i class="fas fa-truck"></i></div>
         </div>
         <div class="card kpi-card glow-card">
           <div class="kpi-icon" style="background:rgba(220,53,69,0.12);color:#ea868f;"><i class="fas fa-shield-halved"></i></div>
-          <div class="kpi-value">3</div>
+          <div class="kpi-value" id="kpiAlerts">3</div>
           <div class="kpi-label">Active Alerts</div>
           <div class="kpi-change negative"><i class="fas fa-arrow-up"></i> 2 new today</div>
           <div class="kpi-bg"><i class="fas fa-shield-halved"></i></div>
@@ -198,19 +198,19 @@
             <div class="weather-main">
               <div class="weather-icon"><i class="fas fa-cloud-sun"></i></div>
               <div>
-                <div class="weather-temp">32°C</div>
-                <div class="weather-desc">Partly Cloudy</div>
+                <div class="weather-temp" id="weatherTemp">32°C</div>
+                <div class="weather-desc" id="weatherDesc">Partly Cloudy</div>
               </div>
             </div>
             <div class="weather-details">
               <div class="weather-detail">
                 <i class="fas fa-wind"></i>
-                <span>18 km/h</span>
+                <span id="weatherWind">18 km/h</span>
                 <small>Wind</small>
               </div>
               <div class="weather-detail">
                 <i class="fas fa-droplet"></i>
-                <span>72%</span>
+                <span id="weatherHumidity">72%</span>
                 <small>Humidity</small>
               </div>
               <div class="weather-detail">
@@ -223,9 +223,10 @@
           <div class="card aqi-widget">
             <h6 style="font-size:0.88rem;font-weight:600;margin-bottom:16px;">Air Quality Index</h6>
             <div class="aqi-circle" style="border-color:var(--success);">
-              <div class="aqi-value" style="color:var(--success);">42</div>
-              <div class="aqi-label" style="color:var(--success);">Good</div>
+              <div class="aqi-value" id="aqiValue" style="color:var(--success);">42</div>
+              <div class="aqi-label" id="aqiLabel" style="color:var(--success);">Good</div>
             </div>
+            <!-- TODO: pollutant breakdown (PM2.5/PM10/NO2/CO) not wired, stays illustrative -->
             <div class="aqi-details">
               <div class="aqi-detail"><i class="fas fa-smog" style="color:var(--info);"></i><div><small>PM2.5</small><span>18 µg/m³</span></div></div>
               <div class="aqi-detail"><i class="fas fa-wind" style="color:var(--warning);"></i><div><small>PM10</small><span>32 µg/m³</span></div></div>
@@ -257,7 +258,7 @@
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;margin-bottom:24px;">
         <div class="card">
           <div class="card-header"><h6><i class="fas fa-ship" style="color:var(--primary-light);margin-right:8px;"></i>Vessel Status</h6></div>
-          <div class="card-body">
+          <div class="card-body" id="vesselStatusBody">
             <div class="ship-stat-row"><div class="label"><i class="fas fa-circle" style="color:var(--success);"></i>At Berth</div><div class="value">8</div></div>
             <div class="ship-stat-row"><div class="label"><i class="fas fa-circle" style="color:var(--warning);"></i>Anchored</div><div class="value">6</div></div>
             <div class="ship-stat-row"><div class="label"><i class="fas fa-circle" style="color:var(--info);"></i>In Channel</div><div class="value">4</div></div>
@@ -280,27 +281,7 @@
         </div>
         <div class="card">
           <div class="card-header"><h6><i class="fas fa-clock-rotate-left" style="color:var(--info);margin-right:8px;"></i>Recent Activity</h6></div>
-          <div class="card-body" style="max-height:300px;overflow-y:auto;">
-            <div class="activity-item">
-              <div class="activity-icon" style="background:rgba(25,135,84,0.12);color:#75b798;"><i class="fas fa-check"></i></div>
-              <div class="activity-body"><h6>MV Pacific Star berthed at Berth 3</h6><p>Container discharge in progress</p><small>5 min ago</small></div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon" style="background:rgba(13,110,253,0.12);color:#6ea8fe;"><i class="fas fa-truck"></i></div>
-              <div class="activity-body"><h6>Truck TK-4521 loaded with 2 containers</h6><p>Heading to Chennai warehouse</p><small>18 min ago</small></div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon" style="background:rgba(220,53,69,0.12);color:#ea868f;"><i class="fas fa-exclamation"></i></div>
-              <div class="activity-body"><h6>Zone B security breach detected</h6><p>AI flagged unauthorized movement</p><small>32 min ago</small></div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon" style="background:rgba(255,193,7,0.12);color:#ffda6a;"><i class="fas fa-wrench"></i></div>
-              <div class="activity-body"><h6>Crane #3 maintenance completed</h6><p>Now operational</p><small>1 hour ago</small></div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon" style="background:rgba(102,16,242,0.12);color:#a98eda;"><i class="fas fa-leaf"></i></div>
-              <div class="activity-body"><h6>Water quality test passed</h6><p>All parameters within limits</p><small>2 hours ago</small></div>
-            </div>
+          <div class="card-body" id="recentActivityBody" style="max-height:300px;overflow-y:auto;">
           </div>
         </div>
       </div>
@@ -321,26 +302,10 @@
         </div>
         <div class="card">
           <div class="card-header"><h6><i class="fas fa-ranking-star" style="color:var(--warning);margin-right:8px;"></i>Top Berths</h6></div>
-          <div class="card-body">
+          <div class="card-body" id="topBerthsBody">
             <div style="margin-bottom:14px;">
               <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:0.82rem;">Berth 3</span><span style="font-size:0.82rem;font-weight:600;">94%</span></div>
               <div class="progress"><div class="progress-bar bg-primary" style="width:94%"></div></div>
-            </div>
-            <div style="margin-bottom:14px;">
-              <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:0.82rem;">Berth 1</span><span style="font-size:0.82rem;font-weight:600;">87%</span></div>
-              <div class="progress"><div class="progress-bar bg-success" style="width:87%"></div></div>
-            </div>
-            <div style="margin-bottom:14px;">
-              <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:0.82rem;">Berth 7</span><span style="font-size:0.82rem;font-weight:600;">72%</span></div>
-              <div class="progress"><div class="progress-bar bg-warning" style="width:72%"></div></div>
-            </div>
-            <div style="margin-bottom:14px;">
-              <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:0.82rem;">Berth 5</span><span style="font-size:0.82rem;font-weight:600;">58%</span></div>
-              <div class="progress"><div class="progress-bar bg-info" style="width:58%"></div></div>
-            </div>
-            <div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:0.82rem;">Berth 9</span><span style="font-size:0.82rem;font-weight:600;">35%</span></div>
-              <div class="progress"><div class="progress-bar bg-danger" style="width:35%"></div></div>
             </div>
           </div>
         </div>
@@ -353,25 +318,104 @@
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/charts.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      ChartFactory.createLineChart('throughputChart',
-        ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-        [
-          { label: 'Containers', data: [1200,1350,1100,1450,1380,980,1247], fill: true },
-          { label: 'Bulk Cargo (tons)', data: [800,920,750,1050,980,600,850], fill: true }
-        ]
-      );
-      ChartFactory.createDoughnutChart('containerDistChart',
-        ['Loaded', 'Empty', 'Reefer', 'Hazmat', 'Tank'],
-        [520, 310, 180, 140, 97]
-      );
-      ChartFactory.createBarChart('truckTrafficChart',
-        ['6AM','8AM','10AM','12PM','2PM','4PM','6PM','8PM'],
-        [{ label: 'Trucks', data: [12,34,56,48,62,45,28,15], backgroundColor: 'rgba(255,193,7,0.7)' }]
-      );
+      loadKpis();
+      loadCharts();
+      loadVesselStatus();
+      loadRecentActivity();
+      loadBerthOccupancy();
     });
+
+    async function loadKpis() {
+      try {
+        const res = await Api.request('/dashboard/kpis');
+        const k = res.data;
+        document.getElementById('kpiShips').textContent = k.total_ships.value;
+        document.getElementById('kpiContainers').textContent = k.total_containers.value.toLocaleString();
+        document.getElementById('kpiTrucks').textContent = k.trucks_in_transit.value;
+        document.getElementById('kpiAlerts').textContent = k.active_alerts.value;
+
+        document.getElementById('weatherTemp').textContent = Math.round(k.weather.temperature) + '°C';
+        document.getElementById('weatherDesc').textContent = k.weather.condition;
+        document.getElementById('weatherWind').textContent = k.weather.wind_speed + ' km/h';
+        document.getElementById('weatherHumidity').textContent = k.weather.humidity + '%';
+
+        document.getElementById('aqiValue').textContent = k.aqi.value;
+        document.getElementById('aqiLabel').textContent = k.aqi.category;
+      } catch (err) {
+        App.showToast('Failed to load KPIs', 'danger');
+      }
+    }
+
+    async function loadCharts() {
+      try {
+        const throughput = await Api.request('/dashboard/charts/throughput?days=7');
+        ChartFactory.createLineChart('throughputChart', throughput.data.labels,
+          throughput.data.datasets.map(ds => ({ label: ds.label, data: ds.data, fill: true })));
+      } catch (err) { App.showToast('Failed to load throughput chart', 'danger'); }
+
+      try {
+        const dist = await Api.request('/dashboard/charts/container-distribution');
+        ChartFactory.createDoughnutChart('containerDistChart', dist.data.by_type.labels, dist.data.by_type.data);
+      } catch (err) { App.showToast('Failed to load container chart', 'danger'); }
+
+      try {
+        const traffic = await Api.request('/dashboard/charts/truck-traffic');
+        ChartFactory.createBarChart('truckTrafficChart', traffic.data.labels,
+          [{ label: 'Trucks', data: traffic.data.datasets[0].data, backgroundColor: 'rgba(255,193,7,0.7)' }]);
+      } catch (err) { App.showToast('Failed to load truck traffic chart', 'danger'); }
+    }
+
+    async function loadVesselStatus() {
+      try {
+        const res = await Api.request('/dashboard/vessel-status');
+        const colors = { 'At Berth': 'success', 'Anchored': 'warning', 'In Channel': 'info', 'Approaching': 'primary', 'Departed': 'text-muted', 'Scheduled': 'info', 'Loading': 'warning', 'Unloading': 'warning', 'Departing': 'primary', 'Diverted': 'danger', 'Delayed': 'danger' };
+        const entries = Object.entries(res.data);
+        if (entries.length === 0) { document.getElementById('vesselStatusBody').innerHTML = '<p class="text-muted">No vessel data</p>'; return; }
+        document.getElementById('vesselStatusBody').innerHTML = entries.map(([status, count]) =>
+          `<div class="ship-stat-row"><div class="label"><i class="fas fa-circle" style="color:var(--${colors[status] || 'text-muted'});"></i>${status}</div><div class="value">${count}</div></div>`
+        ).join('');
+      } catch (err) {
+        App.showToast('Failed to load vessel status', 'danger');
+      }
+    }
+
+    async function loadRecentActivity() {
+      try {
+        const res = await Api.request('/dashboard/recent-activity?limit=10');
+        const colorMap = { primary: 'rgba(13,110,253,0.12);color:#6ea8fe', success: 'rgba(25,135,84,0.12);color:#75b798', danger: 'rgba(220,53,69,0.12);color:#ea868f', warning: 'rgba(255,193,7,0.12);color:#ffda6a', info: 'rgba(13,202,240,0.12);color:#66d9f0' };
+        const items = res.data || [];
+        if (items.length === 0) { document.getElementById('recentActivityBody').innerHTML = '<p class="text-muted">No recent activity</p>'; return; }
+        document.getElementById('recentActivityBody').innerHTML = items.map(a => `
+          <div class="activity-item">
+            <div class="activity-icon" style="background:${colorMap[a.color] || colorMap.info};"><i class="fas ${a.icon}"></i></div>
+            <div class="activity-body"><h6>${a.title}</h6><p>${a.description || ''}</p><small>${Utils.timeAgo(a.timestamp)}</small></div>
+          </div>
+        `).join('');
+      } catch (err) {
+        App.showToast('Failed to load recent activity', 'danger');
+      }
+    }
+
+    async function loadBerthOccupancy() {
+      try {
+        const res = await Api.request('/dashboard/berth-occupancy');
+        const occupied = (res.data || []).filter(b => b.occupied).sort((a, b) => b.occupancy_pct - a.occupancy_pct).slice(0, 5);
+        if (occupied.length === 0) { document.getElementById('topBerthsBody').innerHTML = '<p class="text-muted">No berths occupied</p>'; return; }
+        const barColor = pct => pct >= 90 ? 'primary' : pct >= 75 ? 'success' : pct >= 55 ? 'warning' : 'info';
+        document.getElementById('topBerthsBody').innerHTML = occupied.map(b => `
+          <div style="margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:0.82rem;">${b.berth}</span><span style="font-size:0.82rem;font-weight:600;">${b.occupancy_pct}%</span></div>
+            <div class="progress"><div class="progress-bar bg-${barColor(b.occupancy_pct)}" style="width:${b.occupancy_pct}%"></div></div>
+          </div>
+        `).join('');
+      } catch (err) {
+        App.showToast('Failed to load berth occupancy', 'danger');
+      }
+    }
   </script>
 </body>
 </html>

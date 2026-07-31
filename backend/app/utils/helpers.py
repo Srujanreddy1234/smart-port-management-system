@@ -115,7 +115,9 @@ def register_cli_commands(app):
         for v in vessels:
             ship = Ship(**v)
             db.session.add(ship)
-        
+        db.session.flush()
+        ship_ids = [s.id for s in Ship.query.all()]
+
         for i in range(1, 11):
             container = Container(
                 container_id=f'MSKU{1000000+i}',
@@ -135,10 +137,12 @@ def register_cli_commands(app):
                 is_reefer=random.choice([True, False]),
                 is_hazardous=random.choice([True, False]),
                 customs_status='CLEARED',
-                ship_id=random.randint(1, 3) if random.choice([True, False]) else None,
+                ship_id=random.choice(ship_ids) if random.choice([True, False]) else None,
             )
             db.session.add(container)
-            
+        db.session.flush()
+        container_ids = [c.id for c in Container.query.all()]
+
         for i in range(1, 21):
             truck = Truck(
                 truck_number=f'TN-{1000+i}',
@@ -147,15 +151,15 @@ def register_cli_commands(app):
                 truck_type=random.choice(list(TruckType)),
                 status=random.choice(list(TruckStatus)),
                 capacity=random.choice([20, 40]),
-                assigned_container_id=random.randint(1, 10) if random.choice([True, False]) else None,
+                assigned_container_id=random.choice(container_ids) if random.choice([True, False]) else None,
             )
             db.session.add(truck)
             
         equipments = [
-            {'equipment_id': 'STS-01', 'name': 'STS Crane 1', 'equipment_type': EquipmentType.STS_CRANE, 'status': EquipmentStatus.OPERATIONAL, 'health_percentage': 95, 'location': 'Berth 1'},
-            {'equipment_id': 'STS-02', 'name': 'STS Crane 2', 'equipment_type': EquipmentType.STS_CRANE, 'status': EquipmentStatus.OPERATIONAL, 'health_percentage': 92, 'location': 'Berth 2'},
-            {'equipment_id': 'RTG-01', 'name': 'RTG Crane 1', 'equipment_type': EquipmentType.RTG_CRANE, 'status': EquipmentStatus.OPERATIONAL, 'health_percentage': 88, 'location': 'Block A'},
-            {'equipment_id': 'RTG-02', 'name': 'RTG Crane 2', 'equipment_type': EquipmentType.RTG_CRANE, 'status': EquipmentStatus.MAINTENANCE, 'health_percentage': 45, 'location': 'Block B'},
+            {'equipment_id': 'STS-01', 'name': 'STS Crane 1', 'equipment_type': EquipmentType.CRANE_STS, 'status': EquipmentStatus.OPERATIONAL, 'health_percentage': 95, 'location': 'Berth 1'},
+            {'equipment_id': 'STS-02', 'name': 'STS Crane 2', 'equipment_type': EquipmentType.CRANE_STS, 'status': EquipmentStatus.OPERATIONAL, 'health_percentage': 92, 'location': 'Berth 2'},
+            {'equipment_id': 'RTG-01', 'name': 'RTG Crane 1', 'equipment_type': EquipmentType.CRANE_RTG, 'status': EquipmentStatus.OPERATIONAL, 'health_percentage': 88, 'location': 'Block A'},
+            {'equipment_id': 'RTG-02', 'name': 'RTG Crane 2', 'equipment_type': EquipmentType.CRANE_RTG, 'status': EquipmentStatus.MAINTENANCE, 'health_percentage': 45, 'location': 'Block B'},
             {'equipment_id': 'RS-01', 'name': 'Reach Stacker 1', 'equipment_type': EquipmentType.REACH_STACKER, 'status': EquipmentStatus.OPERATIONAL, 'health_percentage': 90, 'location': 'Yard 1'},
             {'equipment_id': 'TT-01', 'name': 'Terminal Tractor 1', 'equipment_type': EquipmentType.TERMINAL_TRACTOR, 'status': EquipmentStatus.OPERATIONAL, 'health_percentage': 93, 'location': 'Gate 1'},
         ]

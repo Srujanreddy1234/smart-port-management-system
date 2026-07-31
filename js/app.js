@@ -5,8 +5,22 @@ const App = {
     this.initNotifications();
     this.initSearch();
     this.initTheme();
+    this.initUserDisplay();
     this.updateClock();
     setInterval(() => this.updateClock(), 1000);
+  },
+
+  initUserDisplay() {
+    if (typeof Api === 'undefined') return;
+    const user = Api.getUser();
+    if (!user) return;
+    const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email;
+    const initials = Utils && Utils.getInitials ? Utils.getInitials(fullName) : fullName.slice(0, 2).toUpperCase();
+    const roleLabel = (user.role || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+    document.querySelectorAll('.sidebar-user-info h6').forEach(el => el.textContent = fullName);
+    document.querySelectorAll('.sidebar-user-info small').forEach(el => el.textContent = roleLabel);
+    document.querySelectorAll('.sidebar-user-avatar').forEach(el => el.textContent = initials);
   },
 
   initSidebar() {

@@ -1,12 +1,12 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, redirect, url_for
 from flask_jwt_extended import (
     create_access_token, create_refresh_token, jwt_required,
     get_jwt_identity, get_jwt, verify_jwt_in_request
 )
 from marshmallow import Schema, fields, validate, ValidationError
 from werkzeug.security import check_password_hash
-from app.extensions import db, limiter
-from app.models import User, Session, AuditLog
+from app.extensions import db, limiter, oauth
+from app.models import User, Session, AuditLog, UserRole, UserStatus
 from app.services.auth_service import AuthService
 from app.utils.exceptions import ValidationError as AppValidationError, AuthenticationError, AuthorizationError
 from app.utils.helpers import success_response, error_response, paginate_query
@@ -136,6 +136,64 @@ def login():
         'expires_in': 7200,
         'user': user.to_dict()
     }, 'Login successful')
+
+
+@auth_bp.route('/register', methods=['POST'])
+@limiter.limit("10 per hour")
+def register():
+    schema = RegisterSchema()
+    try:
+        data = schema.load(request.get_json() or {})
+    except ValidationError as err:
+        return error_response('Validation failed', errors=err.messages, status_code=400)
+
+    email = data['email'].lower()
+    if User.query.filter_by(email=email).first():
+        raise AppValidationError('An account with this email already exists')
+
+    user = User(
+        email=email,
+        first_name=data['first_name'],
+        last_name=data['last_name'],
+        role=UserRole.VIEWER,
+        status=UserStatus.ACTIVE,
+        department=data.get('department'),
+        designation=data.get('designation'),
+        phone=data.get('phone'),
+        mobile=data.get('mobile')
+    )
+    user.set_password(data['password'])
+    db.session.add(user)
+    db.session.commit()
+
+    access_token = create_access_token(
+        identity=str(user.id),
+        additional_claims={'role': user.role.value, 'email': user.email, 'full_name': user.get_full_name()}
+    )
+    refresh_token = create_refresh_token(identity=str(user.id))
+
+    session = Session(
+        user_id=user.id,
+        token=access_token,
+        refresh_token=refresh_token,
+        user_agent=get_user_agent(),
+        ip_address=get_client_ip(),
+        device_info={'platform': request.user_agent.platform, 'browser': request.user_agent.browser, 'version': request.user_agent.version},
+        expires_at=datetime.utcnow() + timedelta(hours=2),
+        refresh_expires_at=datetime.utcnow() + timedelta(days=7)
+    )
+    db.session.add(session)
+    db.session.commit()
+
+    AuthService._log_audit(user_id=user.id, action='register', resource_type='auth', status='success')
+
+    return success_response({
+        'access_token': access_token,
+        'refresh_token': refresh_token,
+        'token_type': 'Bearer',
+        'expires_in': 7200,
+        'user': user.to_dict()
+    }, 'Account created successfully', 201)
 
 
 @auth_bp.route('/logout', methods=['POST'])
@@ -331,7 +389,69 @@ def revoke_all_sessions():
         Session.is_revoked == False,
         Session.token != request.headers.get('Authorization', '').replace('Bearer ', '')
     ).update({'is_revoked': True, 'revoked_at': datetime.utcnow(), 'revoked_reason': 'Revoked all other sessions'})
-    
+
     db.session.commit()
 
     return success_response(None, 'All other sessions revoked')
+
+
+@auth_bp.route('/google/login', methods=['GET'])
+def google_login():
+    redirect_uri = url_for('auth.google_callback', _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
+
+
+@auth_bp.route('/google/callback', methods=['GET'])
+def google_callback():
+    frontend_url = current_app.config.get('FRONTEND_URL', 'http://localhost:5501')
+    try:
+        token = oauth.google.authorize_access_token()
+        userinfo = token.get('userinfo') or oauth.google.userinfo()
+    except Exception:
+        return redirect(f'{frontend_url}/login.html?error=oauth_failed')
+
+    email = (userinfo.get('email') or '').lower()
+    if not email:
+        return redirect(f'{frontend_url}/login.html?error=oauth_no_email')
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        user = User(
+            email=email,
+            first_name=userinfo.get('given_name') or userinfo.get('name') or 'Google',
+            last_name=userinfo.get('family_name') or 'User',
+            role=UserRole.VIEWER,
+            status=UserStatus.ACTIVE,
+            email_verified=bool(userinfo.get('email_verified')),
+            avatar_url=userinfo.get('picture')
+        )
+        db.session.add(user)
+        db.session.commit()
+
+    if not user.is_active():
+        return redirect(f'{frontend_url}/login.html?error=account_inactive')
+
+    user.record_successful_login(get_client_ip())
+
+    access_token = create_access_token(
+        identity=str(user.id),
+        additional_claims={'role': user.role.value, 'email': user.email, 'full_name': user.get_full_name()}
+    )
+    refresh_token = create_refresh_token(identity=str(user.id))
+
+    session = Session(
+        user_id=user.id,
+        token=access_token,
+        refresh_token=refresh_token,
+        user_agent=get_user_agent(),
+        ip_address=get_client_ip(),
+        device_info={'platform': None, 'browser': None, 'version': None},
+        expires_at=datetime.utcnow() + timedelta(hours=2),
+        refresh_expires_at=datetime.utcnow() + timedelta(days=7)
+    )
+    db.session.add(session)
+    db.session.commit()
+
+    AuthService._log_audit(user_id=user.id, action='login', resource_type='auth', status='success')
+
+    return redirect(f'{frontend_url}/oauth-callback.html?access_token={access_token}&refresh_token={refresh_token}')

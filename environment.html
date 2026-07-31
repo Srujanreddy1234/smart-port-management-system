@@ -223,8 +223,8 @@
               <i class="fas fa-wind"></i>
             </div>
             <div class="stat-content">
-              <h3 class="stat-value">42</h3>
-              <p class="stat-label">AQI — Good</p>
+              <h3 class="stat-value" id="aqiStat">42</h3>
+              <p class="stat-label" id="aqiStatLabel">AQI — Good</p>
             </div>
             <div class="stat-trend trend-up">
               <i class="fas fa-check-circle"></i> Normal
@@ -235,7 +235,7 @@
               <i class="fas fa-droplet"></i>
             </div>
             <div class="stat-content">
-              <h3 class="stat-value">7.2</h3>
+              <h3 class="stat-value" id="phStat">7.2</h3>
               <p class="stat-label">Water pH Level</p>
             </div>
             <div class="stat-trend trend-up">
@@ -247,7 +247,7 @@
               <i class="fas fa-volume-high"></i>
             </div>
             <div class="stat-content">
-              <h3 class="stat-value">68 <small style="font-size:0.55em;">dB</small></h3>
+              <h3 class="stat-value"><span id="noiseStat">68</span> <small style="font-size:0.55em;">dB</small></h3>
               <p class="stat-label">Noise Level</p>
             </div>
             <div class="stat-trend trend-down">
@@ -255,6 +255,7 @@
             </div>
           </div>
           <div class="stat-card stat-card-primary">
+            <!-- TODO: no backend endpoint for emissions summary yet, stays illustrative -->
             <div class="stat-icon">
               <i class="fas fa-cloud"></i>
             </div>
@@ -269,6 +270,7 @@
         </div>
 
         <!-- Real-time Monitoring Section -->
+        <!-- TODO: per-parameter breakdown (PM2.5, PM10, etc.) not wired, stays illustrative -->
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:24px;">
           <!-- Air Quality Card -->
           <div class="card chart-card">
@@ -496,104 +498,7 @@
                     <th>Actions</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td><span class="container-id">ENV-2024-00341</span></td>
-                    <td><i class="fas fa-wind text-info me-1"></i>Air</td>
-                    <td>PM10 levels exceed threshold at Crane Yard</td>
-                    <td>Crane Yard - Zone B</td>
-                    <td><span class="status-badge status-warning">High</span></td>
-                    <td>2024-12-15 09:12:45</td>
-                    <td><span class="status-badge status-danger">Active</span></td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-search"></i></button>
-                        <button class="btn btn-icon btn-track" title="Resolve" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-check"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">ENV-2024-00340</span></td>
-                    <td><i class="fas fa-water text-primary me-1"></i>Water</td>
-                    <td>TSS levels approaching upper limit at Outfall Point</td>
-                    <td>Discharge Outfall - Zone D</td>
-                    <td><span class="status-badge status-info">Medium</span></td>
-                    <td>2024-12-15 08:34:21</td>
-                    <td><span class="status-badge status-warning">Investigating</span></td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-search"></i></button>
-                        <button class="btn btn-icon btn-track" title="Resolve" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-check"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">ENV-2024-00339</span></td>
-                    <td><i class="fas fa-volume-high text-warning me-1"></i>Noise</td>
-                    <td>Engine Workshop exceeds 85 dB night-time limit</td>
-                    <td>Engine Workshop - Zone A</td>
-                    <td><span class="status-badge status-danger">Critical</span></td>
-                    <td>2024-12-15 06:48:09</td>
-                    <td><span class="status-badge status-danger">Active</span></td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-search"></i></button>
-                        <button class="btn btn-icon btn-track" title="Resolve" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-check"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">ENV-2024-00338</span></td>
-                    <td><i class="fas fa-recycle text-success me-1"></i>Waste</td>
-                    <td>Oil-contaminated waste container near capacity</td>
-                    <td>Hazardous Waste Yard</td>
-                    <td><span class="status-badge status-warning">High</span></td>
-                    <td>2024-12-15 05:15:33</td>
-                    <td><span class="status-badge status-warning">Pending</span></td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-search"></i></button>
-                        <button class="btn btn-icon btn-track" title="Resolve" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-check"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">ENV-2024-00337</span></td>
-                    <td><i class="fas fa-smog text-secondary me-1"></i>Emission</td>
-                    <td>CO₂ output from backup generators above target</td>
-                    <td>Power Station - Zone C</td>
-                    <td><span class="status-badge status-info">Medium</span></td>
-                    <td>2024-12-15 04:22:18</td>
-                    <td><span class="status-badge status-success">Resolved</span></td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-search"></i></button>
-                        <button class="btn btn-icon btn-track" title="Resolve" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-check"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><span class="container-id">ENV-2024-00336</span></td>
-                    <td><i class="fas fa-wind text-info me-1"></i>Air</td>
-                    <td>SO₂ spike detected near ship berthing area</td>
-                    <td>Berth 3 - Zone A</td>
-                    <td><span class="status-badge status-warning">High</span></td>
-                    <td>2024-12-15 02:05:47</td>
-                    <td><span class="status-badge status-success">Resolved</span></td>
-                    <td>
-                      <div class="action-btns">
-                        <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-search"></i></button>
-                        <button class="btn btn-icon btn-track" title="Resolve" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-check"></i></button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
+                <tbody id="complianceTableBody"></tbody>
               </table>
             </div>
           </div>
@@ -708,6 +613,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/utils.js"></script>
   <script>
     // Notification Dropdown Toggle
@@ -731,82 +637,118 @@
       }
     });
 
-    // Type Filter
-    document.getElementById('typeFilter').addEventListener('change', function() {
-      var val = this.value.toLowerCase();
-      var rows = document.querySelectorAll('#complianceTable tbody tr');
-      rows.forEach(function(row) {
-        if (!val) {
-          row.style.display = '';
-        } else {
-          var typeCell = row.children[1].textContent.toLowerCase();
-          row.style.display = typeCell.indexOf(val) === -1 ? 'none' : '';
-        }
+    // Compliance alerts — real data
+    var envAlertsData = [];
+    var filteredEnvAlerts = [];
+    var envCurrentPage = 1;
+    var envPerPage = 10;
+
+    var ENV_TYPE_ICON = { air: 'fa-wind text-info', water: 'fa-water text-primary', noise: 'fa-volume-high text-warning', waste: 'fa-recycle text-success', emission: 'fa-smog text-secondary' };
+    var ENV_SEVERITY_BADGE = { 'Low': 'status-info', 'Medium': 'status-info', 'High': 'status-warning', 'Critical': 'status-danger' };
+    var ENV_STATUS_BADGE = { 'Active': 'status-danger', 'Investigating': 'status-warning', 'Pending': 'status-warning', 'Resolved': 'status-success' };
+
+    function envAlertRow(a) {
+      var typeKey = String(a.parameter_type || '').toLowerCase();
+      var icon = ENV_TYPE_ICON[typeKey] || 'fa-circle-info text-secondary';
+      return '<tr>' +
+        '<td><span class="container-id">' + a.alert_id + '</span></td>' +
+        '<td><i class="fas ' + icon + ' me-1"></i>' + (a.parameter_type || a.parameter || '—') + '</td>' +
+        '<td>' + (a.message || '—') + '</td>' +
+        '<td>' + (a.station_id ? 'Station #' + a.station_id : '—') + '</td>' +
+        '<td><span class="status-badge ' + (ENV_SEVERITY_BADGE[a.severity] || 'status-info') + '">' + a.severity + '</span></td>' +
+        '<td>' + (a.triggered_at ? Utils.formatDateTime(a.triggered_at) : '—') + '</td>' +
+        '<td><span class="status-badge ' + (ENV_STATUS_BADGE[a.status] || 'status-info') + '">' + a.status + '</span></td>' +
+        '<td><div class="action-btns">' +
+          '<button class="btn btn-icon btn-view" title="View" onclick="App.showToast(\'Feature coming soon\',\'info\')"><i class="fas fa-eye"></i></button>' +
+          '<button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast(\'Feature coming soon\',\'info\')"><i class="fas fa-search"></i></button>' +
+          '<button class="btn btn-icon btn-track" title="Resolve" onclick="App.showToast(\'Feature coming soon\',\'info\')"><i class="fas fa-check"></i></button>' +
+        '</div></td>' +
+      '</tr>';
+    }
+
+    function applyEnvFilter() {
+      var val = document.getElementById('typeFilter').value.toLowerCase();
+      filteredEnvAlerts = !val ? envAlertsData.slice() : envAlertsData.filter(function(a) {
+        return String(a.parameter_type || '').toLowerCase().indexOf(val) !== -1;
       });
-    });
+      envCurrentPage = 1;
+      renderEnvPage();
+    }
 
-    // Pagination (10 rows per page)
-    (function() {
-      var tbody = document.querySelector('#complianceTable tbody');
-      if (!tbody) return;
-      var allRows = Array.from(tbody.querySelectorAll('tr'));
-      var perPage = 10;
-      var currentPage = 1;
-      var totalPages = Math.max(1, Math.ceil(allRows.length / perPage));
+    function renderEnvPage() {
+      var totalPages = Math.max(1, Math.ceil(filteredEnvAlerts.length / envPerPage));
+      if (envCurrentPage > totalPages) envCurrentPage = totalPages;
+      var start = (envCurrentPage - 1) * envPerPage;
+      var end = start + envPerPage;
+      document.getElementById('complianceTableBody').innerHTML = filteredEnvAlerts.slice(start, end).map(envAlertRow).join('');
+
       var paginationInfo = document.querySelector('.pagination-info');
+      if (paginationInfo) {
+        var total = filteredEnvAlerts.length;
+        paginationInfo.textContent = total === 0 ? 'No alerts found' : 'Showing ' + (start + 1) + '-' + Math.min(end, total) + ' of ' + total + ' alerts';
+      }
       var paginationUl = document.querySelector('.pagination');
-
-      function renderPage(page) {
-        currentPage = page;
-        var start = (page - 1) * perPage;
-        var end = start + perPage;
-        allRows.forEach(function(r, i) {
-          r.style.display = (i >= start && i < end) ? '' : 'none';
-        });
-        if (paginationInfo) {
-          paginationInfo.textContent = 'Showing ' + (start + 1) + '-' + Math.min(end, allRows.length) + ' of ' + allRows.length + ' alerts';
-        }
-        buildPagination();
+      if (!paginationUl) return;
+      paginationUl.innerHTML = '';
+      var prevLi = document.createElement('li');
+      prevLi.className = 'page-item' + (envCurrentPage === 1 ? ' disabled' : '');
+      prevLi.innerHTML = '<a class="page-link" href="#"><i class="fas fa-chevron-left"></i></a>';
+      prevLi.addEventListener('click', function(e) { e.preventDefault(); if (envCurrentPage > 1) { envCurrentPage--; renderEnvPage(); } });
+      paginationUl.appendChild(prevLi);
+      for (var p = 1; p <= totalPages; p++) {
+        var li = document.createElement('li');
+        li.className = 'page-item' + (p === envCurrentPage ? ' active' : '');
+        li.innerHTML = '<a class="page-link" href="#">' + p + '</a>';
+        (function(pg) { li.addEventListener('click', function(e) { e.preventDefault(); envCurrentPage = pg; renderEnvPage(); }); })(p);
+        paginationUl.appendChild(li);
       }
+      var nextLi = document.createElement('li');
+      nextLi.className = 'page-item' + (envCurrentPage === totalPages ? ' disabled' : '');
+      nextLi.innerHTML = '<a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a>';
+      nextLi.addEventListener('click', function(e) { e.preventDefault(); if (envCurrentPage < totalPages) { envCurrentPage++; renderEnvPage(); } });
+      paginationUl.appendChild(nextLi);
+    }
 
-      function buildPagination() {
-        if (!paginationUl) return;
-        paginationUl.innerHTML = '';
-        var prevLi = document.createElement('li');
-        prevLi.className = 'page-item' + (currentPage === 1 ? ' disabled' : '');
-        prevLi.innerHTML = '<a class="page-link" href="#"><i class="fas fa-chevron-left"></i></a>';
-        prevLi.addEventListener('click', function(e) {
-          e.preventDefault();
-          if (currentPage > 1) renderPage(currentPage - 1);
-        });
-        paginationUl.appendChild(prevLi);
+    document.getElementById('typeFilter').addEventListener('change', applyEnvFilter);
 
-        for (var p = 1; p <= totalPages; p++) {
-          var li = document.createElement('li');
-          li.className = 'page-item' + (p === currentPage ? ' active' : '');
-          li.innerHTML = '<a class="page-link" href="#">' + p + '</a>';
-          (function(pg) {
-            li.addEventListener('click', function(e) {
-              e.preventDefault();
-              renderPage(pg);
-            });
-          })(p);
-          paginationUl.appendChild(li);
-        }
-
-        var nextLi = document.createElement('li');
-        nextLi.className = 'page-item' + (currentPage === totalPages ? ' disabled' : '');
-        nextLi.innerHTML = '<a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a>';
-        nextLi.addEventListener('click', function(e) {
-          e.preventDefault();
-          if (currentPage < totalPages) renderPage(currentPage + 1);
-        });
-        paginationUl.appendChild(nextLi);
+    async function loadEnvAlerts() {
+      try {
+        var res = await Api.request('/environment/alerts?page=1&per_page=200');
+        envAlertsData = res.data.items || [];
+      } catch (err) {
+        App.showToast('Failed to load alerts', 'danger');
+        envAlertsData = [];
       }
+      applyEnvFilter();
+    }
 
-      renderPage(1);
-    })();
+    async function loadLatestReadings() {
+      try {
+        var aqRes = await Api.request('/environment/air-quality?page=1&per_page=1&sort_by=recorded_at&sort_order=desc');
+        var latestAqi = (aqRes.data.items || [])[0];
+        if (latestAqi && latestAqi.aqi != null) {
+          document.getElementById('aqiStat').textContent = latestAqi.aqi;
+          document.getElementById('aqiStatLabel').textContent = 'AQI — ' + (latestAqi.aqi_category || '—');
+        }
+      } catch (err) { /* leave mock */ }
 
+      try {
+        var wqRes = await Api.request('/environment/water-quality?page=1&per_page=1&sort_by=recorded_at&sort_order=desc');
+        var latestPh = (wqRes.data.items || [])[0];
+        if (latestPh && latestPh.ph != null) document.getElementById('phStat').textContent = latestPh.ph;
+      } catch (err) { /* leave mock */ }
+
+      try {
+        var noiseRes = await Api.request('/environment/noise?page=1&per_page=1&sort_by=recorded_at&sort_order=desc');
+        var latestNoise = (noiseRes.data.items || [])[0];
+        if (latestNoise && latestNoise.leq != null) document.getElementById('noiseStat').textContent = latestNoise.leq;
+      } catch (err) { /* leave mock */ }
+    }
+
+    loadEnvAlerts();
+    loadLatestReadings();
+
+    // TODO: no backend endpoint for AQI time-series trend yet, chart stays illustrative
     // Air Quality Trend Line Chart — 24 Hours
     const aqiCtx = document.getElementById('aqiTrendChart').getContext('2d');
     const hours = [];
@@ -873,6 +815,7 @@
       }
     });
 
+    // TODO: no backend endpoint for emissions-by-source aggregation yet, chart stays illustrative
     // Emissions by Source Doughnut Chart
     const emitCtx = document.getElementById('emissionsSourceChart').getContext('2d');
     new Chart(emitCtx, {
