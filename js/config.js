@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://127.0.0.1:5001/api/v1';
+const API_BASE_URL = '/api/v1';
 
 const MOCK_USERS = {
   'admin@smartport.gov.in': { password: 'admin123', role: 'Super Admin', role_raw: 'SUPER_ADMIN', first_name: 'Super', last_name: 'Admin', email: 'admin@smartport.gov.in', department: 'IT', designation: 'Super Administrator', employee_id: 'ADMIN001', phone: '+1-555-0100', id: 1 },

@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: smart-port-backend
+    runtime: python
+    plan: free
+    rootDir: smart-port-management-system/backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: sqlite:///smart_port.db
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: FRONTEND_URL
+        value: ""

@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_migrate import Migrate
 from config import config
 from app.extensions import db, migrate, jwt, bcrypt, mail, cache, limiter, oauth
@@ -92,5 +92,17 @@ def create_app(config_name=None):
                     db.create_all()
                 except Exception:
                     pass  # DB not ready yet, will retry on next request
+
+    FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
+
+    @app.route('/', defaults={'path': 'dashboard.html'})
+    @app.route('/<path:path>')
+    def serve_frontend(path):
+        if path.startswith('api/') or path.startswith('health'):
+            return jsonify({'error': 'Not Found'}), 404
+        try:
+            return send_from_directory(FRONTEND_DIR, path)
+        except Exception:
+            return jsonify({'error': 'Not Found'}), 404
 
     return app
