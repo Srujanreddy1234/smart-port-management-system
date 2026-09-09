@@ -87,30 +87,65 @@
             <i class="fas fa-right-to-bracket"></i> Sign In
           </button>
           <div class="divider"><span>or</span></div>
-          <button type="button" class="btn-login" id="googleLoginBtn" style="background:#fff;color:#3c4043;border:1px solid #dadce0;">
-            <i class="fab fa-google" style="color:#4285F4;"></i> Sign in with Google
+          <button type="button" class="btn-login" id="mockLoginBtn" style="background:var(--gradient-primary);color:#fff;border:none;">
+            <i class="fas fa-mock"></i> Try Mock Login (Demo)
           </button>
-          <div class="divider"><span>Quick access demo</span></div>
-          <div class="demo-accounts">
-            <button type="button" class="demo-btn" data-role="admin">
+          <div class="divider"><span>Quick access demo (password: admin123)</span></div>
+          <div class="demo-accounts" style="max-height:320px;overflow-y:auto;">
+            <button type="button" class="demo-btn" data-email="superadmin@smartport.gov.in" data-password="admin123" data-role="superadmin">
+              <i class="fas fa-crown" style="color:#ffd700;"></i>
+              <div class="demo-info">
+                <h6>Super Admin</h6>
+                <small>superadmin@smartport.gov.in</small>
+              </div>
+            </button>
+            <button type="button" class="demo-btn" data-email="admin@smartport.gov.in" data-password="admin123" data-role="admin">
               <i class="fas fa-user-shield" style="color:#6ea8fe;"></i>
               <div class="demo-info">
-                <h6>Admin Access</h6>
-                <small>Full system access &amp; configuration</small>
+                <h6>Admin / Port Director</h6>
+                <small>admin@smartport.gov.in</small>
               </div>
             </button>
-            <button type="button" class="demo-btn" data-role="operator">
-              <i class="fas fa-user-gear" style="color:#75b798;"></i>
+            <button type="button" class="demo-btn" data-email="supervisor@smartport.gov.in" data-password="admin123" data-role="supervisor">
+              <i class="fas fa-user-tie" style="color:#75b798;"></i>
               <div class="demo-info">
-                <h6>Port Operator</h6>
-                <small>Operations &amp; vessel management</small>
+                <h6>Port Supervisor</h6>
+                <small>supervisor@smartport.gov.in</small>
               </div>
             </button>
-            <button type="button" class="demo-btn" data-role="viewer">
-              <i class="fas fa-eye" style="color:#ffda6a;"></i>
+            <button type="button" class="demo-btn" data-email="staff@smartport.gov.in" data-password="admin123" data-role="staff">
+              <i class="fas fa-hard-hat" style="color:#0dcaf0;"></i>
               <div class="demo-info">
-                <h6>Viewer Access</h6>
-                <small>Read-only dashboard view</small>
+                <h6>Port Staff</h6>
+                <small>staff@smartport.gov.in</small>
+              </div>
+            </button>
+            <button type="button" class="demo-btn" data-email="customs@smartport.gov.in" data-password="admin123" data-role="customs">
+              <i class="fas fa-passport" style="color:#ea868f;"></i>
+              <div class="demo-info">
+                <h6>Customs Officer</h6>
+                <small>customs@smartport.gov.in</small>
+              </div>
+            </button>
+            <button type="button" class="demo-btn" data-email="shipping@smartport.gov.in" data-password="admin123" data-role="shipping">
+              <i class="fas fa-ship" style="color:#6610f2;"></i>
+              <div class="demo-info">
+                <h6>Shipping Company</h6>
+                <small>shipping@smartport.gov.in</small>
+              </div>
+            </button>
+            <button type="button" class="demo-btn" data-email="truck@smartport.gov.in" data-password="admin123" data-role="truck">
+              <i class="fas fa-truck" style="color:#fd7e14;"></i>
+              <div class="demo-info">
+                <h6>Truck Operator</h6>
+                <small>truck@smartport.gov.in</small>
+              </div>
+            </button>
+            <button type="button" class="demo-btn" data-email="customer@smartport.gov.in" data-password="admin123" data-role="customer">
+              <i class="fas fa-building" style="color:#20c997;"></i>
+              <div class="demo-info">
+                <h6>Customer</h6>
+                <small>customer@smartport.gov.in</small>
               </div>
             </button>
           </div>

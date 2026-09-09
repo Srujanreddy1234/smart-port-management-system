@@ -1,0 +1,203 @@
+================================================================================
+SMART PORT MANAGEMENT SYSTEM - ARCHITECTURE BLOCK DIAGRAM (DAG)
+================================================================================
+
+
+═══════════════════════════════════════════════════════════════════════════════
+LAYER 1: FRONTEND PAGES (served on port 5500 via python3 http.server)
+═══════════════════════════════════════════════════════════════════════════════
+
+  login.html           ─── entry point, email/password + mock login
+    │
+    ├──► dashboard.html       ─── KPIs, charts, alerts, recent activity
+    ├──► ships.html           ─── vessel list/search/filter/pagination + register
+    ├──► containers.html      ─── container list/search/filter/pagination + add
+    ├──► trucks.html          ─── truck list, export, view/edit/track
+    ├──► berths.html          ─── berth list with assign/release modals
+    ├──► security.html        ─── alerts list + export, view/edit/resolve
+    ├──► profile.html         ─── user profile view/edit
+    ├──► billing.html         ─── invoice CRUD with line items
+    ├──► reports.html         ─── report generation + download
+    ├──► maintenance.html     ─── equipment + maintenance schedules
+    └──► environment.html     ─── air/water/noise/weather monitoring
+
+  Each page loads JS in this order:
+    utils.js → config.js → store.js → app.js → (page-specific inline script)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+LAYER 2: FRONTEND JAVASCRIPT LAYER
+═══════════════════════════════════════════════════════════════════════════════
+
+  utils.js (NO dependencies)
+    ├── Utils.formatNumber(n)
+    ├── Utils.formatDate(d)
+    ├── Utils.timeAgo(d)
+    ├── Utils.generateId()
+    ├── Utils.debounce(fn, ms)
+    ├── Utils.paginate(arr, page, perPage)
+    └── Utils.searchFilter(arr, query, fields)
+
+  config.js (depends on: utils.js)
+    ├── API_BASE_URL = 'http://127.0.0.1:5001/api/v1'
+    ├── MOCK_USERS = { 'superadmin@smartport.gov.in': {...}, ... }
+    └── class Api
+        ├── Api.login(email, password) → tries API, falls back to mock
+        ├── Api.request(endpoint, options)
+        ├── Api.get(endpoint)
+        ├── Api.post(endpoint, data)
+        ├── Api.put(endpoint, data)
+        └── Api.delete(endpoint)
+
+  store.js (depends on: utils.js)
+    ├── localStorage CRUD with 10 collections
+    ├── Store.init() → loads or seeds demo data
+    ├── Store.get(collection) / Store.add / Store.update / Store.remove
+    ├── Store.getShipStats()
+    ├── Store.getContainerStats()
+    ├── Store.getTruckStats()
+    ├── Store.getDashboardKPIs()
+    └── Store.getUser()
+
+  app.js (depends on: utils.js, config.js, store.js)
+    ├── App.showToast(message, type)
+    ├── App.createModal(options)
+    ├── App.exportCSV(data, filename)
+    ├── App.initSearch()
+    ├── App.initUserDisplay()
+    ├── App.initNotifications()
+    ├── App.editProfile()
+    ├── App.saveProfile()
+    ├── App.exportTrucks()
+    ├── App.exportSecurity()
+    ├── App.exportBerths()
+    ├── App.showAddTruckModal()
+    ├── App.submitAddTruck()
+    ├── App.showAddAlertModal()
+    ├── App.submitAddAlert()
+    ├── App.showAddScheduleModal()
+    └── App.submitAddSchedule()
+
+  charts.js (depends on: Chart.js CDN)
+    └── Chart.js initialization helpers
+
+  login.js (depends on: config.js)
+    └── Login page handler + mock auth fallback
+
+
+═══════════════════════════════════════════════════════════════════════════════
+LAYER 3: BACKEND FLASK API (port 5001, prefix /api/v1)
+═══════════════════════════════════════════════════════════════════════════════
+
+  /api/v1/auth               POST   /login                    POST /register
+    Blueprint: auth_bp       POST   /logout                   POST /refresh
+                             POST   /change-password           GET /me
+                             POST   /forgot-password          POST /reset-password
+                              GET   /sessions                POST /revoke-all-sessions
+                            DELETE   /sessions/<id>
+
+  /api/v1/ships              GET    /                      POST /
+  Blueprint: ships_bp         GET    /<id>                 PUT  /<id>
+                            DELETE   /<id>                POST  /<id>/arrival
+                             POST    /<id>/departure       GET  /stats
+                              GET    /arrivals-chart
+
+  /api/v1/containers          GET    /                      POST /
+  Blueprint: containers_bp    GET    /<id>                 PUT  /<id>
+                            DELETE   /<id>                POST  /<id>/assign-ship
+                             POST    /<id>/assign-truck     POST /<id>/move
+                              GET    /stats                 GET  /flow-chart
+                              GET    /type-distribution     GET  /<id>/history
+
+  /api/v1/trucks              GET    /                      POST /
+  Blueprint: trucks_bp        GET    /<id>                 PUT  /<id>
+                            DELETE   /<id>                POST  /<id>/gate-in
+                             POST    /<id>/gate-out        GET   /stats
+
+  /api/v1/berths              GET    /                      POST /
+  Blueprint: berths_bp        GET    /<id>                 PUT  /<id>
+                            DELETE   /<id>                POST  /<id>/assign
+                             POST    /<id>/release          GET  /available
+                              GET    /stats
+
+  /api/v1/billing             GET    /                      POST /
+  Blueprint: billing_bp       GET    /<id>                POST  /<id>/lines
+                             POST    /<id>/pay             POST  /<id>/send
+                             POST    /<id>/cancel          POST  /generate-berth-invoice
+                              GET    /stats
+
+  /api/v1/security            GET    /                      POST /
+  Blueprint: security_bp      GET    /<id>                 PUT  /<id>
+                            DELETE   /<id>                  GET  /alerts
+                             POST    /alerts/<id>/acknowledge   GET  /cameras
+
+  /api/v1/maintenance         GET    /                      POST /
+  Blueprint: maintenance_bp   GET    /<id>                 PUT  /<id>
+                            DELETE   /<id>                GET  /schedules
+                             POST    /schedules              GET  /schedules/<id>
+                              PUT    /schedules/<id>
+
+  /api/v1/environment         GET    /                      POST /
+  Blueprint: environment_bp   GET    /<id>                 PUT  /<id>
+                            DELETE   /<id>                GET  /air-quality
+                              GET    /water-quality          GET  /noise
+                              GET    /weather                GET  /alerts
+
+  /api/v1/dashboard           GET    /kpis                  GET  /recent-activity
+  Blueprint: dashboard_bp     GET    /vessel-status          GET  /berth-occupancy
+                              GET    /charts/vessel-arrivals     GET  /charts/container-distribution
+                              GET    /charts/throughput          GET  /charts/truck-traffic
+                              GET    /charts/environmental-trends   GET /charts/equipment-health
+
+  /api/v1/reports              GET    /                      POST /
+  Blueprint: reports_bp       GET    /<id>                  GET  /<id>/download
+                              GET    /<id>/file              GET  /ship-traffic
+                              GET    /container-throughput   GET  /dashboard-summary
+
+  /api/v1/users               GET    /                      POST /
+  Blueprint: users_bp         GET    /<id>                 PUT  /<id>
+                            DELETE   /<id>                POST  /<id>/reset-password
+                              GET    /stats
+
+  /api/v1/roles               GET    /                      POST /
+  Blueprint: roles_bp         GET    /<id>                 PUT  /<id>
+                            DELETE    /<id>                GET  /permissions
+
+  /api/v1/events              GET    /stream               GET   /recent
+  Blueprint: sse_bp
+
+  /api/v1/search              GET    /
+  Blueprint: search_bp
+
+
+═══════════════════════════════════════════════════════════════════════════════
+LAYER 4: DATA FLOW SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+  Browser <── HTTP (port 5500) ──► Frontend HTML/JS
+                                          │
+                                          │ Api.request() (port 5001)
+                                          ▼
+                                  Flask Backend API
+                                          │
+                                          ▼
+                                  SQLite Database
+                                          │
+                                    Models (app/models/)
+                                    ├── user.py
+                                    ├── ship.py
+                                    ├── container.py
+                                    ├── truck.py
+                                    ├── security.py
+                                    ├── maintenance.py
+                                    ├── environment.py
+                                    ├── billing.py
+                                    ├── reports.py
+                                    └── event_log.py
+
+  FALLBACK (when backend is down):
+  Frontend Store.js ──► localStorage ──► Seed data (10 collections)
+
+================================================================================
+END OF BLOCK DIAGRAM
+================================================================================

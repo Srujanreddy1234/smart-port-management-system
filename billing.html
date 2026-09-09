@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Billing & Invoices | Smart Port</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/utilities.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="fas fa-anchor"></i>
+          <span>Smart Port</span>
+        </div>
+        <button class="sidebar-toggle" aria-label="Toggle sidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+      <nav class="sidebar-nav"></nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-avatar"></div>
+          <h6 class="sidebar-user-name">User Name</h6>
+          <small class="sidebar-user-role">Role</small>
+        </div>
+        <div class="sidebar-version">v1.0.0</div>
+      </div>
+    </aside>
+    <div class="sidebar-overlay"></div>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 class="page-title">Billing & Invoices</h1>
+        </div>
+        <div class="topbar-right">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search invoices..." aria-label="Search">
+          </div>
+          <button class="topbar-btn" id="notifBtn" aria-label="Notifications">
+            <i class="fas fa-bell"></i>
+            <span class="badge-count" style="display:none;">3</span>
+          </button>
+          <div class="notif-dropdown" id="notifDropdown"></div>
+          <div class="topbar-user">
+            <div class="avatar"></div>
+            <span class="username">User</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+        </div>
+      </header>
+
+      <div class="content-area">
+        <div class="page-header">
+          <div class="header-actions">
+            <button class="btn btn-primary" onclick="App.createModal({id:'createInvoiceModal',title:'Create Invoice',width:'700px',body:InvoiceForm.getFormHtml()})">
+              <i class="fas fa-plus"></i> Create Invoice
+            </button>
+            <button class="btn btn-secondary" onclick="Billing.exportInvoices()">
+              <i class="fas fa-download"></i> Export
+            </button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon bg-blue"><i class="fas fa-file-invoice-dollar"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="totalInvoices">--</span>
+              <span class="stat-label">Total Invoices</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon bg-green"><i class="fas fa-money-bill-wave"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="totalRevenue">--</span>
+              <span class="stat-label">Total Revenue</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon bg-orange"><i class="fas fa-clock"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="totalOutstanding">--</span>
+              <span class="stat-label">Outstanding</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon bg-purple"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="totalCollected">--</span>
+              <span class="stat-label">Collected</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Invoices</h3>
+            <div class="card-actions">
+              <select class="form-select" id="invoiceStatusFilter" style="width:auto;">
+                <option value="">All Status</option>
+                <option value="DRAFT">Draft</option>
+                <option value="SENT">Sent</option>
+                <option value="PAID">Paid</option>
+                <option value="PARTIALLY_PAID">Partially Paid</option>
+                <option value="OVERDUE">Overdue</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="data-table" id="invoicesTable">
+                <thead>
+                  <tr>
+                    <th>Invoice #</th>
+                    <th>Ship</th>
+                    <th>Berth</th>
+                    <th>Period</th>
+                    <th>Due Date</th>
+                    <th>Total</th>
+                    <th>Paid</th>
+                    <th>Balance</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div class="pagination" id="invoicesPagination"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+  const InvoiceForm = {
+    getFormHtml(data = {}) {
+      const ships = window.Billing.shipsCache || [];
+      const berths = window.Billing.berthsCache || [];
+      return `
+        <form id="invoiceForm" class="modal-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Invoice Number</label>
+              <input type="text" name="invoice_number" class="form-control" value="${data.invoice_number || ''}" readonly>
+              <small class="form-text">Auto-generated</small>
+            </div>
+            <div class="form-group">
+              <label>Ship <span class="text-danger">*</span></label>
+              <select name="ship_id" class="form-select" required>
+                <option value="">Select ship</option>
+                ${ships.map(s => `<option value="${s.id}" ${data.ship_id === s.id ? 'selected' : ''}>${s.name} (${s.ship_id})</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Berth</label>
+              <select name="berth_id" class="form-select">
+                <option value="">None</option>
+                ${berths.map(b => `<option value="${b.id}" ${data.berth_id === b.id ? 'selected' : ''}>${b.name} (${b.code})</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Tax Rate (%)</label>
+              <input type="number" name="tax_rate" class="form-control" value="${data.tax_rate || 18}" step="0.01" min="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Billing Period Start <span class="text-danger">*</span></label>
+              <input type="datetime-local" name="billing_period_start" class="form-control" required value="${data.billing_period_start || new Date().toISOString().slice(0,16)}">
+            </div>
+            <div class="form-group">
+              <label>Billing Period End <span class="text-danger">*</span></label>
+              <input type="datetime-local" name="billing_period_end" class="form-control" required value="${data.billing_period_end || new Date().toISOString().slice(0,16)}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Due Date <span class="text-danger">*</span></label>
+              <input type="datetime-local" name="due_date" class="form-control" required value="${data.due_date || new Date(Date.now()+30*86400000).toISOString().slice(0,16)}">
+            </div>
+            <div class="form-group">
+              <label>Discount</label>
+              <input type="number" name="discount" class="form-control" value="${data.discount || 0}" step="0.01" min="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Notes</label>
+            <textarea name="notes" class="form-control" rows="2">${data.notes || ''}</textarea>
+          </div>
+          <div class="form-group">
+            <label>Terms</label>
+            <textarea name="terms" class="form-control" rows="2">${data.terms || 'Payment due within 30 days.'}</textarea>
+          </div>
+          <div class="line-items-section">
+            <div class="d-flex justify-between align-center mb-2">
+              <h6>Line Items</h6>
+              <button type="button" class="btn btn-sm btn-outline" onclick="InvoiceForm.addLineItemRow()">+ Add Line</button>
+            </div>
+            <div id="lineItemsContainer" class="line-items-container">
+              ${data.line_items && data.line_items.length ? data.line_items.map(li => InvoiceForm.lineItemRowHtml(li)).join('') : InvoiceForm.lineItemRowHtml()}
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+            <button type="submit" class="btn btn-primary">${data.id ? 'Update' : 'Create'}</button>
+          </div>
+        </form>
+      `;
+    },
+
+    lineItemRowHtml(li = {}) {
+      const categories = ['BERTH_FEE','PILOTAGE','TUGGING','MOORING','CONTAINER_HANDLING','STORAGE','DOCUMENTATION','INSPECTION','ENVIRONMENTAL','SECURITY','EQUIPMENT_RENTAL','LABOR','OTHER'];
+      return `
+        <div class="line-item-row" style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+          <select name="category" class="form-select" style="min-width:180px;" required>${categories.map(c => `<option value="${c}" ${li.category === c ? 'selected' : ''}>${c.replace(/_/g, ' ')}</option>`).join('')}</select>
+          <input type="text" name="description" class="form-control" placeholder="Description" style="flex:1;min-width:200px;" value="${li.description || ''}" required>
+          <input type="number" name="quantity" class="form-control" placeholder="Qty" value="${li.quantity || 1}" step="0.01" min="0" style="width:80px;">
+          <input type="text" name="unit" class="form-control" placeholder="Unit" value="${li.unit || ''}" style="width:100px;">
+          <input type="number" name="unit_price" class="form-control" placeholder="Unit Price" value="${li.unit_price || 0}" step="0.01" min="0" style="width:120px;" required>
+          <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.line-item-row').remove()"><i class="fas fa-trash"></i></button>
+        </div>
+      `;
+    },
+
+    addLineItemRow() {
+      document.getElementById('lineItemsContainer').insertAdjacentHTML('beforeend', this.lineItemRowHtml());
+    },
+
+    getFormData(form) {
+      const data = new FormData(form);
+      const lineItems = [];
+      const rows = form.querySelectorAll('.line-item-row');
+      rows.forEach(row => {
+        const selects = row.querySelectorAll('select, input');
+        lineItems.push({
+          category: row.querySelector('[name="category"]').value,
+          description: row.querySelector('[name="description"]').value,
+          quantity: parseFloat(row.querySelector('[name="quantity"]').value) || 1,
+          unit: row.querySelector('[name="unit"]').value,
+          unit_price: parseFloat(row.querySelector('[name="unit_price"]').value) || 0,
+        });
+      });
+      return {
+        ship_id: parseInt(data.get('ship_id')),
+        berth_id: data.get('berth_id') ? parseInt(data.get('berth_id')) : null,
+        billing_period_start: data.get('billing_period_start'),
+        billing_period_end: data.get('billing_period_end'),
+        tax_rate: parseFloat(data.get('tax_rate')) || 0,
+        discount: parseFloat(data.get('discount')) || 0,
+        due_date: data.get('due_date'),
+        notes: data.get('notes'),
+        terms: data.get('terms'),
+        line_items: lineItems,
+      };
+    }
+  };
+
+  const Billing = {
+    invoices: [],
+    shipsCache: [],
+    berthsCache: [],
+    currentPage: 1,
+    currentFilters: { status: '' },
+
+    async init() {
+      await this.loadShips();
+      await this.loadBerths();
+      await this.loadStats();
+      await this.loadInvoices();
+      this.bindEvents();
+    },
+
+    async loadShips() {
+      try {
+        const res = await Api.request('/ships?per_page=100');
+        this.shipsCache = res.data.items || res.data || [];
+      } catch (e) { console.error(e); }
+    },
+
+    async loadBerths() {
+      try {
+        const res = await Api.request('/berths?per_page=100');
+        this.berthsCache = res.data.items || res.data || [];
+      } catch (e) { console.error(e); }
+    },
+
+    async loadStats() {
+      try {
+        const res = await Api.request('/billing/stats');
+        const s = res.data;
+        document.getElementById('totalInvoices').textContent = s.total || 0;
+        document.getElementById('totalRevenue').textContent = Utils.formatNumber(s.total_revenue || 0);
+        document.getElementById('totalOutstanding').textContent = Utils.formatNumber(s.total_outstanding || 0);
+        document.getElementById('totalCollected').textContent = Utils.formatNumber(s.total_collected || 0);
+      } catch (e) { console.error(e); }
+    },
+
+    async loadInvoices(page = 1) {
+      this.currentPage = page;
+      try {
+        const params = new URLSearchParams({ page, per_page: 20 });
+        if (this.currentFilters.status) params.set('status', this.currentFilters.status);
+        const res = await Api.request(`/billing?${params.toString()}`);
+        this.invoices = res.data.items || [];
+        this.renderInvoices(res.data);
+      } catch (e) { console.error(e); }
+    },
+
+    renderInvoices(pagination) {
+      const tbody = document.querySelector('#invoicesTable tbody');
+      tbody.innerHTML = this.invoices.map(inv => `
+        <tr>
+          <td><strong>${inv.invoice_number}</strong></td>
+          <td>${inv.ship_name || ''}</td>
+          <td>${inv.berth_name || '-'}</td>
+          <td>${inv.billing_period_start ? new Date(inv.billing_period_start).toLocaleDateString() : ''} - ${inv.billing_period_end ? new Date(inv.billing_period_end).toLocaleDateString() : ''}</td>
+          <td>${inv.due_date ? new Date(inv.due_date).toLocaleDateString() : ''}</td>
+          <td>₹${Utils.formatNumber(inv.total_amount)}</td>
+          <td>₹${Utils.formatNumber(inv.amount_paid)}</td>
+          <td class="${inv.balance_due > 0 ? 'text-danger' : 'text-success'}">₹${Utils.formatNumber(inv.balance_due)}</td>
+          <td><span class="badge badge-${Billing.getStatusBadgeClass(inv.status)}">${inv.status.replace(/_/g, ' ')}</span></td>
+          <td>
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline btn-sm" onclick="Billing.viewInvoice(${inv.id})" title="View"><i class="fas fa-eye"></i></button>
+              ${inv.status === 'DRAFT' ? `<button class="btn btn-outline btn-sm" onclick="Billing.editInvoice(${inv.id})" title="Edit"><i class="fas fa-edit"></i></button>` : ''}
+              ${inv.status === 'SENT' ? `<button class="btn btn-outline btn-sm" onclick="Billing.recordPayment(${inv.id})" title="Record Payment"><i class="fas fa-money-bill"></i></button>` : ''}
+              ${inv.status === 'DRAFT' ? `<button class="btn btn-danger btn-sm" onclick="Billing.deleteInvoice(${inv.id})" title="Delete"><i class="fas fa-trash"></i></button>` : ''}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      this.renderPagination(pagination);
+    },
+
+    getStatusBadgeClass(status) {
+      const map = { DRAFT: 'secondary', SENT: 'info', PAID: 'success', PARTIALLY_PAID: 'warning', OVERDUE: 'danger', CANCELLED: 'dark' };
+      return map[status] || 'secondary';
+    },
+
+    renderPagination(pagination) {
+      const container = document.getElementById('invoicesPagination');
+      if (!container || pagination.pages <= 1) { container.innerHTML = ''; return; }
+      let html = '';
+      if (pagination.has_prev) html += `<button class="btn btn-sm btn-outline" onclick="Billing.loadInvoices(${pagination.page - 1})"><i class="fas fa-chevron-left"></i></button>`;
+      for (let i = Math.max(1, pagination.page - 2); i <= Math.min(pagination.pages, pagination.page + 2); i++) {
+        html += `<button class="btn btn-sm ${i === pagination.page ? 'btn-primary' : 'btn-outline'}" onclick="Billing.loadInvoices(${i})">${i}</button>`;
+      }
+      if (pagination.has_next) html += `<button class="btn btn-sm btn-outline" onclick="Billing.loadInvoices(${pagination.page + 1})"><i class="fas fa-chevron-right"></i></button>`;
+      container.innerHTML = html;
+    },
+
+    bindEvents() {
+      document.getElementById('invoiceStatusFilter').addEventListener('change', (e) => {
+        this.currentFilters.status = e.target.value;
+        this.loadInvoices(1);
+      });
+    },
+
+    async viewInvoice(id) {
+      try {
+        const res = await Api.request(`/billing/${id}`);
+        const inv = res.data;
+        const modal = App.createModal({
+          id: 'viewInvoiceModal',
+          title: `Invoice ${inv.invoice_number}`,
+          width: '800px',
+          body: this.getInvoiceDetailHtml(inv),
+        });
+      } catch (e) { App.showToast('Failed to load invoice', 'danger'); }
+    },
+
+    getInvoiceDetailHtml(inv) {
+      return `
+        <div class="invoice-detail">
+          <div class="row mb-3">
+            <div class="col-md-6"><strong>Invoice #:</strong> ${inv.invoice_number}</div>
+            <div class="col-md-6"><strong>Status:</strong> <span class="badge badge-${this.getStatusBadgeClass(inv.status)}">${inv.status.replace(/_/g, ' ')}</span></div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6"><strong>Ship:</strong> ${inv.ship_name}</div>
+            <div class="col-md-6"><strong>Berth:</strong> ${inv.berth_name || '-'}</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4"><strong>Period:</strong> ${inv.billing_period_start ? new Date(inv.billing_period_start).toLocaleDateString() : ''} - ${inv.billing_period_end ? new Date(inv.billing_period_end).toLocaleDateString() : ''}</div>
+            <div class="col-md-4"><strong>Due Date:</strong> ${inv.due_date ? new Date(inv.due_date).toLocaleDateString() : ''}</div>
+            <div class="col-md-4"><strong>Issued:</strong> ${inv.created_at ? new Date(inv.created_at).toLocaleString() : ''}</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-12"><strong>Terms:</strong> ${inv.terms || '-'}</div>
+          </div>
+          <h6>Line Items</h6>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead><tr><th>Category</th><th>Description</th><th>Qty</th><th>Unit</th><th>Unit Price</th><th>Amount</th></tr></thead>
+              <tbody>
+                ${(inv.line_items || []).map(li => `
+                  <tr>
+                    <td>${li.category.replace(/_/g, ' ')}</td>
+                    <td>${li.description}</td>
+                    <td>${li.quantity}</td>
+                    <td>${li.unit || ''}</td>
+                    <td>₹${Utils.formatNumber(li.unit_price)}</td>
+                    <td>₹${Utils.formatNumber(li.amount)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-6"></div>
+            <div class="col-md-6">
+              <table class="table table-borderless">
+                <tr><td>Subtotal:</td><td class="text-end">₹${Utils.formatNumber(inv.subtotal)}</td></tr>
+                <tr><td>Tax (${inv.tax_rate}%):</td><td class="text-end">₹${Utils.formatNumber(inv.tax_amount)}</td></tr>
+                <tr><td>Discount:</td><td class="text-end">-₹${Utils.formatNumber(inv.discount)}</td></tr>
+                <tr class="fw-bold"><td>Total:</td><td class="text-end">₹${Utils.formatNumber(inv.total_amount)}</td></tr>
+                <tr><td>Paid:</td><td class="text-end">₹${Utils.formatNumber(inv.amount_paid)}</td></tr>
+                <tr class="fw-bold text-${inv.balance_due > 0 ? 'danger' : 'success'}"><td>Balance Due:</td><td class="text-end">₹${Utils.formatNumber(inv.balance_due)}</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+    },
+
+    async editInvoice(id) {
+      const inv = this.invoices.find(i => i.id === id);
+      if (!inv) return;
+      const modal = App.createModal({
+        id: 'editInvoiceModal',
+        title: `Edit Invoice ${inv.invoice_number}`,
+        width: '700px',
+        body: InvoiceForm.getFormHtml(inv),
+      });
+      modal.querySelector('#invoiceForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = InvoiceForm.getFormData(e.target);
+        try {
+          // Note: PUT not implemented in billing API, would need to add
+          App.showToast('Edit not fully implemented', 'warning');
+        } catch (err) { App.showToast(err.message, 'danger'); }
+      });
+    },
+
+    async recordPayment(id) {
+      const inv = this.invoices.find(i => i.id === id);
+      if (!inv) return;
+      const amount = prompt(`Record payment for ${inv.invoice_number}. Balance: ₹${Utils.formatNumber(inv.balance_due)}. Amount:`);
+      if (!amount) return;
+      const method = prompt('Payment method (BANK_TRANSFER, CREDIT_CARD, CHEQUE, CASH, ONLINE):') || 'BANK_TRANSFER';
+      const ref = prompt('Payment reference (optional):') || '';
+      try {
+        await Api.request(`/billing/${id}/pay`, {
+          method: 'POST',
+          body: JSON.stringify({ amount: parseFloat(amount), payment_method: method, payment_reference: ref })
+        });
+        App.showToast('Payment recorded', 'success');
+        this.loadInvoices(this.currentPage);
+        this.loadStats();
+      } catch (e) { App.showToast(e.message, 'danger'); }
+    },
+
+    async deleteInvoice(id) {
+      if (!confirm('Delete this invoice?')) return;
+      try {
+        await Api.request(`/billing/${id}/cancel`, { method: 'POST' });
+        App.showToast('Invoice cancelled', 'success');
+        this.loadInvoices(this.currentPage);
+      } catch (e) { App.showToast(e.message, 'danger'); }
+    },
+
+    exportInvoices() {
+      const data = this.invoices.map(inv => ({
+        'Invoice #': inv.invoice_number,
+        Ship: inv.ship_name,
+        Berth: inv.berth_name || '',
+        'Period Start': inv.billing_period_start ? new Date(inv.billing_period_start).toLocaleDateString() : '',
+        'Period End': inv.billing_period_end ? new Date(inv.billing_period_end).toLocaleDateString() : '',
+        'Due Date': inv.due_date ? new Date(inv.due_date).toLocaleDateString() : '',
+        Total: inv.total_amount,
+        Paid: inv.amount_paid,
+        Balance: inv.balance_due,
+        Status: inv.status,
+      }));
+      App.exportCSV(data, 'invoices.csv');
+    }
+  };
+
+  window.Billing = Billing;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (Api.requireAuth()) {
+      Billing.init();
+    }
+  });
+  </script>
+</body>
+</html>

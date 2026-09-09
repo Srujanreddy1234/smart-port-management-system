@@ -206,3 +206,74 @@ def get_truck_stats():
         'by_status': {s.value: c for s, c in by_status},
         'by_type': {t.value: c for t, c in by_type}
     })
+
+
+@trucks_bp.route('/<int:truck_id>/gate-in', methods=['POST'])
+@jwt_required()
+def gate_in(truck_id):
+    user = check_permission('trucks.write')
+    truck = Truck.query.get(truck_id)
+    if not truck:
+        raise NotFoundError('Truck not found')
+    if truck.status == TruckStatus.AT_GATE:
+        raise AppValidationError('Truck is already at gate')
+
+    now = datetime.utcnow()
+    truck.status = TruckStatus.AT_GATE
+    truck.gate_in_time = now
+    truck.current_location = 'Gate'
+    truck.updated_at = now
+
+    data = request.get_json() or {}
+    container_id = data.get('container_id')
+    if container_id:
+        container = Container.query.get(container_id)
+        if not container:
+            raise NotFoundError('Container not found')
+        truck.assigned_container_id = container_id
+
+    from app.api.sse import publish_event
+    from app.models.event_log import EventType, EventSeverity
+    publish_event(
+        event_type=EventType.TRUCK_GATE_IN,
+        title=f'Truck {truck.truck_number} entered port',
+        entity_type='truck',
+        entity_id=truck.id,
+        user_id=user.id,
+        severity=EventSeverity.INFO,
+        data={'truck_number': truck.truck_number, 'driver': truck.driver_name, 'container_id': container_id},
+    )
+
+    db.session.commit()
+    return success_response(truck.to_dict(), 'Truck gate-in recorded')
+
+
+@trucks_bp.route('/<int:truck_id>/gate-out', methods=['POST'])
+@jwt_required()
+def gate_out(truck_id):
+    user = check_permission('trucks.write')
+    truck = Truck.query.get(truck_id)
+    if not truck:
+        raise NotFoundError('Truck not found')
+    if truck.status != TruckStatus.AT_GATE:
+        raise AppValidationError('Truck is not at gate')
+
+    now = datetime.utcnow()
+    truck.status = TruckStatus.IN_TRANSIT
+    truck.gate_out_time = now
+    truck.current_location = 'Outside'
+    truck.updated_at = now
+
+    from app.api.sse import publish_event
+    from app.models.event_log import EventType
+    publish_event(
+        event_type=EventType.TRUCK_GATE_OUT,
+        title=f'Truck {truck.truck_number} left port',
+        entity_type='truck',
+        entity_id=truck.id,
+        user_id=user.id,
+        data={'truck_number': truck.truck_number, 'driver': truck.driver_name},
+    )
+
+    db.session.commit()
+    return success_response(truck.to_dict(), 'Truck gate-out recorded')

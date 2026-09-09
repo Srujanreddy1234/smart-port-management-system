@@ -19,97 +19,19 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">
-        <a href="dashboard.html" class="brand-link">
-          <i class="fas fa-anchor brand-icon"></i>
-          <div class="brand-text">
-            <span class="brand-title">Smart Port</span>
-            <span class="brand-subtitle">Thoothukudi</span>
-          </div>
-        </a>
+        <div class="sidebar-brand-icon"><i class="fas fa-anchor"></i></div>
+        <div class="sidebar-brand-text">
+          <h5>Smart Port</h5>
+          <small>Thoothukudi</small>
+        </div>
       </div>
-
-      <nav class="sidebar-nav">
-        <div class="nav-section">Main</div>
-        <ul class="nav-menu">
-          <li class="nav-item">
-            <a href="dashboard.html" class="nav-link">
-              <i class="fas fa-th-large nav-icon"></i>
-              <span class="nav-text">Dashboard</span>
-            </a>
-          </li>
-        </ul>
-
-        <div class="nav-section">Operations</div>
-        <ul class="nav-menu">
-          <li class="nav-item">
-            <a href="ships.html" class="nav-link">
-              <i class="fas fa-ship nav-icon"></i>
-              <span class="nav-text">Ship Management</span>
-              <span class="badge badge-nav">24</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="containers.html" class="nav-link">
-              <i class="fas fa-boxes-stacked nav-icon"></i>
-              <span class="nav-text">Container Ops</span>
-              <span class="badge badge-nav">1.2K</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="trucks.html" class="nav-link">
-              <i class="fas fa-truck nav-icon"></i>
-              <span class="nav-text">Truck Operations</span>
-              <span class="badge badge-nav">18</span>
-            </a>
-          </li>
-        </ul>
-
-        <div class="nav-section">Management</div>
-        <ul class="nav-menu">
-          <li class="nav-item active">
-            <a href="security.html" class="nav-link">
-              <i class="fas fa-shield-halved nav-icon"></i>
-              <span class="nav-text">Security Center</span>
-              <span class="badge badge-nav">3</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="maintenance.html" class="nav-link">
-              <i class="fas fa-wrench nav-icon"></i>
-              <span class="nav-text">Equipment Maint.</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="environment.html" class="nav-link">
-              <i class="fas fa-leaf nav-icon"></i>
-              <span class="nav-text">Environmental</span>
-            </a>
-          </li>
-        </ul>
-
-        <div class="nav-section">Analytics</div>
-        <ul class="nav-menu">
-          <li class="nav-item">
-            <a href="reports.html" class="nav-link">
-              <i class="fas fa-chart-line nav-icon"></i>
-              <span class="nav-text">Reports & Analytics</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="profile.html" class="nav-link">
-              <i class="fas fa-user-circle nav-icon"></i>
-              <span class="nav-text">User Profile</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
-
+      <nav class="sidebar-nav"></nav>
       <div class="sidebar-footer">
         <div class="sidebar-user">
-          <div class="user-avatar">RA</div>
-          <div class="user-info">
-            <span class="user-name">Rajesh Admin</span>
-            <span class="user-role">Port Director</span>
+          <div class="sidebar-user-avatar"></div>
+          <div class="sidebar-user-info">
+            <h6>Loading...</h6>
+            <small></small>
           </div>
         </div>
       </div>
@@ -136,62 +58,27 @@
             <input type="text" class="search-input" placeholder="Search security...">
           </div>
           <div class="topbar-clock" id="liveClock">10:45:32</div>
-          <button class="topbar-btn notification-btn" id="notifBtn">
+          <button class="topbar-btn" id="notifBtn">
             <i class="fas fa-bell"></i>
-            <span class="badge-count">5</span>
+            <span class="badge-count" id="notifBadge" style="display:none;">0</span>
           </button>
           <div class="notification-dropdown" id="notifDropdown">
             <div class="dropdown-header">
               <h6>Notifications</h6>
               <a href="#" id="markAllRead" style="font-size:0.78rem;">Mark all read</a>
             </div>
-            <div class="notification-list">
-              <div class="notification-item unread">
-                <div class="notification-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
-                <div class="notification-body">
-                  <h6>Intrusion Detected — Zone A</h6>
-                  <p>Unauthorized movement detected near Berth 1-3</p>
-                  <small>2 min ago</small>
-                </div>
-              </div>
-              <div class="notification-item unread">
-                <div class="notification-icon warning"><i class="fas fa-clock"></i></div>
-                <div class="notification-body">
-                  <h6>Perimeter Breach — Gate 2</h6>
-                  <p>Perimeter sensor triggered at Zone C</p>
-                  <small>15 min ago</small>
-                </div>
-              </div>
-              <div class="notification-item unread">
-                <div class="notification-icon info"><i class="fas fa-info-circle"></i></div>
-                <div class="notification-body">
-                  <h6>Access Denied</h6>
-                  <p>Keycard rejected for Vikram R. at Zone C</p>
-                  <small>30 min ago</small>
-                </div>
-              </div>
-              <div class="notification-item">
-                <div class="notification-icon success"><i class="fas fa-check-circle"></i></div>
-                <div class="notification-body">
-                  <h6>Alert Resolved</h6>
-                  <p>SEC-2024-00889 access alert has been resolved</p>
-                  <small>1 hour ago</small>
-                </div>
-              </div>
-              <div class="notification-item">
-                <div class="notification-icon danger"><i class="fas fa-user-secret"></i></div>
-                <div class="notification-body">
-                  <h6>Suspicious Activity — Zone A</h6>
-                  <p>Unknown individual flagged near Berth 4-6</p>
-                  <small>3 hours ago</small>
-                </div>
+            <div class="notification-list" id="notifList">
+              <div class="notification-item" style="text-align:center;padding:24px;color:var(--text-muted);">
+                <p>No notifications</p>
               </div>
             </div>
           </div>
           <button class="topbar-btn">
             <i class="fas fa-cog"></i>
           </button>
-          <div class="topbar-avatar">RA</div>
+          <a href="profile.html" class="topbar-btn" style="text-decoration:none;">
+            <div class="avatar avatar-sm" style="background:var(--gradient-primary);font-size:0.7rem;"></div>
+          </a>
         </div>
       </header>
 
@@ -204,7 +91,7 @@
             <p class="page-subtitle">AI-powered surveillance and threat detection</p>
           </div>
           <div class="page-header-right">
-            <button class="btn btn-primary" onclick="App.showToast('New alert form opened','info')">
+            <button class="btn btn-primary" onclick="App.showAddAlertModal()">
               <i class="fas fa-plus me-2"></i>New Alert
             </button>
             <button class="btn btn-outline-danger ms-2" onclick="App.showToast('Emergency lockdown initiated','danger')">
@@ -220,7 +107,7 @@
               <i class="fas fa-video"></i>
             </div>
             <div class="stat-content">
-              <h3 class="stat-value" id="activeCamerasStat">48</h3>
+              <h3 class="stat-value" id="activeCamerasStat">--</h3>
               <p class="stat-label">Active Cameras</p>
             </div>
             <div class="stat-trend trend-up">
@@ -232,7 +119,7 @@
               <i class="fas fa-exclamation-circle"></i>
             </div>
             <div class="stat-content">
-              <h3 class="stat-value" id="alertsTodayStat">3</h3>
+              <h3 class="stat-value" id="alertsTodayStat">--</h3>
               <p class="stat-label">Alerts Today</p>
             </div>
             <div class="stat-trend trend-down">
@@ -244,7 +131,7 @@
               <i class="fas fa-user-lock"></i>
             </div>
             <div class="stat-content">
-              <h3 class="stat-value">7</h3>
+              <h3 class="stat-value">--</h3>
               <p class="stat-label">Access Denied</p>
             </div>
             <div class="stat-trend trend-up">
@@ -256,7 +143,7 @@
               <i class="fas fa-hard-hat"></i>
             </div>
             <div class="stat-content">
-              <h3 class="stat-value">234</h3>
+              <h3 class="stat-value">--</h3>
               <p class="stat-label">Personnel On-Site</p>
             </div>
             <div class="stat-trend trend-up">
@@ -278,7 +165,7 @@
                 <option value="suspicious">Suspicious</option>
                 <option value="violation">Violation</option>
               </select>
-              <button class="btn btn-outline-secondary btn-sm ms-2" onclick="App.showToast('Export started','success')">
+              <button class="btn btn-outline-secondary btn-sm ms-2" onclick="exportSecurity()">
                 <i class="fas fa-download me-1"></i>Export
               </button>
             </div>
@@ -424,7 +311,7 @@
             <div class="card-header">
               <h5 class="card-title"><i class="fas fa-door-open me-2"></i>Access Control Logs</h5>
               <div class="card-actions">
-                <button class="btn btn-outline-secondary btn-sm" onclick="App.showToast('Export started','success')">
+                <button class="btn btn-outline-secondary btn-sm" onclick="exportSecurity()">
                   <i class="fas fa-download me-1"></i>Export
                 </button>
               </div>
@@ -512,10 +399,11 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/config.js"></script>
   <script src="js/utils.js"></script>
-  <script>
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+    <script>
     // TODO: no backend endpoint for incidents-over-time series yet, chart stays illustrative
     // Security Incidents Line Chart
     const incidentCtx = document.getElementById('securityIncidentsChart').getContext('2d');
@@ -614,9 +502,9 @@
         <td><span class="status-badge ${STATUS_CLASS[inc.status] || 'status-info'}">${inc.status}</span></td>
         <td>
           <div class="action-btns">
-            <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-            <button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-search"></i></button>
-            <button class="btn btn-icon btn-track" title="Dispatch" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-location-dot"></i></button>
+            <button class="btn btn-icon btn-view" title="View" onclick="App.showToast('Opening details','info')"><i class="fas fa-eye"></i></button>
+            <button class="btn btn-icon btn-edit" title="Investigate" onclick="App.showToast('Opening details','info')"><i class="fas fa-search"></i></button>
+            <button class="btn btn-icon btn-track" title="Dispatch" onclick="App.showToast('Opening details','info')"><i class="fas fa-location-dot"></i></button>
           </div>
         </td>
       </tr>`;

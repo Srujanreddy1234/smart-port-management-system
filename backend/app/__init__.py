@@ -41,6 +41,16 @@ def create_app(config_name=None):
     from app.utils.jwt_handlers import register_jwt_handlers
     register_jwt_handlers(jwt)
 
+    @app.after_request
+    def add_security_headers(response):
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'DENY'
+        response.headers['Referrer-Policy'] = 'same-origin'
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        if not app.config.get('DEBUG'):
+            response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        return response
+
     from app.utils.helpers import register_cli_commands
     register_cli_commands(app)
 
@@ -77,6 +87,8 @@ def create_app(config_name=None):
                         WaterQualityParameter, AirQualityParameter, NoiseParameter, WeatherParameter
                     )
                     from app.models.reports import Report, ReportType, ReportFormat, ReportStatus, ReportSchedule, ReportTemplate, DashboardWidget, UserDashboard
+                    from app.models.event_log import EventLog, EventType, EventSeverity
+                    from app.models.billing import Invoice, InvoiceStatus, BillingLine, BillingCategory, PaymentMethod
                     db.create_all()
                 except Exception:
                     pass  # DB not ready yet, will retry on next request

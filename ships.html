@@ -23,27 +23,13 @@
         <small>Thoothukudi</small>
       </div>
     </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section">Main</div>
-      <div class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-th-large"></i><span>Dashboard</span></a></div>
-      <div class="nav-section">Operations</div>
-      <div class="nav-item"><a href="ships.html" class="nav-link active"><i class="fas fa-ship"></i><span>Ship Management</span><span class="badge badge-primary">24</span></a></div>
-      <div class="nav-item"><a href="containers.html" class="nav-link"><i class="fas fa-boxes-stacked"></i><span>Container Ops</span><span class="badge badge-info">1.2K</span></a></div>
-      <div class="nav-item"><a href="trucks.html" class="nav-link"><i class="fas fa-truck"></i><span>Truck Operations</span><span class="badge badge-warning">18</span></a></div>
-      <div class="nav-section">Management</div>
-      <div class="nav-item"><a href="security.html" class="nav-link"><i class="fas fa-shield-halved"></i><span>Security Center</span><span class="badge badge-danger">3</span></a></div>
-      <div class="nav-item"><a href="maintenance.html" class="nav-link"><i class="fas fa-wrench"></i><span>Equipment Maint.</span></a></div>
-      <div class="nav-item"><a href="environment.html" class="nav-link"><i class="fas fa-leaf"></i><span>Environmental</span></a></div>
-      <div class="nav-section">Analytics</div>
-      <div class="nav-item"><a href="reports.html" class="nav-link"><i class="fas fa-chart-line"></i><span>Reports &amp; Analytics</span></a></div>
-      <div class="nav-item"><a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i><span>User Profile</span></a></div>
-    </nav>
+    <nav class="sidebar-nav"></nav>
     <div class="sidebar-footer">
       <div class="sidebar-user">
-        <div class="sidebar-user-avatar">RA</div>
+        <div class="sidebar-user-avatar"></div>
         <div class="sidebar-user-info">
-          <h6>Rajesh Admin</h6>
-          <small>Port Director</small>
+          <h6>Loading...</h6>
+          <small></small>
         </div>
       </div>
     </div>
@@ -76,59 +62,22 @@
         <button class="topbar-btn"><i class="fas fa-expand"></i></button>
         <button class="topbar-btn" id="notifBtn">
           <i class="fas fa-bell"></i>
-          <span class="badge-count">5</span>
+          <span class="badge-count" id="notifBadge" style="display:none;">0</span>
         </button>
         <div class="notification-dropdown" id="notifDropdown">
           <div class="dropdown-header">
             <h6>Notifications</h6>
             <a href="#" id="markAllRead" style="font-size:0.78rem;">Mark all read</a>
           </div>
-          <div class="notification-list">
-            <div class="notification-item unread">
-              <div class="notification-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
-              <div class="notification-body">
-                <h6>Security Alert — Zone B</h6>
-                <p>Unauthorized access detected near Berth 7</p>
-                <small>2 min ago</small>
-              </div>
-            </div>
-            <div class="notification-item unread">
-              <div class="notification-icon warning"><i class="fas fa-clock"></i></div>
-              <div class="notification-body">
-                <h6>Vessel Delay</h6>
-                <p>MV Chennai Express delayed by 2.5 hours</p>
-                <small>15 min ago</small>
-              </div>
-            </div>
-            <div class="notification-item unread">
-              <div class="notification-icon success"><i class="fas fa-check-circle"></i></div>
-              <div class="notification-body">
-                <h6>Container Discharged</h6>
-                <p>450 containers unloaded from MV Pacific Star</p>
-                <small>1 hour ago</small>
-              </div>
-            </div>
-            <div class="notification-item">
-              <div class="notification-icon info"><i class="fas fa-info-circle"></i></div>
-              <div class="notification-body">
-                <h6>Maintenance Scheduled</h6>
-                <p>Crane #3 maintenance at 14:00 today</p>
-                <small>3 hours ago</small>
-              </div>
-            </div>
-            <div class="notification-item">
-              <div class="notification-icon success"><i class="fas fa-leaf"></i></div>
-              <div class="notification-body">
-                <h6>AQI Normal</h6>
-                <p>Air quality index returned to safe levels</p>
-                <small>5 hours ago</small>
-              </div>
+          <div class="notification-list" id="notifList">
+            <div class="notification-item" style="text-align:center;padding:24px;color:var(--text-muted);">
+              <p>No notifications</p>
             </div>
           </div>
         </div>
         <button class="topbar-btn"><i class="fas fa-cog"></i></button>
         <a href="profile.html" class="topbar-btn" style="text-decoration:none;">
-          <div class="avatar avatar-sm" style="background:var(--gradient-primary);font-size:0.7rem;">RA</div>
+          <div class="avatar avatar-sm" style="background:var(--gradient-primary);font-size:0.7rem;"></div>
         </a>
       </div>
     </header>
@@ -139,10 +88,10 @@
           <h2>Ship Management</h2>
           <p>Track and manage all vessels at Thoothukudi Port</p>
         </div>
-        <div style="display:flex;gap:10px;align-items:center;">
-          <button class="btn btn-secondary" onclick="App.showToast('Ship list refreshed','success')"><i class="fas fa-sync-alt"></i> Refresh</button>
-          <button class="btn btn-primary" onclick="App.showToast('Registration form opened','info')"><i class="fas fa-plus"></i> Register Ship</button>
-        </div>
+         <div style="display:flex;gap:10px;align-items:center;">
+           <button class="btn btn-secondary" onclick="loadShips()"><i class="fas fa-sync-alt"></i> Refresh</button>
+           <button class="btn btn-primary" onclick="showRegisterShipModal()"><i class="fas fa-plus"></i> Register Ship</button>
+         </div>
       </div>
 
       <div class="card" style="margin-bottom:24px;">
@@ -227,8 +176,8 @@
         <div class="card-header">
           <h6><i class="fas fa-ship" style="color:var(--primary-light);margin-right:8px;"></i>Vessel Registry</h6>
           <div style="display:flex;gap:6px;">
-            <button class="btn btn-sm btn-secondary" onclick="App.showToast('Export started','success')"><i class="fas fa-download"></i> Export</button>
-            <button class="btn btn-sm btn-secondary" onclick="App.showToast('Print dialog opened','info')"><i class="fas fa-print"></i> Print</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="exportShips()"><i class="fas fa-download me-1"></i>Export</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="printShips()"><i class="fas fa-print me-1"></i>Print</button>
           </div>
         </div>
         <div class="card-body" style="padding:0;overflow-x:auto;">
@@ -279,52 +228,71 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/config.js"></script>
   <script src="js/utils.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
   <script>
     let shipsData = [];
     let filteredData = [];
-    let currentPage = 1;
+    var currentPage = 1;
     const rowsPerPage = 10;
 
-    function getStatusBadgeClass(status) {
-      const map = { 'At Berth': 'success', 'Anchored': 'warning', 'In Channel': 'info', 'Approaching': 'primary', 'Departed': 'secondary' };
-      return map[status] || 'secondary';
+    document.addEventListener('DOMContentLoaded', () => {
+      Store.init();
+      loadShips();
+      loadKpis();
+      loadArrivalsChart();
+    });
+
+    function filterShips() {
+      const search = document.getElementById('shipSearch').value.toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+      const type = document.getElementById('typeFilter').value;
+      const berth = document.getElementById('berthFilter').value;
+      filteredData = shipsData.filter(s => {
+        const matchSearch = !search || String(s.name || '').toLowerCase().includes(search) || String(s.ship_id || '').toLowerCase().includes(search) || String(s.agent || '').toLowerCase().includes(search);
+        const matchStatus = !status || s.status === status;
+        const matchType = !type || String(s.vessel_type || '').toLowerCase().includes(type.toLowerCase());
+        const matchBerth = !berth || s.current_berth === berth;
+        return matchSearch && matchStatus && matchType && matchBerth;
+      });
+      currentPage = 1;
+      renderShips(filteredData);
     }
 
     function renderShips(data) {
-      filteredData = data;
-      const totalPages = Math.ceil(data.length / rowsPerPage);
-      if (currentPage > totalPages) currentPage = totalPages || 1;
+      const tbody = document.getElementById('shipsTableBody');
+      if (!tbody) return;
       const start = (currentPage - 1) * rowsPerPage;
       const pageData = data.slice(start, start + rowsPerPage);
+      const totalItems = data.length;
+      const totalPages = Math.ceil(totalItems / rowsPerPage) || 1;
 
-      const tbody = document.getElementById('shipsTableBody');
-      tbody.innerHTML = pageData.map(s => `
-        <tr>
-          <td><strong>${s.ship_id}</strong></td>
-          <td>${s.name}</td>
-          <td>${s.vessel_type}</td>
-          <td>${s.flag || '—'}</td>
-          <td><span class="badge badge-${getStatusBadgeClass(s.status)}">${s.status}</span></td>
-          <td>${s.current_berth || '—'}</td>
-          <td>${s.eta ? Utils.formatDate(s.eta) : '—'}</td>
-          <td>${s.containers_onboard > 0 ? s.containers_onboard.toLocaleString() : '—'}</td>
-          <td>${s.agent || '—'}</td>
-          <td>
-            <div style="display:flex;gap:4px;">
-              <button class="btn btn-sm btn-secondary" title="View Details" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-eye"></i></button>
-              <button class="btn btn-sm btn-secondary" title="Edit" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-pen"></i></button>
-              <button class="btn btn-sm btn-secondary" title="Track" onclick="App.showToast('Feature coming soon','info')"><i class="fas fa-location-dot"></i></button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
+      if (pageData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);">No vessels found</td></tr>';
+      } else {
+        tbody.innerHTML = pageData.map(s => `
+          <tr>
+            <td><strong>${s.name}</strong></td>
+            <td>${s.ship_id}</td>
+            <td>${s.vessel_type}</td>
+            <td>${s.flag || '—'}</td>
+            <td><span class="badge badge-nav">${s.status}</span></td>
+            <td>${s.current_berth || '—'}</td>
+            <td>${s.agent || '—'}</td>
+            <td>
+              <div style="display:flex;gap:4px;">
+                <button class="btn btn-sm btn-secondary" title="View Details" onclick="App.showToast('Viewing ${s.name}','info')"><i class="fas fa-eye"></i></button>
+                <button class="btn btn-sm btn-secondary" title="Edit" onclick="App.showToast('Editing ${s.name}','info')"><i class="fas fa-pen"></i></button>
+                <button class="btn btn-sm btn-secondary" title="Track" onclick="App.showToast('Tracking ${s.name}','info')"><i class="fas fa-location-dot"></i></button>
+              </div>
+            </td>
+          </tr>`).join('');
+      }
 
       const infoEl = document.querySelector('.card-footer span');
       if (infoEl) {
-        const totalItems = data.length;
         const end = Math.min(start + rowsPerPage, totalItems);
         infoEl.textContent = totalItems === 0 ? 'No vessels found' : `Showing ${start + 1}-${end} of ${totalItems} vessels`;
       }
@@ -341,26 +309,7 @@
       }
     }
 
-    function goToPage(page) {
-      currentPage = page;
-      renderShips(filteredData);
-    }
-
-    function filterShips() {
-      const search = document.getElementById('shipSearch').value.toLowerCase();
-      const status = document.getElementById('statusFilter').value;
-      const type = document.getElementById('typeFilter').value;
-      const berth = document.getElementById('berthFilter').value;
-      const data = shipsData.filter(s => {
-        const matchSearch = !search || String(s.name || '').toLowerCase().includes(search) || String(s.ship_id || '').toLowerCase().includes(search) || String(s.agent || '').toLowerCase().includes(search);
-        const matchStatus = !status || s.status === status;
-        const matchType = !type || String(s.vessel_type || '').replace(/[^A-Za-z]/g, '') === type.replace(/[^A-Za-z]/g, '');
-        const matchBerth = !berth || s.current_berth === berth;
-        return matchSearch && matchStatus && matchType && matchBerth;
-      });
-      currentPage = 1;
-      renderShips(data);
-    }
+    function goToPage(page) { currentPage = page; renderShips(filteredData); }
 
     function updateKpiValue(label, value) {
       document.querySelectorAll('.kpi-card').forEach(card => {
@@ -372,17 +321,13 @@
       });
     }
 
-    async function loadKpis() {
-      try {
-        const res = await Api.request('/ships/stats');
-        const stats = res.data;
-        updateKpiValue('Total Ships', stats.total);
-        updateKpiValue('At Berth', stats.by_status['At Berth']);
-        updateKpiValue('Anchored', stats.by_status['Anchored']);
-        updateKpiValue('In Channel', stats.by_status['In Channel']);
-      } catch (err) {
-        App.showToast('Failed to load data', 'danger');
-      }
+    function loadKpis() {
+      const stats = Store.getShipStats();
+      updateKpiValue('Total Ships', stats.total);
+      updateKpiValue('At Berth', stats.by_status['At Berth'] || 0);
+      updateKpiValue('Anchored', stats.by_status['Anchored'] || 0);
+      updateKpiValue('In Channel', stats.by_status['In Channel'] || 0);
+      updateKpiValue('Approaching', stats.by_status['Approaching'] || 0);
     }
 
     async function loadShips() {
@@ -393,46 +338,69 @@
         currentPage = 1;
         renderShips(filteredData);
       } catch (err) {
-        App.showToast('Failed to load data', 'danger');
-        renderShips([]);
+        shipsData = Store.get('ships');
+        filteredData = [...shipsData];
+        currentPage = 1;
+        renderShips(filteredData);
+        App.showToast('Showing local data (API unavailable)', 'warning');
       }
     }
 
     async function loadArrivalsChart() {
       try {
         const res = await Api.request('/ships/arrivals-chart?days=30');
-        const ctx = document.getElementById('vesselArrivalsChart').getContext('2d');
-        new Chart(ctx, {
-          type: 'line',
-          data: res.data,
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { position: 'top', labels: { usePointStyle: true, padding: 20 } }
-            },
-            scales: {
-              y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
-              x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } }
-            },
-            interaction: { mode: 'index', intersect: false }
-          }
+        const ctx = document.getElementById('vesselArrivalsChart');
+        if (!ctx) return;
+        new Chart(ctx.getContext('2d'), {
+          type: 'line', data: res.data,
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { usePointStyle: true, padding: 20 } } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } } }, interaction: { mode: 'index', intersect: false } }
         });
       } catch (err) {
-        App.showToast('Failed to load data', 'danger');
+        const ships = Store.get('ships');
+        const byMonth = {};
+        ships.forEach(s => { const m = s.eta ? new Date(s.eta).toLocaleString('en-US', { month: 'short' }) : 'Unknown'; byMonth[m] = (byMonth[m] || 0) + 1; });
+        const ctx = document.getElementById('vesselArrivalsChart');
+        if (ctx) {
+          new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: { labels: Object.keys(byMonth), datasets: [{ label: 'Expected Arrivals', data: Object.values(byMonth), borderColor: 'rgba(13,110,253,1)', backgroundColor: 'rgba(13,110,253,0.1)', fill: true, tension: 0.4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } } }
+          });
+        }
       }
     }
 
-    document.getElementById('shipSearch').addEventListener('input', filterShips);
-    document.getElementById('statusFilter').addEventListener('change', filterShips);
-    document.getElementById('typeFilter').addEventListener('change', filterShips);
-    document.getElementById('berthFilter').addEventListener('change', filterShips);
+    function showRegisterShipModal() {
+      App.createModal({
+        id: 'registerShipModal', title: 'Register New Ship', width: '700px',
+        body: `<form id="registerShipForm" class="modal-form">
+          <div class="form-row"><div class="form-group"><label>Ship ID *</label><input type="text" id="rsShipId" class="form-control" placeholder="e.g. NEW-001" required></div><div class="form-group"><label>Name *</label><input type="text" id="rsName" class="form-control" placeholder="Vessel name" required></div></div>
+          <div class="form-row"><div class="form-group"><label>Vessel Type</label><select id="rsType" class="form-select"><option>Container Ship</option><option>Bulk Carrier</option><option>Tanker</option><option>Ro-Ro Cargo</option></select></div><div class="form-group"><label>Flag</label><input type="text" id="rsFlag" class="form-control" placeholder="Panama" value="Panama"></div></div>
+          <div class="form-row"><div class="form-group"><label>Length (m)</label><input type="number" id="rsLength" class="form-control" placeholder="200" step="0.1"></div><div class="form-group"><label>Beam (m)</label><input type="number" id="rsBeam" class="form-control" placeholder="30" step="0.1"></div></div>
+          <div class="form-row"><div class="form-group"><label>Draft (m)</label><input type="number" id="rsDraft" class="form-control" placeholder="10" step="0.1"></div><div class="form-group"><label>Agent</label><input type="text" id="rsAgent" class="form-control" placeholder="Shipping agent name"></div></div>
+          <div class="form-group"><label>ETA</label><input type="datetime-local" id="rsEta" class="form-control"></div>
+        </form>`,
+        footer: `<button class="btn btn-secondary" onclick="document.getElementById('registerShipModal').remove()">Cancel</button><button class="btn btn-primary" onclick="submitRegisterShip()">Register Ship</button>`
+      });
+    }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      loadShips();
-      loadKpis();
-      loadArrivalsChart();
-    });
+    function submitRegisterShip() {
+      const shipId = document.getElementById('rsShipId')?.value.trim();
+      const name = document.getElementById('rsName')?.value.trim();
+      if (!shipId || !name) { App.showToast('Ship ID and Name are required', 'danger'); return; }
+      Store.add('ships', { ship_id: shipId, name, vessel_type: document.getElementById('rsType')?.value || 'Container Ship', flag: document.getElementById('rsFlag')?.value || 'Panama', length_overall: parseFloat(document.getElementById('rsLength')?.value) || 0, beam: parseFloat(document.getElementById('rsBeam')?.value) || 0, draft: parseFloat(document.getElementById('rsDraft')?.value) || 0, status: 'Scheduled', current_berth: null, agent: document.getElementById('rsAgent')?.value || '', eta: document.getElementById('rsEta')?.value || null, agent_contact: null, agent_email: null, imo_number: '', call_sign: '', gross_tonnage: 0, deadweight_tonnage: 0, max_containers: 0, containers_onboard: 0, containers_to_discharge: 0, containers_to_load: 0 });
+      document.getElementById('registerShipModal').remove();
+      loadShips(); loadKpis();
+      App.showToast(`Ship ${name} registered successfully`, 'success');
+    }
+
+    function exportShips() { App.exportCSV(Store.get('ships'), 'ships-export.csv'); App.showToast('Ships exported', 'success'); }
+    function printShips() { window.print(); }
+
+    document.getElementById('shipSearch')?.addEventListener('input', filterShips);
+    document.getElementById('statusFilter')?.addEventListener('change', filterShips);
+    document.getElementById('typeFilter')?.addEventListener('change', filterShips);
+    document.getElementById('berthFilter')?.addEventListener('change', filterShips);
   </script>
 </body>
 </html>

@@ -7,9 +7,10 @@ from app.models import (
 )
 from app.utils.exceptions import AuthorizationError, NotFoundError, ValidationError as AppValidationError
 from app.utils.helpers import success_response, paginate_query
-from sqlalchemy import func, or_, and_, desc
+from sqlalchemy import func, or_, and_, desc, text
 from datetime import datetime, timedelta
 from marshmallow import Schema, fields, validate, ValidationError
+from sqlalchemy.dialects import postgresql
 
 
 containers_bp = Blueprint('containers', __name__, url_prefix='/api/v1/containers')
@@ -494,37 +495,11 @@ def get_flow_chart():
     
     period = request.args.get('period', 'monthly')
     months = int(request.args.get('months', 12))
-    
+
     end_date = datetime.utcnow()
     start_date = end_date - timedelta(days=months * 30)
-    
-    # Inbound (loaded at port)
-    inbound = db.session.query(
-        func.date_trunc('month', Container.loaded_at).label('month'),
-        func.count(Container.id).label('count')
-    ).filter(
-        Container.loaded_at >= start_date,
-        Container.loaded_at.isnot(None)
-    ).group_by(func.date_trunc('month', Container.loaded_at)).all()
-    
-    # Outbound (gate out)
-    outbound = db.session.query(
-        func.date_trunc('month', Container.gate_out_at).label('month'),
-        func.count(Container.id).label('count')
-    ).filter(
-        Container.gate_out_at >= start_date,
-        Container.gate_out_at.isnot(None)
-    ).group_by(func.date_trunc('month', Container.gate_out_at)).all()
-    
-    # Transferred (moved between locations)
-    transferred = db.session.query(
-        func.date_trunc('month', ContainerHistory.created_at).label('month'),
-        func.count(ContainerHistory.id).label('count')
-    ).filter(
-        ContainerHistory.created_at >= start_date,
-        ContainerHistory.event_type == 'MOVED'
-    ).group_by(func.date_trunc('month', ContainerHistory.created_at)).all()
-    
+
+    # Build the list of month labels first (portable, no DB function needed)
     labels = []
     current = start_date.replace(day=1)
     while current <= end_date:
@@ -533,22 +508,52 @@ def get_flow_chart():
             current = current.replace(year=current.year + 1, month=1)
         else:
             current = current.replace(month=current.month + 1)
-    
+
+    # Fetch raw records and aggregate in Python — works on SQLite and PostgreSQL
+    # without relying on date_trunc (PostgreSQL-only).
+    inbound_rows = db.session.query(
+        Container.loaded_at, Container.id
+    ).filter(
+        Container.loaded_at >= start_date,
+        Container.loaded_at.isnot(None)
+    ).all()
+
+    outbound_rows = db.session.query(
+        Container.gate_out_at, Container.id
+    ).filter(
+        Container.gate_out_at >= start_date,
+        Container.gate_out_at.isnot(None)
+    ).all()
+
+    transferred_rows = db.session.query(
+        ContainerHistory.created_at, ContainerHistory.id
+    ).filter(
+        ContainerHistory.created_at >= start_date,
+        ContainerHistory.event_type == 'MOVED'
+    ).all()
+
+    def _month_key(dt):
+        return dt.strftime('%b %Y') if dt else None
+
     inbound_data = [0] * len(labels)
     outbound_data = [0] * len(labels)
     transferred_data = [0] * len(labels)
-    
-    for i, label in enumerate(labels):
-        for m, c in inbound:
-            if m and m.strftime('%b %Y') == label:
-                inbound_data[i] = c
-        for m, c in outbound:
-            if m and m.strftime('%b %Y') == label:
-                outbound_data[i] = c
-        for m, c in transferred:
-            if m and m.strftime('%b %Y') == label:
-                transferred_data[i] = c
-    
+
+    for loaded_at, _ in inbound_rows:
+        key = _month_key(loaded_at)
+        if key in labels:
+            inbound_data[labels.index(key)] += 1
+
+    for gate_out_at, _ in outbound_rows:
+        key = _month_key(gate_out_at)
+        if key in labels:
+            outbound_data[labels.index(key)] += 1
+
+    for created_at, _ in transferred_rows:
+        key = _month_key(created_at)
+        if key in labels:
+            transferred_data[labels.index(key)] += 1
+
     return success_response({
         'labels': labels,
         'datasets': [

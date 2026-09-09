@@ -23,27 +23,13 @@
         <small>Thoothukudi</small>
       </div>
     </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section">Main</div>
-      <div class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-th-large"></i><span>Dashboard</span></a></div>
-      <div class="nav-section">Operations</div>
-      <div class="nav-item"><a href="ships.html" class="nav-link"><i class="fas fa-ship"></i><span>Ship Management</span><span class="badge badge-primary">24</span></a></div>
-      <div class="nav-item"><a href="containers.html" class="nav-link"><i class="fas fa-boxes-stacked"></i><span>Container Ops</span><span class="badge badge-info">1.2K</span></a></div>
-      <div class="nav-item"><a href="trucks.html" class="nav-link"><i class="fas fa-truck"></i><span>Truck Operations</span><span class="badge badge-warning">18</span></a></div>
-      <div class="nav-section">Management</div>
-      <div class="nav-item"><a href="security.html" class="nav-link"><i class="fas fa-shield-halved"></i><span>Security Center</span><span class="badge badge-danger">3</span></a></div>
-      <div class="nav-item"><a href="maintenance.html" class="nav-link"><i class="fas fa-wrench"></i><span>Equipment Maint.</span></a></div>
-      <div class="nav-item"><a href="environment.html" class="nav-link"><i class="fas fa-leaf"></i><span>Environmental</span></a></div>
-      <div class="nav-section">Analytics</div>
-      <div class="nav-item"><a href="reports.html" class="nav-link"><i class="fas fa-chart-line"></i><span>Reports &amp; Analytics</span></a></div>
-      <div class="nav-item"><a href="profile.html" class="nav-link active"><i class="fas fa-user-circle"></i><span>User Profile</span></a></div>
-    </nav>
+    <nav class="sidebar-nav"></nav>
     <div class="sidebar-footer">
       <div class="sidebar-user">
-        <div class="sidebar-user-avatar">RA</div>
+        <div class="sidebar-user-avatar"></div>
         <div class="sidebar-user-info">
-          <h6>Rajesh Admin</h6>
-          <small>Port Director</small>
+          <h6>Loading...</h6>
+          <small></small>
         </div>
       </div>
     </div>
@@ -76,59 +62,22 @@
         <button class="topbar-btn"><i class="fas fa-expand"></i></button>
         <button class="topbar-btn" id="notifBtn">
           <i class="fas fa-bell"></i>
-          <span class="badge-count">5</span>
+          <span class="badge-count" id="notifBadge" style="display:none;">0</span>
         </button>
         <div class="notification-dropdown" id="notifDropdown">
           <div class="dropdown-header">
             <h6>Notifications</h6>
             <a href="#" id="markAllRead" style="font-size:0.78rem;">Mark all read</a>
           </div>
-          <div class="notification-list">
-            <div class="notification-item unread">
-              <div class="notification-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
-              <div class="notification-body">
-                <h6>Security Alert — Zone B</h6>
-                <p>Unauthorized access detected near Berth 7</p>
-                <small>2 min ago</small>
-              </div>
-            </div>
-            <div class="notification-item unread">
-              <div class="notification-icon warning"><i class="fas fa-clock"></i></div>
-              <div class="notification-body">
-                <h6>Vessel Delay</h6>
-                <p>MV Chennai Express delayed by 2.5 hours</p>
-                <small>15 min ago</small>
-              </div>
-            </div>
-            <div class="notification-item unread">
-              <div class="notification-icon success"><i class="fas fa-check-circle"></i></div>
-              <div class="notification-body">
-                <h6>Container Discharged</h6>
-                <p>450 containers unloaded from MV Pacific Star</p>
-                <small>1 hour ago</small>
-              </div>
-            </div>
-            <div class="notification-item">
-              <div class="notification-icon info"><i class="fas fa-info-circle"></i></div>
-              <div class="notification-body">
-                <h6>Maintenance Scheduled</h6>
-                <p>Crane #3 maintenance at 14:00 today</p>
-                <small>3 hours ago</small>
-              </div>
-            </div>
-            <div class="notification-item">
-              <div class="notification-icon success"><i class="fas fa-leaf"></i></div>
-              <div class="notification-body">
-                <h6>AQI Normal</h6>
-                <p>Air quality index returned to safe levels</p>
-                <small>5 hours ago</small>
-              </div>
+          <div class="notification-list" id="notifList">
+            <div class="notification-item" style="text-align:center;padding:24px;color:var(--text-muted);">
+              <p>No notifications</p>
             </div>
           </div>
         </div>
         <button class="topbar-btn"><i class="fas fa-cog"></i></button>
         <a href="profile.html" class="topbar-btn" style="text-decoration:none;">
-          <div class="avatar avatar-sm" style="background:var(--gradient-primary);font-size:0.7rem;">RA</div>
+          <div class="avatar avatar-sm" style="background:var(--gradient-primary);font-size:0.7rem;"></div>
         </a>
       </div>
     </header>
@@ -148,8 +97,8 @@
             </div>
           </div>
           <div class="profile-actions">
-            <button class="btn btn-primary" onclick="App.showToast('Profile edit mode enabled','info')"><i class="fas fa-pen"></i> Edit Profile</button>
-            <button class="btn btn-secondary" onclick="App.showToast('Opening settings...','info')"><i class="fas fa-cog"></i> Settings</button>
+            <button class="btn btn-primary" onclick="App.editProfile()"><i class="fas fa-pen"></i> Edit Profile</button>
+            <button class="btn btn-secondary" onclick="App.showToast('Settings panel opened','info')"><i class="fas fa-cog"></i> Settings</button>
             <button class="btn btn-outline-danger" onclick="Api.logout()"><i class="fas fa-right-from-bracket"></i> Sign Out</button>
           </div>
         </div>
@@ -167,7 +116,7 @@
           <div class="card">
             <div class="card-header">
               <h6><i class="fas fa-user" style="color:var(--primary-light);margin-right:8px;"></i>Personal Information</h6>
-              <button class="btn btn-sm btn-secondary" onclick="App.showToast('Edit mode enabled','info')"><i class="fas fa-pen"></i> Edit</button>
+              <button class="btn btn-sm btn-secondary" onclick="App.editProfile()"><i class="fas fa-pen"></i> Edit</button>
             </div>
             <div class="card-body">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
@@ -506,57 +455,92 @@
     </div>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/app.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+   <script src="js/utils.js"></script>
   <script src="js/config.js"></script>
-  <script src="js/utils.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const tabs = document.querySelectorAll('.profile-tab');
-      const tabContents = {
-        overview: document.getElementById('tab-overview'),
-        activity: document.getElementById('tab-activity'),
-        settings: document.getElementById('tab-settings'),
-        security: document.getElementById('tab-security')
-      };
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+   <script>
+     document.addEventListener('DOMContentLoaded', () => {
+       const tabs = document.querySelectorAll('.profile-tab');
+       const tabContents = {
+         overview: document.getElementById('tab-overview'),
+         activity: document.getElementById('tab-activity'),
+         settings: document.getElementById('tab-settings'),
+         security: document.getElementById('tab-security')
+       };
+       tabs.forEach(tab => {
+         tab.addEventListener('click', () => {
+           tabs.forEach(t => t.classList.remove('active'));
+           tab.classList.add('active');
+           Object.values(tabContents).forEach(el => el.style.display = 'none');
+           tabContents[tab.dataset.tab].style.display = '';
+         });
+       });
+       loadProfile();
+     });
 
-      tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          tabs.forEach(t => t.classList.remove('active'));
-          tab.classList.add('active');
-          Object.values(tabContents).forEach(el => el.style.display = 'none');
-          tabContents[tab.dataset.tab].style.display = '';
-        });
-      });
+     function loadProfile() {
+       const user = Store.getUser();
+       if (!user) {
+         App.showToast('No user data available', 'danger');
+         return;
+       }
+       const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email;
+       const initials = Utils.getInitials(fullName);
+       const roleLabel = (user.role || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
-      loadProfile();
-    });
+       const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+       const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
 
-    async function loadProfile() {
-      try {
-        const res = await Api.request('/auth/me');
-        const u = res.data;
-        const fullName = `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email;
-        const initials = Utils.getInitials(fullName);
-        const roleLabel = (u.role || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+       setText('profileAvatar', initials);
+       setText('profileName', fullName);
+       setText('profileRole', roleLabel);
+       setText('profileEmail', user.email);
+       setText('profilePhone', user.phone || '—');
+       setText('profileMemberSince', user.created_at ? 'Member since ' + Utils.formatDate(user.created_at) : '—');
 
-        document.getElementById('profileAvatar').textContent = initials;
-        document.getElementById('profileName').textContent = fullName;
-        document.getElementById('profileRole').textContent = roleLabel;
-        document.getElementById('profileEmail').textContent = u.email;
-        document.getElementById('profilePhone').textContent = u.phone || u.mobile || '—';
-        document.getElementById('profileMemberSince').textContent = u.created_at ? 'Member since ' + Utils.formatDate(u.created_at) : '—';
+       setText('infoFullName', fullName);
+       setText('infoEmail', user.email);
+       setText('infoPhone', user.phone || '—');
+       setText('infoDepartment', user.department || '—');
+       setText('infoRole', roleLabel);
+       setText('infoEmployeeId', user.employee_id || '—');
 
-        document.getElementById('infoFullName').textContent = fullName;
-        document.getElementById('infoEmail').textContent = u.email;
-        document.getElementById('infoPhone').textContent = u.phone || u.mobile || '—';
-        document.getElementById('infoDepartment').textContent = u.department || '—';
-        document.getElementById('infoRole').textContent = roleLabel;
-        document.getElementById('infoEmployeeId').textContent = u.employee_id || '—';
-      } catch (err) {
-        App.showToast('Failed to load profile', 'danger');
-      }
-    }
-  </script>
+       setVal('editFullName', fullName);
+       setVal('editEmail', user.email);
+       setVal('editPhone', user.phone || '');
+       setVal('editDepartment', user.department || '');
+       setVal('editDesignation', user.designation || '');
+       setVal('editEmployeeId', user.employee_id || '');
+     }
+
+     function startEditProfile() { App.editProfile(); return; }
+       const user = Store.getUser();
+       if (!user) return;
+       const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email;
+       document.getElementById('infoFullName').textContent = fullName;
+       const editSection = document.getElementById('editProfileSection');
+       if (editSection) editSection.style.display = editSection.style.display === 'none' ? '' : 'none';
+     }
+
+     function saveProfile() {
+       const user = Store.getUser();
+       if (!user) return;
+       const updated = {
+         ...user,
+         first_name: document.getElementById('editFullName')?.value || user.first_name,
+         phone: document.getElementById('editPhone')?.value || user.phone,
+         department: document.getElementById('editDepartment')?.value || user.department,
+         designation: document.getElementById('editDesignation')?.value || user.designation,
+         employee_id: document.getElementById('editEmployeeId')?.value || user.employee_id,
+       };
+       Store.setUser(updated);
+       Store.set('user', updated);
+       loadProfile();
+       App.initUserDisplay();
+       App.showToast('Profile saved successfully', 'success');
+     }
+   </script>
 </body>
 </html>

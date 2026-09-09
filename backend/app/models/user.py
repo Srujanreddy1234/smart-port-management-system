@@ -6,11 +6,15 @@ from sqlalchemy import Enum, Index
 
 
 class UserRole(PyEnum):
+    SUPER_ADMIN = 'Super Admin'
     ADMIN = 'Admin'
-    OPERATIONS_OFFICER = 'Operations Officer'
-    SECURITY_OFFICER = 'Security Officer'
-    ENVIRONMENTAL_OFFICER = 'Environmental Officer'
-    VIEWER = 'Viewer'
+    PORT_SUPERVISOR = 'Port Supervisor'
+    PORT_STAFF = 'Port Staff'
+    CUSTOMS_OFFICER = 'Customs Officer'
+    SHIPPING_COMPANY = 'Shipping Company'
+    TRUCK_OPERATOR = 'Truck Operator'
+    CUSTOMER = 'Customer'
+    PUBLIC = 'Public'
 
 
 class UserStatus(PyEnum):
@@ -63,31 +67,71 @@ class User(db.Model):
     )
 
     ROLE_PERMISSIONS = {
-        UserRole.ADMIN: [
+        UserRole.SUPER_ADMIN: [
             'all'
         ],
-        UserRole.OPERATIONS_OFFICER: [
+        UserRole.ADMIN: [
+            'users.read', 'users.write', 'users.delete',
+            'roles.read', 'roles.write', 'roles.delete',
             'ships.read', 'ships.write', 'ships.delete',
             'containers.read', 'containers.write', 'containers.delete',
             'trucks.read', 'trucks.write', 'trucks.delete',
+            'berths.read', 'berths.write', 'berths.delete',
+            'dashboard.read', 'dashboard.write',
+            'reports.read', 'reports.write', 'reports.delete',
+            'maintenance.read', 'maintenance.write', 'maintenance.delete',
+            'security.read', 'security.write', 'security.delete',
+            'environment.read', 'environment.write', 'environment.delete',
+            'audit.read', 'settings.read', 'settings.write',
+        ],
+        UserRole.PORT_SUPERVISOR: [
+            'ships.read', 'ships.write',
+            'containers.read', 'containers.write',
+            'trucks.read', 'trucks.write',
+            'berths.read', 'berths.write',
             'dashboard.read', 'reports.read', 'reports.write',
             'maintenance.read', 'maintenance.write',
+            'security.read', 'security.write',
+            'environment.read',
+            'audit.read',
         ],
-        UserRole.SECURITY_OFFICER: [
-            'security.read', 'security.write', 'security.delete',
+        UserRole.PORT_STAFF: [
+            'ships.read', 'ships.write',
+            'containers.read', 'containers.write',
+            'trucks.read', 'trucks.write',
+            'berths.read',
             'dashboard.read', 'reports.read',
-            'ships.read', 'containers.read', 'trucks.read',
+            'maintenance.read', 'maintenance.write',
+            'security.read',
         ],
-        UserRole.ENVIRONMENTAL_OFFICER: [
-            'environment.read', 'environment.write', 'environment.delete',
+        UserRole.CUSTOMS_OFFICER: [
+            'containers.read', 'containers.write',
+            'trucks.read',
+            'ships.read',
             'dashboard.read', 'reports.read',
-            'security.read', 'maintenance.read',
+            'security.read',
         ],
-        UserRole.VIEWER: [
+        UserRole.SHIPPING_COMPANY: [
+            'ships.read',
+            'containers.read', 'containers.write',
+            'trucks.read',
+            'dashboard.read', 'reports.read',
+            'berths.read',
+        ],
+        UserRole.TRUCK_OPERATOR: [
+            'trucks.read', 'trucks.write',
+            'containers.read',
+            'ships.read',
+            'dashboard.read', 'reports.read',
+        ],
+        UserRole.CUSTOMER: [
+            'containers.read',
+            'ships.read',
+            'dashboard.read', 'reports.read',
+        ],
+        UserRole.PUBLIC: [
+            'ships.read',
             'dashboard.read',
-            'ships.read', 'containers.read', 'trucks.read',
-            'security.read', 'maintenance.read', 'environment.read',
-            'reports.read',
         ],
     }
 
@@ -119,10 +163,15 @@ class User(db.Model):
             'ships': 'ships.read',
             'containers': 'containers.read',
             'trucks': 'trucks.read',
+            'berths': 'berths.read',
             'security': 'security.read',
             'maintenance': 'maintenance.read',
             'environment': 'environment.read',
             'reports': 'reports.read',
+            'users': 'users.read',
+            'roles': 'roles.read',
+            'audit': 'audit.read',
+            'settings': 'settings.read',
             'admin': 'all',
         }
         required = module_permissions.get(module)
@@ -291,8 +340,80 @@ class AuditLog(db.Model):
             'new_values': self.new_values,
             'ip_address': self.ip_address,
             'status': self.status,
-'error_message': self.error_message,
+            'error_message': self.error_message,
             'duration_ms': self.duration_ms,
             'metadata': self.audit_metadata,
             'created_at': self.created_at.isoformat()
         }
+
+
+class Permission(db.Model):
+    __tablename__ = 'permissions'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False, index=True)
+    description = db.Column(db.String(255))
+    module = db.Column(db.String(50), nullable=False, index=True)
+    action = db.Column(db.String(50), nullable=False)
+    is_system = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'module': self.module,
+            'action': self.action,
+            'is_system': self.is_system,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+
+    def __repr__(self):
+        return f'<Permission {self.name}>'
+
+
+class Role(db.Model):
+    __tablename__ = 'roles'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False, index=True)
+    display_name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    is_system = db.Column(db.Boolean, default=False)
+    permissions = db.relationship('Permission', secondary='role_permissions', backref='roles')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'display_name': self.display_name,
+            'description': self.description,
+            'is_system': self.is_system,
+            'permissions': [p.to_dict() for p in self.permissions],
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+
+    def has_permission(self, permission_name):
+        return any(p.name == permission_name for p in self.permissions)
+
+    def __repr__(self):
+        return f'<Role {self.name}>'
+
+
+class RolePermission(db.Model):
+    __tablename__ = 'role_permissions'
+
+    id = db.Column(db.Integer, primary_key=True)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False, index=True)
+    permission_id = db.Column(db.Integer, db.ForeignKey('permissions.id'), nullable=False, index=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    __table_args__ = (
+        db.UniqueConstraint('role_id', 'permission_id', name='uq_role_permission'),
+    )

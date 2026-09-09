@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel — Smart Port Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/variables.css" rel="stylesheet">
+  <link href="css/main.css" rel="stylesheet">
+  <link href="css/layout.css" rel="stylesheet">
+  <link href="css/components.css" rel="stylesheet">
+  <link href="css/pages.css" rel="stylesheet">
+  <link href="css/responsive.css" rel="stylesheet">
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon"><i class="fas fa-anchor"></i></div>
+      <div class="sidebar-brand-text">
+        <h5>Smart Port</h5>
+        <small>Thoothukudi</small>
+      </div>
+    </div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar"></div>
+        <div class="sidebar-user-info">
+          <h6>Loading...</h6>
+          <small></small>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        <div>
+          <div class="page-title">Administration</div>
+          <div class="breadcrumb">
+            <a href="dashboard.html">Home</a>
+            <span class="separator">/</span>
+            <span>Admin Panel</span>
+          </div>
+        </div>
+      </div>
+      <div class="topbar-center">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="userSearch" placeholder="Search users...">
+          <span class="search-shortcut">Ctrl+K</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span id="liveClock" style="font-size:0.82rem;color:var(--text-muted);font-family:monospace;margin-right:8px;"></span>
+        <button class="topbar-btn"><i class="fas fa-expand"></i></button>
+        <button class="topbar-btn" id="notifBtn">
+          <i class="fas fa-bell"></i>
+          <span class="badge-count" id="notifBadge" style="display:none;">0</span>
+        </button>
+        <a href="profile.html" class="topbar-btn" style="text-decoration:none;">
+          <div class="avatar avatar-sm" style="background:var(--gradient-primary);font-size:0.7rem;"></div>
+        </a>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="page-header">
+        <div>
+          <h2>User Management</h2>
+          <p>Manage users, roles, and permissions</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-primary" onclick="showCreateUserModal()"><i class="fas fa-plus"></i> Add User</button>
+        </div>
+      </div>
+
+      <div class="dashboard-kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px;">
+        <div class="card kpi-card glow-card">
+          <div class="kpi-icon" style="background:rgba(13,110,253,0.12);color:#6ea8fe;"><i class="fas fa-users"></i></div>
+          <div class="kpi-value" id="totalUsers">--</div>
+          <div class="kpi-label">Total Users</div>
+        </div>
+        <div class="card kpi-card glow-card">
+          <div class="kpi-icon" style="background:rgba(25,135,84,0.12);color:#75b798;"><i class="fas fa-user-check"></i></div>
+          <div class="kpi-value" id="activeUsers">--</div>
+          <div class="kpi-label">Active</div>
+        </div>
+        <div class="card kpi-card glow-card">
+          <div class="kpi-icon" style="background:rgba(255,193,7,0.12);color:#ffda6a;"><i class="fas fa-user-clock"></i></div>
+          <div class="kpi-value" id="pendingUsers">--</div>
+          <div class="kpi-label">Pending</div>
+        </div>
+        <div class="card kpi-card glow-card">
+          <div class="kpi-icon" style="background:rgba(220,53,69,0.12);color:#ea868f;"><i class="fas fa-user-slash"></i></div>
+          <div class="kpi-value" id="suspendedUsers">--</div>
+          <div class="kpi-label">Suspended</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-header">
+          <h6><i class="fas fa-users" style="color:var(--primary-light);margin-right:8px;"></i>User Registry</h6>
+          <div style="display:flex;gap:6px;">
+            <select class="form-select" id="roleFilter" style="width:auto;font-size:0.82rem;">
+              <option value="">All Roles</option>
+              <option value="Super Admin">Super Admin</option>
+              <option value="Admin">Admin</option>
+              <option value="Port Supervisor">Port Supervisor</option>
+              <option value="Port Staff">Port Staff</option>
+              <option value="Customs Officer">Customs Officer</option>
+              <option value="Shipping Company">Shipping Company</option>
+              <option value="Truck Operator">Truck Operator</option>
+              <option value="Customer">Customer</option>
+            </select>
+            <select class="form-select" id="statusFilter" style="width:auto;font-size:0.82rem;">
+              <option value="">All Statuses</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+              <option value="Suspended">Suspended</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Department</th>
+                <th>Status</th>
+                <th>Last Login</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer" style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;">
+          <span id="usersInfo" style="font-size:0.82rem;color:var(--text-muted);">Loading...</span>
+          <div id="usersPagination" style="display:flex;gap:4px;"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    let usersPage = 1;
+    const usersPerPage = 15;
+
+    function getRoleBadge(role) {
+      const map = {
+        'Super Admin': 'danger', 'Admin': 'primary', 'Port Supervisor': 'info',
+        'Port Staff': 'success', 'Customs Officer': 'warning', 'Shipping Company': 'secondary',
+        'Truck Operator': 'secondary', 'Customer': 'info', 'Public': 'secondary'
+      };
+      return `<span class="badge badge-${map[role] || 'secondary'}">${role}</span>`;
+    }
+
+    function getStatusBadge(status) {
+      const map = { 'Active': 'success', 'Inactive': 'secondary', 'Suspended': 'danger', 'Pending': 'warning' };
+      return `<span class="badge badge-${map[status] || 'secondary'}">${status}</span>`;
+    }
+
+    function renderUsers(users, total, page, pages) {
+      const tbody = document.getElementById('usersTableBody');
+      if (!users.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">No users found</td></tr>';
+        return;
+      }
+      tbody.innerHTML = users.map(u => `
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="avatar avatar-sm" style="background:${Utils.getAvatarColor(u.full_name)};font-size:0.65rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;">${Utils.getInitials(u.full_name)}</div>
+              <div>
+                <div style="font-weight:500;font-size:0.85rem;">${u.full_name}</div>
+                <div style="font-size:0.75rem;color:var(--text-muted);">${u.employee_id || ''}</div>
+              </div>
+            </div>
+          </td>
+          <td style="font-size:0.82rem;">${u.email}</td>
+          <td>${getRoleBadge(u.role)}</td>
+          <td style="font-size:0.82rem;">${u.department || '—'}</td>
+          <td>${getStatusBadge(u.status)}</td>
+          <td style="font-size:0.82rem;">${u.last_login_at ? Utils.timeAgo(u.last_login_at) : 'Never'}</td>
+          <td>
+            <div style="display:flex;gap:4px;">
+              <button class="btn btn-sm btn-secondary" onclick="viewUser(${u.id})" title="View"><i class="fas fa-eye"></i></button>
+              <button class="btn btn-sm btn-secondary" onclick="editUser(${u.id})" title="Edit"><i class="fas fa-pen"></i></button>
+              ${u.status === 'Active' ? `<button class="btn btn-sm btn-warning" onclick="toggleUserStatus(${u.id}, 'suspended')" title="Suspend"><i class="fas fa-ban"></i></button>` : `<button class="btn btn-sm btn-success" onclick="toggleUserStatus(${u.id}, 'active')" title="Activate"><i class="fas fa-check"></i></button>`}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      document.getElementById('usersInfo').textContent = `Showing ${(page-1)*usersPerPage+1}-${Math.min(page*usersPerPage, total)} of ${total} users`;
+
+      const pagination = document.getElementById('usersPagination');
+      let btns = `<button class="btn btn-sm btn-secondary" ${page <= 1 ? 'disabled' : ''} onclick="loadUsers(${page-1})"><i class="fas fa-chevron-left"></i></button>`;
+      for (let p = 1; p <= pages; p++) {
+        btns += `<button class="btn btn-sm ${p === page ? 'btn-primary' : 'btn-secondary'}" onclick="loadUsers(${p})">${p}</button>`;
+      }
+      btns += `<button class="btn btn-sm btn-secondary" ${page >= pages ? 'disabled' : ''} onclick="loadUsers(${page+1})"><i class="fas fa-chevron-right"></i></button>`;
+      pagination.innerHTML = btns;
+    }
+
+    async function loadUsers(page = 1) {
+      usersPage = page;
+      try {
+        const search = document.getElementById('userSearch').value;
+        const role = document.getElementById('roleFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        let url = `/users?page=${page}&per_page=${usersPerPage}`;
+        if (search) url += `&search=${encodeURIComponent(search)}`;
+        if (role) url += `&role=${encodeURIComponent(role)}`;
+        if (status) url += `&status=${encodeURIComponent(status)}`;
+        const res = await Api.request(url);
+        renderUsers(res.data.items, res.data.total, res.data.page, res.data.pages);
+      } catch (err) {
+        App.showToast('Failed to load users: ' + err.message, 'danger');
+      }
+    }
+
+    async function loadUserStats() {
+      try {
+        const res = await Api.request('/users/stats');
+        const s = res.data;
+        document.getElementById('totalUsers').textContent = s.total;
+        document.getElementById('activeUsers').textContent = s.by_status['Active'] || 0;
+        document.getElementById('pendingUsers').textContent = s.by_status['Pending'] || 0;
+        document.getElementById('suspendedUsers').textContent = s.by_status['Suspended'] || 0;
+      } catch (err) {
+        App.showToast('Failed to load stats', 'danger');
+      }
+    }
+
+    async function viewUser(userId) {
+      try {
+        const res = await Api.request(`/users/${userId}`);
+        const u = res.data;
+        App.createModal({
+          id: 'viewUserModal',
+          title: 'User Details',
+          body: `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div><strong>Name:</strong> ${u.full_name}</div>
+              <div><strong>Email:</strong> ${u.email}</div>
+              <div><strong>Role:</strong> ${getRoleBadge(u.role)}</div>
+              <div><strong>Status:</strong> ${getStatusBadge(u.status)}</div>
+              <div><strong>Employee ID:</strong> ${u.employee_id || '—'}</div>
+              <div><strong>Department:</strong> ${u.department || '—'}</div>
+              <div><strong>Designation:</strong> ${u.designation || '—'}</div>
+              <div><strong>Phone:</strong> ${u.phone || '—'}</div>
+              <div><strong>Last Login:</strong> ${u.last_login_at ? Utils.formatDateTime(u.last_login_at) : 'Never'}</div>
+              <div><strong>Created:</strong> ${Utils.formatDateTime(u.created_at)}</div>
+            </div>
+            ${u.permissions ? `<div style="margin-top:16px;"><strong>Permissions:</strong><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;">${u.permissions.map(p => `<span class="badge badge-secondary" style="font-size:0.7rem;">${p}</span>`).join('')}</div></div>` : ''}
+          `,
+          footer: `<button class="btn btn-secondary" onclick="document.getElementById('viewUserModal').remove()">Close</button>`
+        });
+      } catch (err) {
+        App.showToast('Failed to load user', 'danger');
+      }
+    }
+
+    async function editUser(userId) {
+      try {
+        const res = await Api.request(`/users/${userId}`);
+        const u = res.data;
+        App.createModal({
+          id: 'editUserModal',
+          title: 'Edit User',
+          body: `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div class="form-group">
+                <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">First Name</label>
+                <input type="text" id="editFirstName" class="form-control" value="${u.first_name}">
+              </div>
+              <div class="form-group">
+                <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">Last Name</label>
+                <input type="text" id="editLastName" class="form-control" value="${u.last_name}">
+              </div>
+              <div class="form-group">
+                <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">Role</label>
+                <select id="editRole" class="form-select">
+                  ${['Super Admin','Admin','Port Supervisor','Port Staff','Customs Officer','Shipping Company','Truck Operator','Customer','Public'].map(r => `<option value="${r}" ${u.role === r ? 'selected' : ''}>${r}</option>`).join('')}
+                </select>
+              </div>
+              <div class="form-group">
+                <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">Status</label>
+                <select id="editStatus" class="form-select">
+                  ${['Active','Inactive','Suspended'].map(s => `<option value="${s}" ${u.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+                </select>
+              </div>
+              <div class="form-group">
+                <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">Department</label>
+                <input type="text" id="editDept" class="form-control" value="${u.department || ''}">
+              </div>
+              <div class="form-group">
+                <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">Designation</label>
+                <input type="text" id="editDesig" class="form-control" value="${u.designation || ''}">
+              </div>
+            </div>
+            <div id="editUserError" style="color:var(--danger);font-size:0.82rem;display:none;margin-top:8px;"></div>
+          `,
+          footer: `
+            <button class="btn btn-secondary" onclick="document.getElementById('editUserModal').remove()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveUser(${userId})">Save</button>
+          `
+        });
+      } catch (err) {
+        App.showToast('Failed to load user', 'danger');
+      }
+    }
+
+    async function saveUser(userId) {
+      const data = {
+        first_name: document.getElementById('editFirstName').value,
+        last_name: document.getElementById('editLastName').value,
+        role: document.getElementById('editRole').value,
+        status: document.getElementById('editStatus').value,
+        department: document.getElementById('editDept').value,
+        designation: document.getElementById('editDesig').value,
+      };
+      try {
+        await Api.request(`/users/${userId}`, { method: 'PUT', body: JSON.stringify(data) });
+        document.getElementById('editUserModal').remove();
+        App.showToast('User updated', 'success');
+        loadUsers(usersPage);
+        loadUserStats();
+      } catch (err) {
+        document.getElementById('editUserError').textContent = err.message;
+        document.getElementById('editUserError').style.display = 'block';
+      }
+    }
+
+    async function toggleUserStatus(userId, newStatus) {
+      try {
+        await Api.request(`/users/${userId}`, { method: 'PUT', body: JSON.stringify({ status: newStatus }) });
+        App.showToast(`User ${newStatus}`, 'success');
+        loadUsers(usersPage);
+        loadUserStats();
+      } catch (err) {
+        App.showToast(err.message, 'danger');
+      }
+    }
+
+    function showCreateUserModal() {
+      App.createModal({
+        id: 'createUserModal',
+        title: 'Create New User',
+        body: `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">Email *</label>
+              <input type="email" id="newEmail" class="form-control" placeholder="user@smartport.gov.in">
+            </div>
+            <div class="form-group">
+              <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">Password *</label>
+              <input type="password" id="newPassword" class="form-control" placeholder="Min 8 characters">
+            </div>
+            <div class="form-group">
+              <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">First Name *</label>
+              <input type="text" id="newFirstName" class="form-control">
+            </div>
+            <div class="form-group">
+              <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">Last Name *</label>
+              <input type="text" id="newLastName" class="form-control">
+            </div>
+            <div class="form-group">
+              <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">Role *</label>
+              <select id="newRole" class="form-select">
+                ${['Port Staff','Port Supervisor','Customs Officer','Shipping Company','Truck Operator','Customer'].map(r => `<option value="${r}">${r}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">Employee ID</label>
+              <input type="text" id="newEmpId" class="form-control" placeholder="EMP001">
+            </div>
+            <div class="form-group">
+              <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">Department</label>
+              <input type="text" id="newDept" class="form-control">
+            </div>
+            <div class="form-group">
+              <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">Designation</label>
+              <input type="text" id="newDesig" class="form-control">
+            </div>
+          </div>
+          <div id="createUserError" style="color:var(--danger);font-size:0.82rem;display:none;margin-top:8px;"></div>
+        `,
+        footer: `
+          <button class="btn btn-secondary" onclick="document.getElementById('createUserModal').remove()">Cancel</button>
+          <button class="btn btn-primary" onclick="submitNewUser()">Create</button>
+        `
+      });
+    }
+
+    async function submitNewUser() {
+      const data = {
+        email: document.getElementById('newEmail').value,
+        password: document.getElementById('newPassword').value,
+        first_name: document.getElementById('newFirstName').value,
+        last_name: document.getElementById('newLastName').value,
+        role: document.getElementById('newRole').value,
+        employee_id: document.getElementById('newEmpId').value || undefined,
+        department: document.getElementById('newDept').value || undefined,
+        designation: document.getElementById('newDesig').value || undefined,
+      };
+      try {
+        await Api.request('/users', { method: 'POST', body: JSON.stringify(data) });
+        document.getElementById('createUserModal').remove();
+        App.showToast('User created', 'success');
+        loadUsers(1);
+        loadUserStats();
+      } catch (err) {
+        document.getElementById('createUserError').textContent = err.message;
+        document.getElementById('createUserError').style.display = 'block';
+      }
+    }
+
+    document.getElementById('userSearch').addEventListener('input', Utils.debounce(() => loadUsers(1), 400));
+    document.getElementById('roleFilter').addEventListener('change', () => loadUsers(1));
+    document.getElementById('statusFilter').addEventListener('change', () => loadUsers(1));
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadUsers(1);
+      loadUserStats();
+    });
+  </script>
+</body>
+</html>

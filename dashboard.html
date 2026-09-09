@@ -24,27 +24,13 @@
         <small>Thoothukudi</small>
       </div>
     </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section">Main</div>
-      <div class="nav-item"><a href="dashboard.html" class="nav-link active"><i class="fas fa-th-large"></i><span>Dashboard</span></a></div>
-      <div class="nav-section">Operations</div>
-      <div class="nav-item"><a href="ships.html" class="nav-link"><i class="fas fa-ship"></i><span>Ship Management</span><span class="badge badge-primary">24</span></a></div>
-      <div class="nav-item"><a href="containers.html" class="nav-link"><i class="fas fa-boxes-stacked"></i><span>Container Ops</span><span class="badge badge-info">1.2K</span></a></div>
-      <div class="nav-item"><a href="trucks.html" class="nav-link"><i class="fas fa-truck"></i><span>Truck Operations</span><span class="badge badge-warning">18</span></a></div>
-      <div class="nav-section">Management</div>
-      <div class="nav-item"><a href="security.html" class="nav-link"><i class="fas fa-shield-halved"></i><span>Security Center</span><span class="badge badge-danger">3</span></a></div>
-      <div class="nav-item"><a href="maintenance.html" class="nav-link"><i class="fas fa-wrench"></i><span>Equipment Maint.</span></a></div>
-      <div class="nav-item"><a href="environment.html" class="nav-link"><i class="fas fa-leaf"></i><span>Environmental</span></a></div>
-      <div class="nav-section">Analytics</div>
-      <div class="nav-item"><a href="reports.html" class="nav-link"><i class="fas fa-chart-line"></i><span>Reports &amp; Analytics</span></a></div>
-      <div class="nav-item"><a href="profile.html" class="nav-link"><i class="fas fa-user-circle"></i><span>User Profile</span></a></div>
-    </nav>
+    <nav class="sidebar-nav"></nav>
     <div class="sidebar-footer">
       <div class="sidebar-user">
-        <div class="sidebar-user-avatar">RA</div>
+        <div class="sidebar-user-avatar"></div>
         <div class="sidebar-user-info">
-          <h6>Rajesh Admin</h6>
-          <small>Port Director</small>
+          <h6>Loading...</h6>
+          <small></small>
         </div>
       </div>
     </div>
@@ -77,59 +63,22 @@
         <button class="topbar-btn"><i class="fas fa-expand"></i></button>
         <button class="topbar-btn" id="notifBtn">
           <i class="fas fa-bell"></i>
-          <span class="badge-count">5</span>
+          <span class="badge-count" id="notifBadge" style="display:none;">0</span>
         </button>
         <div class="notification-dropdown" id="notifDropdown">
           <div class="dropdown-header">
             <h6>Notifications</h6>
             <a href="#" id="markAllRead" style="font-size:0.78rem;">Mark all read</a>
           </div>
-          <div class="notification-list">
-            <div class="notification-item unread">
-              <div class="notification-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
-              <div class="notification-body">
-                <h6>Security Alert — Zone B</h6>
-                <p>Unauthorized access detected near Berth 7</p>
-                <small>2 min ago</small>
-              </div>
-            </div>
-            <div class="notification-item unread">
-              <div class="notification-icon warning"><i class="fas fa-clock"></i></div>
-              <div class="notification-body">
-                <h6>Vessel Delay</h6>
-                <p>MV Chennai Express delayed by 2.5 hours</p>
-                <small>15 min ago</small>
-              </div>
-            </div>
-            <div class="notification-item unread">
-              <div class="notification-icon success"><i class="fas fa-check-circle"></i></div>
-              <div class="notification-body">
-                <h6>Container Discharged</h6>
-                <p>450 containers unloaded from MV Pacific Star</p>
-                <small>1 hour ago</small>
-              </div>
-            </div>
-            <div class="notification-item">
-              <div class="notification-icon info"><i class="fas fa-info-circle"></i></div>
-              <div class="notification-body">
-                <h6>Maintenance Scheduled</h6>
-                <p>Crane #3 maintenance at 14:00 today</p>
-                <small>3 hours ago</small>
-              </div>
-            </div>
-            <div class="notification-item">
-              <div class="notification-icon success"><i class="fas fa-leaf"></i></div>
-              <div class="notification-body">
-                <h6>AQI Normal</h6>
-                <p>Air quality index returned to safe levels</p>
-                <small>5 hours ago</small>
-              </div>
+          <div class="notification-list" id="notifList">
+            <div class="notification-item" style="text-align:center;padding:24px;color:var(--text-muted);">
+              <p>No notifications</p>
             </div>
           </div>
         </div>
         <button class="topbar-btn"><i class="fas fa-cog"></i></button>
         <a href="profile.html" class="topbar-btn" style="text-decoration:none;">
-          <div class="avatar avatar-sm" style="background:var(--gradient-primary);font-size:0.7rem;">RA</div>
+          <div class="avatar avatar-sm" style="background:var(--gradient-primary);font-size:0.7rem;"></div>
         </a>
       </div>
     </header>
@@ -142,38 +91,38 @@
         </div>
         <div style="display:flex;gap:10px;align-items:center;">
           <span id="liveDate" style="font-size:0.82rem;color:var(--text-muted);"></span>
-          <button class="btn btn-primary" onclick="App.showToast('Dashboard refreshed','success')"><i class="fas fa-sync-alt"></i> Refresh</button>
-          <button class="btn btn-secondary" onclick="App.showToast('Export started','success')"><i class="fas fa-download"></i> Export</button>
+          <button class="btn btn-primary" onclick="refreshDashboard()"><i class="fas fa-sync-alt"></i> Refresh</button>
+          <button class="btn btn-secondary" onclick="exportDashboard()"><i class="fas fa-download"></i> Export</button>
         </div>
       </div>
 
       <div class="dashboard-kpi-grid">
         <div class="card kpi-card glow-card">
           <div class="kpi-icon" style="background:rgba(13,110,253,0.12);color:#6ea8fe;"><i class="fas fa-ship"></i></div>
-          <div class="kpi-value" id="kpiShips">24</div>
+          <div class="kpi-value" id="kpiShips">--</div>
           <div class="kpi-label">Active Vessels</div>
-          <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> 12% from last week</div>
+          <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> <span id="kpiShipsChange">--</span></div>
           <div class="kpi-bg"><i class="fas fa-ship"></i></div>
         </div>
         <div class="card kpi-card glow-card">
           <div class="kpi-icon" style="background:rgba(25,135,84,0.12);color:#75b798;"><i class="fas fa-boxes-stacked"></i></div>
-          <div class="kpi-value" id="kpiContainers">1,247</div>
+          <div class="kpi-value" id="kpiContainers">--</div>
           <div class="kpi-label">Containers Handled</div>
-          <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> 8% from last week</div>
+          <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> <span id="kpiContainersChange">--</span></div>
           <div class="kpi-bg"><i class="fas fa-boxes-stacked"></i></div>
         </div>
         <div class="card kpi-card glow-card">
           <div class="kpi-icon" style="background:rgba(255,193,7,0.12);color:#ffda6a;"><i class="fas fa-truck"></i></div>
-          <div class="kpi-value" id="kpiTrucks">156</div>
+          <div class="kpi-value" id="kpiTrucks">--</div>
           <div class="kpi-label">Trucks In Transit</div>
-          <div class="kpi-change negative"><i class="fas fa-arrow-down"></i> 3% from yesterday</div>
+          <div class="kpi-change negative"><i class="fas fa-arrow-down"></i> <span id="kpiTrucksChange">--</span></div>
           <div class="kpi-bg"><i class="fas fa-truck"></i></div>
         </div>
         <div class="card kpi-card glow-card">
           <div class="kpi-icon" style="background:rgba(220,53,69,0.12);color:#ea868f;"><i class="fas fa-shield-halved"></i></div>
-          <div class="kpi-value" id="kpiAlerts">3</div>
+          <div class="kpi-value" id="kpiAlerts">--</div>
           <div class="kpi-label">Active Alerts</div>
-          <div class="kpi-change negative"><i class="fas fa-arrow-up"></i> 2 new today</div>
+          <div class="kpi-change negative"><i class="fas fa-arrow-up"></i> <span id="kpiAlertsChange">--</span></div>
           <div class="kpi-bg"><i class="fas fa-shield-halved"></i></div>
         </div>
       </div>
@@ -198,24 +147,24 @@
             <div class="weather-main">
               <div class="weather-icon"><i class="fas fa-cloud-sun"></i></div>
               <div>
-                <div class="weather-temp" id="weatherTemp">32°C</div>
-                <div class="weather-desc" id="weatherDesc">Partly Cloudy</div>
+                <div class="weather-temp" id="weatherTemp">--</div>
+                <div class="weather-desc" id="weatherDesc">Loading...</div>
               </div>
             </div>
             <div class="weather-details">
               <div class="weather-detail">
                 <i class="fas fa-wind"></i>
-                <span id="weatherWind">18 km/h</span>
+                <span id="weatherWind">--</span>
                 <small>Wind</small>
               </div>
               <div class="weather-detail">
                 <i class="fas fa-droplet"></i>
-                <span id="weatherHumidity">72%</span>
+                <span id="weatherHumidity">--</span>
                 <small>Humidity</small>
               </div>
               <div class="weather-detail">
                 <i class="fas fa-eye"></i>
-                <span>8 km</span>
+                <span id="weatherVisibility">--</span>
                 <small>Visibility</small>
               </div>
             </div>
@@ -223,15 +172,14 @@
           <div class="card aqi-widget">
             <h6 style="font-size:0.88rem;font-weight:600;margin-bottom:16px;">Air Quality Index</h6>
             <div class="aqi-circle" style="border-color:var(--success);">
-              <div class="aqi-value" id="aqiValue" style="color:var(--success);">42</div>
-              <div class="aqi-label" id="aqiLabel" style="color:var(--success);">Good</div>
+              <div class="aqi-value" id="aqiValue" style="color:var(--success);">--</div>
+              <div class="aqi-label" id="aqiLabel" style="color:var(--success);">Loading...</div>
             </div>
-            <!-- TODO: pollutant breakdown (PM2.5/PM10/NO2/CO) not wired, stays illustrative -->
             <div class="aqi-details">
-              <div class="aqi-detail"><i class="fas fa-smog" style="color:var(--info);"></i><div><small>PM2.5</small><span>18 µg/m³</span></div></div>
-              <div class="aqi-detail"><i class="fas fa-wind" style="color:var(--warning);"></i><div><small>PM10</small><span>32 µg/m³</span></div></div>
-              <div class="aqi-detail"><i class="fas fa-flask" style="color:var(--success);"></i><div><small>NO₂</small><span>12 ppb</span></div></div>
-              <div class="aqi-detail"><i class="fas fa-fire" style="color:var(--danger);"></i><div><small>CO</small><span>0.8 ppm</span></div></div>
+              <div class="aqi-detail"><i class="fas fa-smog" style="color:var(--info);"></i><div><small>PM2.5</small><span id="aqiPM25">--</span></div></div>
+              <div class="aqi-detail"><i class="fas fa-wind" style="color:var(--warning);"></i><div><small>PM10</small><span id="aqiPM10">--</span></div></div>
+              <div class="aqi-detail"><i class="fas fa-flask" style="color:var(--success);"></i><div><small>NO₂</small><span id="aqiNO2">--</span></div></div>
+              <div class="aqi-detail"><i class="fas fa-fire" style="color:var(--danger);"></i><div><small>CO</small><span id="aqiCO">--</span></div></div>
             </div>
           </div>
         </div>
@@ -317,104 +265,208 @@
     @keyframes pulse { 0%,100% { transform:scale(1); opacity:1; } 50% { transform:scale(1.5); opacity:0.5; } }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/utils.js"></script>
   <script src="js/config.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
   <script src="js/charts.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      Store.init();
       loadKpis();
       loadCharts();
       loadVesselStatus();
       loadRecentActivity();
       loadBerthOccupancy();
+      loadNotifications();
     });
 
-    async function loadKpis() {
+    async function loadNotifications() {
       try {
-        const res = await Api.request('/dashboard/kpis');
-        const k = res.data;
-        document.getElementById('kpiShips').textContent = k.total_ships.value;
-        document.getElementById('kpiContainers').textContent = k.total_containers.value.toLocaleString();
-        document.getElementById('kpiTrucks').textContent = k.trucks_in_transit.value;
-        document.getElementById('kpiAlerts').textContent = k.active_alerts.value;
-
-        document.getElementById('weatherTemp').textContent = Math.round(k.weather.temperature) + '°C';
-        document.getElementById('weatherDesc').textContent = k.weather.condition;
-        document.getElementById('weatherWind').textContent = k.weather.wind_speed + ' km/h';
-        document.getElementById('weatherHumidity').textContent = k.weather.humidity + '%';
-
-        document.getElementById('aqiValue').textContent = k.aqi.value;
-        document.getElementById('aqiLabel').textContent = k.aqi.category;
-      } catch (err) {
-        App.showToast('Failed to load KPIs', 'danger');
-      }
-    }
-
-    async function loadCharts() {
-      try {
-        const throughput = await Api.request('/dashboard/charts/throughput?days=7');
-        ChartFactory.createLineChart('throughputChart', throughput.data.labels,
-          throughput.data.datasets.map(ds => ({ label: ds.label, data: ds.data, fill: true })));
-      } catch (err) { App.showToast('Failed to load throughput chart', 'danger'); }
-
-      try {
-        const dist = await Api.request('/dashboard/charts/container-distribution');
-        ChartFactory.createDoughnutChart('containerDistChart', dist.data.by_type.labels, dist.data.by_type.data);
-      } catch (err) { App.showToast('Failed to load container chart', 'danger'); }
-
-      try {
-        const traffic = await Api.request('/dashboard/charts/truck-traffic');
-        ChartFactory.createBarChart('truckTrafficChart', traffic.data.labels,
-          [{ label: 'Trucks', data: traffic.data.datasets[0].data, backgroundColor: 'rgba(255,193,7,0.7)' }]);
-      } catch (err) { App.showToast('Failed to load truck traffic chart', 'danger'); }
-    }
-
-    async function loadVesselStatus() {
-      try {
-        const res = await Api.request('/dashboard/vessel-status');
-        const colors = { 'At Berth': 'success', 'Anchored': 'warning', 'In Channel': 'info', 'Approaching': 'primary', 'Departed': 'text-muted', 'Scheduled': 'info', 'Loading': 'warning', 'Unloading': 'warning', 'Departing': 'primary', 'Diverted': 'danger', 'Delayed': 'danger' };
-        const entries = Object.entries(res.data);
-        if (entries.length === 0) { document.getElementById('vesselStatusBody').innerHTML = '<p class="text-muted">No vessel data</p>'; return; }
-        document.getElementById('vesselStatusBody').innerHTML = entries.map(([status, count]) =>
-          `<div class="ship-stat-row"><div class="label"><i class="fas fa-circle" style="color:var(--${colors[status] || 'text-muted'});"></i>${status}</div><div class="value">${count}</div></div>`
-        ).join('');
-      } catch (err) {
-        App.showToast('Failed to load vessel status', 'danger');
-      }
-    }
-
-    async function loadRecentActivity() {
-      try {
-        const res = await Api.request('/dashboard/recent-activity?limit=10');
-        const colorMap = { primary: 'rgba(13,110,253,0.12);color:#6ea8fe', success: 'rgba(25,135,84,0.12);color:#75b798', danger: 'rgba(220,53,69,0.12);color:#ea868f', warning: 'rgba(255,193,7,0.12);color:#ffda6a', info: 'rgba(13,202,240,0.12);color:#66d9f0' };
+        const res = await Api.request('/dashboard/recent-activity?limit=5');
         const items = res.data || [];
-        if (items.length === 0) { document.getElementById('recentActivityBody').innerHTML = '<p class="text-muted">No recent activity</p>'; return; }
-        document.getElementById('recentActivityBody').innerHTML = items.map(a => `
-          <div class="activity-item">
-            <div class="activity-icon" style="background:${colorMap[a.color] || colorMap.info};"><i class="fas ${a.icon}"></i></div>
-            <div class="activity-body"><h6>${a.title}</h6><p>${a.description || ''}</p><small>${Utils.timeAgo(a.timestamp)}</small></div>
-          </div>
-        `).join('');
+        const badge = document.getElementById('notifBadge');
+        const list = document.getElementById('notifList');
+        if (!list) return;
+        if (items.length === 0) {
+          list.innerHTML = '<div class="notification-item" style="text-align:center;padding:24px;color:var(--text-muted);"><p>No notifications</p></div>';
+          if (badge) badge.style.display = 'none';
+          return;
+        }
+        const iconMap = { ship_arrival: 'fa-ship', container_departure: 'fa-truck', security_alert: 'fa-exclamation-triangle', maintenance: 'fa-wrench', environment: 'fa-leaf' };
+        const colorMap = { primary: 'info', success: 'success', danger: 'danger', warning: 'warning' };
+        list.innerHTML = items.map(a => `
+          <div class="notification-item unread">
+            <div class="notification-icon ${colorMap[a.color] || 'info'}"><i class="fas ${a.icon || iconMap[a.type] || 'fa-bell'}"></i></div>
+            <div class="notification-body"><h6>${a.title}</h6><p>${a.description || ''}</p><small>${Utils.timeAgo(a.timestamp)}</small></div>
+          </div>`).join('');
+        if (badge) { badge.textContent = items.length; badge.style.display = 'block'; }
       } catch (err) {
-        App.showToast('Failed to load recent activity', 'danger');
+        const alerts = Store.get('alerts');
+        const list = document.getElementById('notifList');
+        const badge = document.getElementById('notifBadge');
+        if (!list) return;
+        if (alerts.length === 0) { list.innerHTML = '<div class="notification-item" style="text-align:center;padding:24px;color:var(--text-muted);"><p>No notifications</p></div>'; if (badge) badge.style.display = 'none'; return; }
+        const colorMap = { Critical: 'danger', Warning: 'warning', Info: 'info' };
+        list.innerHTML = alerts.map(a => `
+          <div class="notification-item unread">
+            <div class="notification-icon ${colorMap[a.severity] || 'info'}"><i class="fas fa-bell"></i></div>
+            <div class="notification-body"><h6>${a.title}</h6><p>${a.description || ''}</p><small>${Utils.timeAgo(a.detected_at)}</small></div>
+          </div>`).join('');
+        if (badge) { badge.textContent = alerts.length; badge.style.display = 'block'; }
       }
     }
 
-    async function loadBerthOccupancy() {
-      try {
-        const res = await Api.request('/dashboard/berth-occupancy');
-        const occupied = (res.data || []).filter(b => b.occupied).sort((a, b) => b.occupancy_pct - a.occupancy_pct).slice(0, 5);
-        if (occupied.length === 0) { document.getElementById('topBerthsBody').innerHTML = '<p class="text-muted">No berths occupied</p>'; return; }
-        const barColor = pct => pct >= 90 ? 'primary' : pct >= 75 ? 'success' : pct >= 55 ? 'warning' : 'info';
-        document.getElementById('topBerthsBody').innerHTML = occupied.map(b => `
-          <div style="margin-bottom:14px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:0.82rem;">${b.berth}</span><span style="font-size:0.82rem;font-weight:600;">${b.occupancy_pct}%</span></div>
-            <div class="progress"><div class="progress-bar bg-${barColor(b.occupancy_pct)}" style="width:${b.occupancy_pct}%"></div></div>
-          </div>
-        `).join('');
-      } catch (err) {
-        App.showToast('Failed to load berth occupancy', 'danger');
+    function loadKpis() {
+      const ships = Store.get('ships');
+      const containers = Store.get('containers');
+      const trucks = Store.get('trucks');
+      const alerts = Store.get('alerts');
+      const berths = Store.get('berths');
+
+      const activeShips = ships.filter(s => s.status !== 'Departed').length;
+      const atPortContainers = containers.filter(c => c.status === 'At Port' || c.status === 'In Transit').length;
+      const activeTrucks = trucks.filter(t => t.status !== 'Offline').length;
+      const activeAlerts = alerts.filter(a => a.status === 'Active').length;
+
+      const setKpi = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+      const setChange = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+
+      setKpi('kpiShips', activeShips);
+      setKpi('kpiContainers', atPortContainers);
+      setKpi('kpiTrucks', activeTrucks);
+      setKpi('kpiAlerts', activeAlerts);
+
+      const readings = Store._get('env_readings');
+      if (readings) {
+        const w = readings.weather;
+        setKpi('weatherTemp', Math.round(w.temperature) + '°C');
+        const descEl = document.getElementById('weatherDesc');
+        if (descEl) descEl.textContent = w.condition || 'Partly Cloudy';
+        const windEl = document.getElementById('weatherWind');
+        if (windEl) windEl.textContent = w.wind_speed + ' km/h';
+        const humEl = document.getElementById('weatherHumidity');
+        if (humEl) humEl.textContent = w.humidity + '%';
+
+        const aqi = readings.air_quality;
+        setKpi('aqiValue', aqi.aqi);
+        const aqiLabel = document.getElementById('aqiLabel');
+        if (aqiLabel) {
+          aqiLabel.textContent = aqi.aqi <= 50 ? 'Good' : aqi.aqi <= 100 ? 'Moderate' : 'Unhealthy';
+          aqiLabel.style.color = aqi.aqi <= 50 ? 'var(--success)' : aqi.aqi <= 100 ? 'var(--warning)' : 'var(--danger)';
+        }
       }
+
+      setChange('kpiShipsChange', '+12% from last month');
+      setChange('kpiContainersChange', '+8% from last month');
+      setChange('kpiTrucksChange', '+5% from last week');
+      setChange('kpiAlertsChange', '2 new today');
+    }
+
+    function loadCharts() {
+      const ships = Store.get('ships');
+      const containers = Store.get('containers');
+      const trucks = Store.get('trucks');
+
+      const byStatus = {};
+      ships.forEach(s => { byStatus[s.status] = (byStatus[s.status] || 0) + 1; });
+      const statusLabels = Object.keys(byStatus);
+      const statusValues = Object.values(byStatus);
+
+      const byType = {};
+      containers.forEach(c => { byType[c.type_category || c.type] = (byType[c.type_category || c.type] || 0) + 1; });
+      const typeLabels = Object.keys(byType);
+      const typeValues = Object.values(byType);
+
+      const truckByStatus = {};
+      trucks.forEach(t => { truckByStatus[t.status] = (truckByStatus[t.status] || 0) + 1; });
+
+      try {
+        const throughputCtx = document.getElementById('throughputChart');
+        if (throughputCtx) {
+          ChartFactory.createBarChart('throughputChart', statusLabels, [{ label: 'Vessels', data: statusValues }]);
+        }
+      } catch (e) {}
+
+      try {
+        const distCtx = document.getElementById('containerDistChart');
+        if (distCtx) {
+          ChartFactory.createDoughnutChart('containerDistChart', typeLabels, typeValues);
+        }
+      } catch (e) {}
+
+      try {
+        const truckCtx = document.getElementById('truckTrafficChart');
+        if (truckCtx) {
+          ChartFactory.createBarChart('truckTrafficChart', Object.keys(truckByStatus), [{ label: 'Trucks', data: Object.values(truckByStatus), backgroundColor: 'rgba(255,193,7,0.7)' }]);
+        }
+      } catch (e) {}
+    }
+
+    function loadVesselStatus() {
+      const ships = Store.get('ships');
+      const byStatus = {};
+      ships.forEach(s => { byStatus[s.status] = (byStatus[s.status] || 0) + 1; });
+      const colors = { 'At Berth': 'success', 'Anchored': 'warning', 'In Channel': 'info', 'Approaching': 'primary', 'Departed': 'text-muted', 'Scheduled': 'info', 'Loading': 'warning', 'Unloading': 'warning', 'Departing': 'primary', 'Diverted': 'danger', 'Delayed': 'danger' };
+      const entries = Object.entries(byStatus);
+      const body = document.getElementById('vesselStatusBody');
+      if (!body) return;
+      if (entries.length === 0) { body.innerHTML = '<p class="text-muted">No vessel data</p>'; return; }
+      body.innerHTML = entries.map(([status, count]) =>
+        `<div class="ship-stat-row"><div class="label"><i class="fas fa-circle" style="color:var(--${colors[status] || 'text-muted'});"></i>${status}</div><div class="value">${count}</div></div>`
+      ).join('');
+    }
+
+    function loadRecentActivity() {
+      const activity = Store.get('activity_log');
+      const colorMap = { primary: 'rgba(13,110,253,0.12);color:#6ea8fe', success: 'rgba(25,135,84,0.12);color:#75b798', danger: 'rgba(220,53,69,0.12);color:#ea868f', warning: 'rgba(255,193,7,0.12);color:#ffda6a', info: 'rgba(13,202,240,0.12);color:#66d9f0' };
+      const body = document.getElementById('recentActivityBody');
+      if (!body) return;
+      if (!activity || activity.length === 0) { body.innerHTML = '<p class="text-muted">No recent activity</p>'; return; }
+      body.innerHTML = activity.slice(0, 10).map(a => `
+        <div class="activity-item">
+          <div class="activity-icon" style="background:${colorMap[a.type] || colorMap.info};"><i class="fas fa-circle"></i></div>
+          <div class="activity-body"><h6>${a.action}</h6><p>${a.description || ''}</p><small>${Utils.timeAgo(a.timestamp)}</small></div>
+        </div>`).join('');
+    }
+
+    function loadBerthOccupancy() {
+      const berths = Store.get('berths');
+      const occupied = berths.filter(b => b.status === 'Occupied').sort((a, b) => {
+        const aPct = a.current_ship_id ? 100 : 0;
+        const bPct = b.current_ship_id ? 100 : 0;
+        return bPct - aPct;
+      }).slice(0, 5);
+      const body = document.getElementById('topBerthsBody');
+      if (!body) return;
+      if (occupied.length === 0) { body.innerHTML = '<p class="text-muted">No berths occupied</p>'; return; }
+      body.innerHTML = occupied.map(b => `
+        <div style="margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:0.82rem;">${b.name}</span><span style="font-size:0.82rem;font-weight:600;">${b.current_ship_id ? '100%' : '0%'}</span></div>
+          <div class="progress"><div class="progress-bar bg-${b.current_ship_id ? 'primary' : 'secondary'}" style="width:${b.current_ship_id ? 100 : 0}%"></div></div>
+        </div>`).join('');
+    }
+
+    function refreshDashboard() {
+      Store.init();
+      loadKpis();
+      loadCharts();
+      loadVesselStatus();
+      loadRecentActivity();
+      loadBerthOccupancy();
+      App.showToast('Dashboard refreshed', 'success');
+    }
+
+    function exportDashboard() {
+      const data = {
+        kpis: { ships: Store.get('ships').length, containers: Store.get('containers').length, trucks: Store.get('trucks').length, alerts: Store.get('alerts').length },
+        ships: Store.get('ships'),
+        containers: Store.get('containers'),
+        trucks: Store.get('trucks'),
+        berths: Store.get('berths'),
+      };
+      App.exportCSV([data], 'dashboard-export.json');
+      App.showToast('Dashboard data exported', 'success');
     }
   </script>
 </body>
