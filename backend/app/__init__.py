@@ -93,7 +93,7 @@ def create_app(config_name=None):
                 except Exception:
                     pass  # DB not ready yet, will retry on next request
 
-    FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+    FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
 
     @app.route('/', defaults={'path': 'dashboard.html'})
     @app.route('/<path:path>')
