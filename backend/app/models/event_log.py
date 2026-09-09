@@ -34,8 +34,8 @@ class EventLog(db.Model):
     __tablename__ = 'event_logs'
 
     id = db.Column(db.Integer, primary_key=True)
-    event_type = db.Column(Enum(EventType), nullable=False, index=True)
-    severity = db.Column(Enum(EventSeverity), default=EventSeverity.INFO, nullable=False, index=True)
+    event_type = db.Column(Enum(EventType, values_callable=lambda x: x.value), nullable=False, index=True)
+    severity = db.Column(Enum(EventSeverity, values_callable=lambda x: x.value), default=EventSeverity.INFO, nullable=False, index=True)
     entity_type = db.Column(db.String(50), index=True)
     entity_id = db.Column(db.String(50), index=True)
     title = db.Column(db.String(255), nullable=False)
