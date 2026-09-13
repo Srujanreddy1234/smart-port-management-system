@@ -28,12 +28,20 @@ class RegisterSchema(Schema):
     password = fields.Str(required=True, validate=validate.Length(min=8))
     first_name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
     last_name = fields.Str(required=True, validate=validate.Length(min=1, max=100))
-    role = fields.Str(validate=validate.OneOf(['admin', 'operations_officer', 'security_officer', 'environmental_officer', 'viewer']))
     employee_id = fields.Str(validate=validate.Length(max=50))
     department = fields.Str(validate=validate.Length(max=100))
     designation = fields.Str(validate=validate.Length(max=100))
     phone = fields.Str(validate=validate.Length(max=20))
     mobile = fields.Str(validate=validate.Length(max=20))
+
+
+class UpdateProfileSchema(Schema):
+    first_name = fields.Str(validate=validate.Length(min=1, max=100))
+    last_name = fields.Str(validate=validate.Length(min=1, max=100))
+    phone = fields.Str(validate=validate.Length(max=20), allow_none=True)
+    mobile = fields.Str(validate=validate.Length(max=20), allow_none=True)
+    department = fields.Str(validate=validate.Length(max=100), allow_none=True)
+    designation = fields.Str(validate=validate.Length(max=100), allow_none=True)
 
 
 class ChangePasswordSchema(Schema):
@@ -155,7 +163,7 @@ def register():
         email=email,
         first_name=data['first_name'],
         last_name=data['last_name'],
-        role=UserRole.VIEWER,
+        role=UserRole.PUBLIC,
         status=UserStatus.ACTIVE,
         department=data.get('department'),
         designation=data.get('designation'),
@@ -262,6 +270,39 @@ def get_current_user():
         raise AuthenticationError('User not found')
 
     return success_response(user.to_dict(include_sensitive=True))
+
+
+@auth_bp.route('/me', methods=['PUT'])
+@jwt_required()
+def update_current_user():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+
+    if not user:
+        raise AuthenticationError('User not found')
+
+    schema = UpdateProfileSchema()
+    try:
+        data = schema.load(request.get_json() or {}, partial=True)
+    except ValidationError as err:
+        return error_response('Validation failed', errors=err.messages, status_code=400)
+
+    for key in ['first_name', 'last_name', 'phone', 'mobile', 'department', 'designation']:
+        if key in data:
+            setattr(user, key, data[key])
+
+    user.updated_at = datetime.utcnow()
+    db.session.commit()
+
+    AuthService._log_audit(
+        user_id=user.id,
+        action='update_profile',
+        resource_type='user',
+        resource_id=str(user.id),
+        status='success'
+    )
+
+    return success_response(user.to_dict(), 'Profile updated successfully')
 
 
 @auth_bp.route('/change-password', methods=['POST'])
@@ -395,8 +436,19 @@ def revoke_all_sessions():
     return success_response(None, 'All other sessions revoked')
 
 
+@auth_bp.route('/google/status', methods=['GET'])
+def google_status():
+    configured = bool(
+        current_app.config.get('GOOGLE_CLIENT_ID') and current_app.config.get('GOOGLE_CLIENT_SECRET')
+    )
+    return success_response({'configured': configured})
+
+
 @auth_bp.route('/google/login', methods=['GET'])
 def google_login():
+    if not (current_app.config.get('GOOGLE_CLIENT_ID') and current_app.config.get('GOOGLE_CLIENT_SECRET')):
+        frontend_url = current_app.config.get('FRONTEND_URL', 'http://localhost:5501')
+        return redirect(f'{frontend_url}/login.html?error=oauth_not_configured')
     redirect_uri = url_for('auth.google_callback', _external=True)
     return oauth.google.authorize_redirect(redirect_uri)
 
@@ -420,7 +472,7 @@ def google_callback():
             email=email,
             first_name=userinfo.get('given_name') or userinfo.get('name') or 'Google',
             last_name=userinfo.get('family_name') or 'User',
-            role=UserRole.VIEWER,
+            role=UserRole.PUBLIC,
             status=UserStatus.ACTIVE,
             email_verified=bool(userinfo.get('email_verified')),
             avatar_url=userinfo.get('picture')

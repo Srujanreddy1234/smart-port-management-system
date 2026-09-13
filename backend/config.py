@@ -96,9 +96,13 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    # In-memory SQLite uses StaticPool, which doesn't accept the QueuePool-only
+    # options (pool_size/max_overflow) set on the base Config for Postgres.
+    SQLALCHEMY_ENGINE_OPTIONS = {}
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
     WTF_CSRF_ENABLED = False
     MAIL_SUPPRESS_SEND = True
+    RATELIMIT_ENABLED = False
 
 
 class ProductionConfig(Config):

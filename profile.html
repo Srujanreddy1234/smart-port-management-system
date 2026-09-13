@@ -458,6 +458,7 @@
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
    <script src="js/utils.js"></script>
   <script src="js/config.js"></script>
+  <script src="js/api-store.js"></script>
   <script src="js/store.js"></script>
   <script src="js/app.js"></script>
    <script>
@@ -515,32 +516,6 @@
        setVal('editEmployeeId', user.employee_id || '');
      }
 
-     function startEditProfile() { App.editProfile(); return; }
-       const user = Store.getUser();
-       if (!user) return;
-       const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email;
-       document.getElementById('infoFullName').textContent = fullName;
-       const editSection = document.getElementById('editProfileSection');
-       if (editSection) editSection.style.display = editSection.style.display === 'none' ? '' : 'none';
-     }
-
-     function saveProfile() {
-       const user = Store.getUser();
-       if (!user) return;
-       const updated = {
-         ...user,
-         first_name: document.getElementById('editFullName')?.value || user.first_name,
-         phone: document.getElementById('editPhone')?.value || user.phone,
-         department: document.getElementById('editDepartment')?.value || user.department,
-         designation: document.getElementById('editDesignation')?.value || user.designation,
-         employee_id: document.getElementById('editEmployeeId')?.value || user.employee_id,
-       };
-       Store.setUser(updated);
-       Store.set('user', updated);
-       loadProfile();
-       App.initUserDisplay();
-       App.showToast('Profile saved successfully', 'success');
-     }
    </script>
 </body>
 </html>

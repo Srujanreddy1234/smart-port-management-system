@@ -425,5 +425,6 @@ class AuthService:
                 audit_metadata=metadata
             )
             db.session.add(audit)
+            db.session.commit()
         except Exception:
-            pass
+            db.session.rollback()

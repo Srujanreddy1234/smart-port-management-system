@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showError(loginForm, err.message || 'Login failed');
       }
     });
+  }
 
   document.querySelectorAll('.demo-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -56,13 +57,29 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  const googleBtn = document.getElementById('googleSignInBtn');
+  if (googleBtn) {
+    fetch(`${API_BASE_URL}/auth/google/status`)
+      .then(res => res.json())
+      .then(body => {
+        if (body?.data?.configured) {
+          googleBtn.style.display = '';
+        }
+      })
+      .catch(() => {});
+    googleBtn.addEventListener('click', () => {
+      window.location.href = `${API_BASE_URL}/auth/google/login`;
+    });
+  }
+
   const params = new URLSearchParams(window.location.search);
   const oauthError = params.get('error');
   if (oauthError) {
     const errorMessages = {
       oauth_failed: 'Google sign-in failed. Please try again.',
       oauth_no_email: 'Google account has no email address.',
-      account_inactive: 'This account is not active.'
+      account_inactive: 'This account is not active.',
+      oauth_not_configured: 'Google sign-in is not available yet.'
     };
     const form = document.getElementById('loginForm');
     if (form) showError(form, errorMessages[oauthError] || 'Sign-in failed.');

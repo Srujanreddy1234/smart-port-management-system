@@ -82,7 +82,7 @@ const ROLE_DASHBOARDS = {
 };
 
 const ROLE_NAV_ITEMS = {
-  'super Admin': [
+  'Super Admin': [
     { section: 'Main', items: [{ href: 'dashboard.html', icon: 'fa-th-large', label: 'Dashboard' }] },
     { section: 'Operations', items: [
       { href: 'ships.html', icon: 'fa-ship', label: 'Ship Management' },
@@ -238,6 +238,21 @@ const Api = {
   getUser() {
     const raw = localStorage.getItem('user');
     return raw ? JSON.parse(raw) : null;
+  },
+
+  setUser(user) {
+    localStorage.setItem('user', JSON.stringify(user));
+  },
+
+  async updateProfile(payload) {
+    const res = await this.request('/auth/me', {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    });
+    if (res.data) {
+      this.setUser(res.data);
+    }
+    return res;
   },
 
   getUserRole() {

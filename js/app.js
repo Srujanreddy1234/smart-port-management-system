@@ -242,28 +242,29 @@ const App = {
         <div class="form-group"><label>Phone</label><input type="tel" id="epPhone" class="form-control" value="${user.phone || ''}"></div>
         <div class="form-group"><label>Department</label><input type="text" id="epDepartment" class="form-control" value="${user.department || ''}"></div>
         <div class="form-group"><label>Designation</label><input type="text" id="epDesignation" class="form-control" value="${user.designation || ''}"></div>
-        <div class="form-group"><label>Employee ID</label><input type="text" id="epEmployeeId" class="form-control" value="${user.employee_id || ''}"></div>
+        <div class="form-group"><label>Employee ID</label><input type="text" id="epEmployeeId" class="form-control" value="${user.employee_id || ''}" readonly title="Employee ID is managed by an administrator"></div>
       </form>`,
       footer: `<button class="btn btn-secondary" onclick="document.getElementById('editProfileModal').remove()">Cancel</button><button class="btn btn-primary" onclick="App.saveProfile()">Save Changes</button>`
     });
   },
 
-  saveProfile() {
+  async saveProfile() {
     const user = Store.getUser();
     if (!user) return;
-    const updated = {
-      ...user,
+    const payload = {
       first_name: document.getElementById('epFirstName')?.value || user.first_name,
       phone: document.getElementById('epPhone')?.value || user.phone,
       department: document.getElementById('epDepartment')?.value || user.department,
       designation: document.getElementById('epDesignation')?.value || user.designation,
-      employee_id: document.getElementById('epEmployeeId')?.value || user.employee_id,
     };
-    Store.setUser(updated);
-    Store.set('user', updated);
-    document.getElementById('editProfileModal').remove();
-    App.initUserDisplay();
-    App.showToast('Profile updated successfully', 'success');
+    try {
+      await Api.updateProfile(payload);
+      document.getElementById('editProfileModal').remove();
+      App.initUserDisplay();
+      App.showToast('Profile updated successfully', 'success');
+    } catch (err) {
+      App.showToast(err.message || 'Failed to update profile', 'danger');
+    }
   },
    showToast(message, type = 'info') {
      const container = document.getElementById('toastContainer') || this.createToastContainer();

@@ -4,7 +4,7 @@ from marshmallow import Schema, fields, validate, ValidationError
 from app.extensions import db
 from app.models import (
     Report, ReportType, ReportFormat, ReportStatus,
-    Ship, Container, Truck, Equipment, User, Berth
+    Ship, Container, ContainerStatus, Truck, Equipment, User, Berth
 )
 from app.utils.exceptions import ValidationError as AppValidationError, NotFoundError, AuthorizationError
 from app.utils.helpers import success_response
@@ -202,7 +202,7 @@ def container_throughput_report():
     by_type = db.session.query(Container.container_type, func.count(Container.id)).group_by(Container.container_type).all()
 
     loaded = db.session.query(func.count(Container.id)).filter(
-        Container.status == Container.status.value if hasattr(Container.status, 'value') else Container.status == 'Loaded'
+        Container.status == ContainerStatus.LOADED
     ).scalar() or 0
 
     return success_response({

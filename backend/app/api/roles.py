@@ -133,7 +133,13 @@ def delete_role(role_id):
     if role.is_system:
         raise AppValidationError('Cannot delete system roles')
 
-    user_count = User.query.filter(User.role == role.name).count()
+    try:
+        matching_role = UserRole(role.display_name)
+        user_count = User.query.filter(User.role == matching_role).count()
+    except ValueError:
+        # No built-in UserRole maps to this custom role's display_name, so no
+        # user account (which can only hold a UserRole value) can be assigned it.
+        user_count = 0
     if user_count > 0:
         raise AppValidationError(f'Cannot delete role assigned to {user_count} users')
 
