@@ -243,6 +243,32 @@
 
       <div class="card" style="margin-top:24px;">
         <div class="card-header">
+          <h6><i class="fas fa-landmark" style="color:var(--success);margin-right:8px;"></i>Historical Port Traffic (Annual)</h6>
+          <span style="font-size:0.75rem;color:var(--text-muted);">Port authority annual statistics — reference only</span>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Fiscal Year</th>
+                  <th>Total Cargo (MMT)</th>
+                  <th>Container TEU</th>
+                  <th>Vessel Calls</th>
+                  <th>Avg Berth Occupancy</th>
+                  <th>Avg Turnaround (hrs)</th>
+                </tr>
+              </thead>
+              <tbody id="portTrafficAnnualBody">
+                <tr><td colspan="6" class="text-center text-muted" style="padding:16px;">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:24px;">
+        <div class="card-header">
           <h6><i class="fas fa-clock-rotate-left" style="color:var(--info);margin-right:8px;"></i>Recent Reports</h6>
           <button class="btn btn-sm btn-secondary" onclick="App.showToast('Export started','success')"><i class="fas fa-download me-1"></i>Export Table</button>
         </div>
@@ -509,9 +535,34 @@
     document.querySelector('#recentReportsTable tbody').innerHTML =
       '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted);">Loading reports...</td></tr>';
 
+    async function loadPortTrafficAnnual() {
+      const tbody = document.getElementById('portTrafficAnnualBody');
+      if (!tbody) return;
+      try {
+        const res = await Api.request('/reports/port-traffic-annual');
+        const items = res.data.items || [];
+        if (items.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:16px;">No data available</td></tr>';
+          return;
+        }
+        tbody.innerHTML = items.map(r => `
+          <tr>
+            <td>FY ${r.fiscal_year}</td>
+            <td>${r.total_cargo_mmt ?? '—'}</td>
+            <td>${r.container_teu != null ? r.container_teu.toLocaleString() : '—'}</td>
+            <td>${r.vessel_calls != null ? r.vessel_calls.toLocaleString() : '—'}</td>
+            <td>${r.avg_berth_occupancy_pct != null ? r.avg_berth_occupancy_pct + '%' : '—'}</td>
+            <td>${r.avg_turnaround_time_hrs ?? '—'}</td>
+          </tr>`).join('');
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:16px;">Unable to load port traffic history</td></tr>';
+      }
+    }
+
     loadKpis();
     loadCharts();
     loadRecentReports();
+    loadPortTrafficAnnual();
   </script>
 </body>
 </html>

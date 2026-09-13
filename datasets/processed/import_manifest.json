@@ -1,0 +1,59 @@
+{
+  "generated_at": "2026-09-13T17:57:11.457846Z",
+  "sources": {
+    "weather": {
+      "years_imported": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "years_excluded": [],
+      "exclusion_reason": null,
+      "records_imported": 52608,
+      "model": "WeatherReading",
+      "station": "MS-004",
+      "notes": "ERA5 reanalysis via Open-Meteo; fully populated for every downloaded year (2018-2025). A 6-year window is imported."
+    },
+    "air_quality": {
+      "years_imported": [
+        2023,
+        2024,
+        2025
+      ],
+      "years_excluded": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022
+      ],
+      "exclusion_reason": "2018-2021 have 0% AQI coverage in the downloaded CAMS reanalysis data; 2022 has only ~41% coverage (3,571/8,760 hours). Importing partial years would misrepresent them as complete, so only the fully-populated years are loaded.",
+      "records_imported": 26304,
+      "model": "AirQualityReading",
+      "station": "MS-001"
+    },
+    "marine": {
+      "years_imported": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "years_excluded": [],
+      "exclusion_reason": null,
+      "records_imported": 35064,
+      "model": "MarineReading",
+      "station": "MS-005",
+      "notes": "Wave height/direction/period are populated from 2022 onward. sea_surface_temp_c and sea_level_height_msl_m are partially null in 2022-2023 (Open-Meteo Marine API backfill limitation) -- imported as NULL, not fabricated."
+    },
+    "port_traffic": {
+      "years_imported": "FY2018-19 through FY2023-24 (6 fiscal years)",
+      "records_imported": 6,
+      "model": "PortTrafficAnnual",
+      "notes": "Annual aggregate statistics only (Indian Ports Association / port authority reports). Deliberately NOT used to derive any daily/hourly figure -- too coarse for that."
+    }
+  }
+}

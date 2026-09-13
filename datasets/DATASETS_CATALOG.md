@@ -4,6 +4,23 @@ This catalog lists every dataset that is **100% needed and fully useful** for th
 Each dataset maps directly to one or more data models in the backend (`backend/app/models/`).
 Datasets not used by the project are intentionally excluded.
 
+> **Actual integration status (see `README.md` and `processed/import_manifest.json`
+> for current numbers):** only *some* years of each dataset are actually imported
+> into the database -- not every year listed below turned out to be usable. In
+> particular:
+> - Air quality: only 2023-2025 are imported (2018-2021 are empty, 2022 is ~41%
+>   populated in the downloaded data).
+> - Marine data feeds a real `MarineReading` model and a "sea conditions" read
+>   path, but it does **not** feed `Berth.can_accommodate()` -- that method only
+>   compares static ship/berth dimensions and was never changed to use marine
+>   data, despite the claim below when this catalog was first written.
+> - Port traffic statistics are surfaced as a small **read-only annual
+>   reference table** (`/api/v1/reports/port-traffic-annual`) on the Reports
+>   page. They do **not** feed the Ship/Container models, dashboard charts, or
+>   "vessel_type filter" as originally claimed below -- six annual rows are far
+>   too coarse for that, and doing so would have meant fabricating daily/hourly
+>   figures from an annual number.
+
 ---
 
 ## 0. Port Location (used by all API-based datasets)

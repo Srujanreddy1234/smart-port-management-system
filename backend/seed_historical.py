@@ -346,55 +346,13 @@ def seed_historical(db, User, UserRole, UserStatus, Permission, Role,
         db.session.flush()
         inv.calculate_totals()
 
-    print('Creating environmental readings...')
+    print('Creating environmental readings (noise only -- weather and air quality')
+    print('come from real historical data via datasets/scripts/import_to_database.py)...')
     stations = MonitoringStation.query.all()
     station_ids = [s.id for s in stations]
     for sid in station_ids:
         current = seven_years_ago
         while current <= now:
-            aq = AirQualityReading(
-                station_id=sid,
-                aqi=random.randint(20, 150),
-                aqi_category=random.choice(['Good', 'Moderate', 'Unhealthy', 'Hazardous']),
-                pm25=random.uniform(5, 80),
-                pm10=random.uniform(10, 120),
-                no2=random.uniform(5, 60),
-                so2=random.uniform(2, 30),
-                co=random.uniform(0.2, 2.5),
-                o3=random.uniform(10, 80),
-                nh3=random.uniform(1, 20),
-                temperature=random.uniform(26, 38),
-                humidity=random.uniform(50, 95),
-                wind_speed=random.uniform(2, 25),
-                wind_direction=random.uniform(0, 360),
-                pressure=random.uniform(1005, 1018),
-                recorded_at=current,
-            )
-            db.session.add(aq)
-
-            w = WeatherReading(
-                station_id=sid,
-                temperature=random.uniform(26, 38),
-                feels_like=random.uniform(28, 42),
-                humidity=random.uniform(50, 95),
-                wind_speed=random.uniform(2, 25),
-                wind_direction=random.uniform(0, 360),
-                wind_gust=random.uniform(10, 45),
-                pressure=random.uniform(1005, 1018),
-                precipitation=random.uniform(0, 50),
-                visibility=random.uniform(2, 15),
-                uv_index=random.uniform(1, 12),
-                dew_point=random.uniform(22, 28),
-                heat_index=random.uniform(30, 45),
-                wind_chill=random.uniform(20, 30),
-                cloud_cover=random.uniform(0, 100),
-                solar_radiation=random.uniform(100, 1000),
-                weather_condition=random.choice(['Sunny', 'Partly Cloudy', 'Cloudy', 'Light Rain', 'Thunderstorm', 'Hazy']),
-                weather_description=random.choice(['Clear skies', 'Scattered clouds', 'Overcast', 'Rain showers', 'Dust storm']),
-                recorded_at=current,
-            )
-            db.session.add(w)
-
             if random.random() < 0.3:
                 n = NoiseReading(
                     station_id=sid,

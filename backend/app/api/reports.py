@@ -4,7 +4,7 @@ from marshmallow import Schema, fields, validate, ValidationError
 from app.extensions import db
 from app.models import (
     Report, ReportType, ReportFormat, ReportStatus,
-    Ship, Container, ContainerStatus, Truck, Equipment, User, Berth
+    Ship, Container, ContainerStatus, Truck, Equipment, User, Berth, PortTrafficAnnual
 )
 from app.utils.exceptions import ValidationError as AppValidationError, NotFoundError, AuthorizationError
 from app.utils.helpers import success_response
@@ -229,6 +229,23 @@ def dashboard_summary():
         'berths': {'total': Berth.query.count()},
         'equipment': {'total': Equipment.query.count()},
         'users': {'total': User.query.count()},
+    })
+
+
+@reports_bp.route('/port-traffic-annual', methods=['GET'])
+@jwt_required()
+def port_traffic_annual():
+    current_user_id = get_jwt_identity()
+    current_user = User.query.get(current_user_id)
+    if not current_user or not current_user.has_permission('reports.read'):
+        raise AuthorizationError('Insufficient permissions')
+
+    rows = PortTrafficAnnual.query.order_by(PortTrafficAnnual.fiscal_year).all()
+    return success_response({
+        'items': [r.to_dict() for r in rows],
+        'total': len(rows),
+        'source': 'Indian Ports Association / port authority annual reports',
+        'granularity': 'annual'
     })
 
 

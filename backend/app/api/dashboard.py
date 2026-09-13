@@ -478,51 +478,27 @@ def get_environmental_trends():
     parameter = request.args.get('parameter', 'aqi')
     hours = int(request.args.get('hours', 24))
 
-    end_time = datetime.utcnow()
+    param_config = {
+        'aqi': (AirQualityReading, 'aqi', 'AQI'),
+        'pm25': (AirQualityReading, 'pm25', 'PM2.5 (µg/m³)'),
+        'pm10': (AirQualityReading, 'pm10', 'PM10 (µg/m³)'),
+        'noise': (NoiseReading, 'leq', 'Noise (dB)'),
+        'temperature': (WeatherReading, 'temperature', 'Temperature (°C)'),
+    }
+    model, field, label = param_config.get(parameter, (WaterQualityReading, 'ph', 'Water pH'))
+
+    # Anchor the window to the most recent reading actually available for this
+    # parameter, not wall-clock "now" -- historical datasets end in the past,
+    # so a "last N hours from now" query would otherwise always return empty.
+    latest = model.query.order_by(desc(model.recorded_at)).first()
+    end_time = latest.recorded_at if latest else datetime.utcnow()
     start_time = end_time - timedelta(hours=hours)
 
-    if parameter == 'aqi':
-        readings = AirQualityReading.query.filter(
-            AirQualityReading.recorded_at >= start_time
-        ).order_by(AirQualityReading.recorded_at).all()
-        labels = [r.recorded_at.strftime('%H:%M') for r in readings]
-        data = [r.aqi for r in readings]
-        label = 'AQI'
-    elif parameter == 'pm25':
-        readings = AirQualityReading.query.filter(
-            AirQualityReading.recorded_at >= start_time
-        ).order_by(AirQualityReading.recorded_at).all()
-        labels = [r.recorded_at.strftime('%H:%M') for r in readings]
-        data = [r.pm25 for r in readings]
-        label = 'PM2.5 (µg/m³)'
-    elif parameter == 'pm10':
-        readings = AirQualityReading.query.filter(
-            AirQualityReading.recorded_at >= start_time
-        ).order_by(AirQualityReading.recorded_at).all()
-        labels = [r.recorded_at.strftime('%H:%M') for r in readings]
-        data = [r.pm10 for r in readings]
-        label = 'PM10 (µg/m³)'
-    elif parameter == 'noise':
-        readings = NoiseReading.query.filter(
-            NoiseReading.recorded_at >= start_time
-        ).order_by(NoiseReading.recorded_at).all()
-        labels = [r.recorded_at.strftime('%H:%M') for r in readings]
-        data = [r.leq for r in readings]
-        label = 'Noise (dB)'
-    elif parameter == 'temperature':
-        readings = WeatherReading.query.filter(
-            WeatherReading.recorded_at >= start_time
-        ).order_by(WeatherReading.recorded_at).all()
-        labels = [r.recorded_at.strftime('%H:%M') for r in readings]
-        data = [r.temperature for r in readings]
-        label = 'Temperature (°C)'
-    else:
-        readings = WaterQualityReading.query.filter(
-            WaterQualityReading.recorded_at >= start_time
-        ).order_by(WaterQualityReading.recorded_at).all()
-        labels = [r.recorded_at.strftime('%H:%M') for r in readings]
-        data = [r.ph for r in readings]
-        label = 'Water pH'
+    readings = model.query.filter(
+        model.recorded_at >= start_time, model.recorded_at <= end_time
+    ).order_by(model.recorded_at).all()
+    labels = [r.recorded_at.strftime('%H:%M') for r in readings]
+    data = [getattr(r, field) for r in readings]
 
     return success_response({
         'labels': labels,
