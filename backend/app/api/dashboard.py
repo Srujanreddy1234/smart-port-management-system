@@ -6,7 +6,7 @@ from app.models import (
     Truck, TruckStatus, SecurityIncident, IncidentStatus, IncidentSeverity,
     Equipment, EquipmentStatus, MaintenanceStatus, MaintenanceType,
     AirQualityReading, WaterQualityReading, NoiseReading, WeatherReading,
-    Report, ReportStatus
+    Report, ReportStatus, Berth, Invoice, InvoiceStatus
 )
 from app.utils.exceptions import AuthorizationError
 from app.utils.helpers import success_response, paginate_query
@@ -45,73 +45,92 @@ def get_kpis():
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     week_ago = now - timedelta(days=7)
     month_ago = now - timedelta(days=30)
+    this_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    last_month_end = this_month_start - timedelta(seconds=1)
+    last_month_start = last_month_end.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
     total_ships = Ship.query.count()
     ships_docked = Ship.query.filter(Ship.status == ShipStatus.AT_BERTH).count()
     ships_waiting = Ship.query.filter(Ship.status.in_([ShipStatus.ANCHORED, ShipStatus.APPROACHING, ShipStatus.IN_CHANNEL])).count()
+    ships_arrived_this_week = Ship.query.filter(Ship.ata.isnot(None), Ship.ata >= week_ago).count()
 
     total_containers = Container.query.count()
     containers_loaded = Container.query.filter(Container.status == ContainerStatus.LOADED).count()
     containers_in_transit = Container.query.filter(Container.status == ContainerStatus.IN_TRANSIT).count()
+    containers_added_this_week = Container.query.filter(Container.created_at >= week_ago).count()
 
     total_trucks = Truck.query.count()
     trucks_in_transit = Truck.query.filter(Truck.status == TruckStatus.IN_TRANSIT).count()
     trucks_loading = Truck.query.filter(Truck.status == TruckStatus.LOADING).count()
+    trucks_gated_in_this_week = Truck.query.filter(Truck.gate_in_time.isnot(None), Truck.gate_in_time >= week_ago).count()
 
     active_alerts = SecurityIncident.query.filter(SecurityIncident.status == IncidentStatus.ACTIVE).count()
     critical_alerts = SecurityIncident.query.filter(
         SecurityIncident.severity == IncidentSeverity.CRITICAL,
         SecurityIncident.status == IncidentStatus.ACTIVE
     ).count()
+    alerts_today = SecurityIncident.query.filter(SecurityIncident.detected_at >= today_start).count()
 
     operational_equipment = Equipment.query.filter(Equipment.status == EquipmentStatus.OPERATIONAL).count()
     maintenance_equipment = Equipment.query.filter(Equipment.status == EquipmentStatus.MAINTENANCE).count()
     total_equipment = Equipment.query.count()
+    equipment_added_this_month = Equipment.query.filter(Equipment.created_at >= this_month_start).count()
 
     latest_aqi = AirQualityReading.query.order_by(desc(AirQualityReading.recorded_at)).first()
-    aqi_value = latest_aqi.aqi if latest_aqi else 42
-    aqi_category = latest_aqi.aqi_category if latest_aqi else 'Good'
+    aqi_value = latest_aqi.aqi if latest_aqi else None
+    aqi_category = latest_aqi.aqi_category if latest_aqi else None
 
     latest_noise = NoiseReading.query.order_by(desc(NoiseReading.recorded_at)).first()
-    noise_value = round(latest_noise.leq, 1) if latest_noise else 68
+    noise_value = round(latest_noise.leq, 1) if latest_noise else None
 
     latest_weather = WeatherReading.query.order_by(desc(WeatherReading.recorded_at)).first()
     weather = {
-        'temperature': latest_weather.temperature if latest_weather else 32,
-        'humidity': latest_weather.humidity if latest_weather else 72,
-        'wind_speed': latest_weather.wind_speed if latest_weather else 18,
-        'condition': latest_weather.weather_condition if latest_weather else 'Partly Cloudy'
+        'temperature': latest_weather.temperature if latest_weather else None,
+        'humidity': latest_weather.humidity if latest_weather else None,
+        'wind_speed': latest_weather.wind_speed if latest_weather else None,
+        'visibility': latest_weather.visibility if latest_weather else None,
+        'condition': latest_weather.weather_condition if latest_weather else None
     }
 
-    revenue_this_month = 248000000
-    revenue_last_month = 221000000
-    revenue_growth = ((revenue_this_month - revenue_last_month) / revenue_last_month) * 100
+    revenue_this_month = db.session.query(func.coalesce(func.sum(Invoice.amount_paid), 0.0)).filter(
+        Invoice.payment_date.isnot(None), Invoice.payment_date >= this_month_start
+    ).scalar()
+    revenue_last_month = db.session.query(func.coalesce(func.sum(Invoice.amount_paid), 0.0)).filter(
+        Invoice.payment_date.isnot(None), Invoice.payment_date >= last_month_start, Invoice.payment_date <= last_month_end
+    ).scalar()
+    revenue_growth = ((revenue_this_month - revenue_last_month) / revenue_last_month * 100) if revenue_last_month else 0.0
 
-    throughput_this_month = 15847
-    throughput_last_month = 14673
-    throughput_growth = ((throughput_this_month - throughput_last_month) / throughput_last_month) * 100
+    throughput_this_month = Container.query.filter(
+        Container.status.in_([ContainerStatus.LOADED, ContainerStatus.DELIVERED]),
+        Container.created_at >= this_month_start
+    ).count()
+    throughput_last_month = Container.query.filter(
+        Container.status.in_([ContainerStatus.LOADED, ContainerStatus.DELIVERED]),
+        Container.created_at >= last_month_start, Container.created_at <= last_month_end
+    ).count()
+    throughput_growth = ((throughput_this_month - throughput_last_month) / throughput_last_month * 100) if throughput_last_month else 0.0
 
     kpis = {
         'total_ships': {
             'value': total_ships,
             'label': 'Total Ships',
-            'change': 12,
-            'change_label': 'from last week',
+            'change': ships_arrived_this_week,
+            'change_label': 'arrivals this week',
             'icon': 'fa-ship',
             'color': 'primary'
         },
         'ships_docked': {
             'value': ships_docked,
             'label': 'Ships Docked',
-            'change': 2,
-            'change_label': 'unloading',
+            'change': None,
+            'change_label': 'currently at berth',
             'icon': 'fa-anchor',
             'color': 'success'
         },
         'ships_waiting': {
             'value': ships_waiting,
             'label': 'Ships Waiting',
-            'change': -1,
+            'change': None,
             'change_label': 'awaiting berth',
             'icon': 'fa-clock',
             'color': 'warning'
@@ -119,15 +138,15 @@ def get_kpis():
         'total_containers': {
             'value': total_containers,
             'label': 'Containers',
-            'change': 8,
-            'change_label': 'from last week',
+            'change': containers_added_this_week,
+            'change_label': 'new this week',
             'icon': 'fa-boxes-stacked',
             'color': 'info'
         },
         'containers_loaded': {
             'value': containers_loaded,
             'label': 'Loaded',
-            'change': 5,
+            'change': None,
             'change_label': 'ready for dispatch',
             'icon': 'fa-box',
             'color': 'success'
@@ -135,7 +154,7 @@ def get_kpis():
         'containers_in_transit': {
             'value': containers_in_transit,
             'label': 'In Transit',
-            'change': 15,
+            'change': None,
             'change_label': 'out for delivery',
             'icon': 'fa-truck-fast',
             'color': 'warning'
@@ -143,15 +162,15 @@ def get_kpis():
         'total_trucks': {
             'value': total_trucks,
             'label': 'Total Trucks',
-            'change': 7,
-            'change_label': 'from last week',
+            'change': trucks_gated_in_this_week,
+            'change_label': 'gated in this week',
             'icon': 'fa-truck',
             'color': 'primary'
         },
         'trucks_in_transit': {
             'value': trucks_in_transit,
             'label': 'In Transit',
-            'change': 12,
+            'change': None,
             'change_label': 'on the road',
             'icon': 'fa-truck-moving',
             'color': 'info'
@@ -159,7 +178,7 @@ def get_kpis():
         'trucks_loading': {
             'value': trucks_loading,
             'label': 'Loading',
-            'change': -3,
+            'change': None,
             'change_label': 'at berths',
             'icon': 'fa-truck-loading',
             'color': 'warning'
@@ -167,7 +186,7 @@ def get_kpis():
         'active_alerts': {
             'value': active_alerts,
             'label': 'Active Alerts',
-            'change': 2,
+            'change': alerts_today,
             'change_label': 'new today',
             'icon': 'fa-shield-halved',
             'color': 'danger'
@@ -175,7 +194,7 @@ def get_kpis():
         'critical_alerts': {
             'value': critical_alerts,
             'label': 'Critical Alerts',
-            'change': 0,
+            'change': None,
             'change_label': 'requiring attention',
             'icon': 'fa-exclamation-triangle',
             'color': 'danger'
@@ -183,15 +202,15 @@ def get_kpis():
         'operational_equipment': {
             'value': operational_equipment,
             'label': 'Equipment Operational',
-            'change': 5,
-            'change_label': 'of total',
+            'change': None,
+            'change_label': f'of {total_equipment} total',
             'icon': 'fa-cogs',
             'color': 'success'
         },
         'maintenance_equipment': {
             'value': maintenance_equipment,
             'label': 'Under Maintenance',
-            'change': 2,
+            'change': None,
             'change_label': 'scheduled',
             'icon': 'fa-tools',
             'color': 'warning'
@@ -199,7 +218,7 @@ def get_kpis():
         'total_equipment': {
             'value': total_equipment,
             'label': 'Total Equipment',
-            'change': 3,
+            'change': equipment_added_this_month,
             'change_label': 'new this month',
             'icon': 'fa-wrench',
             'color': 'primary'
@@ -209,14 +228,14 @@ def get_kpis():
             'label': 'Air Quality Index',
             'category': aqi_category,
             'icon': 'fa-wind',
-            'color': 'success' if aqi_value <= 50 else 'warning' if aqi_value <= 100 else 'danger'
+            'color': 'secondary' if aqi_value is None else 'success' if aqi_value <= 50 else 'warning' if aqi_value <= 100 else 'danger'
         },
         'noise_level': {
             'value': noise_value,
             'label': 'Noise Level',
             'unit': 'dB',
             'icon': 'fa-volume-high',
-            'color': 'success' if noise_value <= 70 else 'warning' if noise_value <= 85 else 'danger'
+            'color': 'secondary' if noise_value is None else 'success' if noise_value <= 70 else 'warning' if noise_value <= 85 else 'danger'
         },
         'weather': weather,
         'revenue': {
@@ -226,7 +245,7 @@ def get_kpis():
             'change': round(revenue_growth, 1),
             'change_label': 'from last month',
             'icon': 'fa-indian-rupee-sign',
-            'color': 'success' if revenue_growth > 0 else 'danger'
+            'color': 'success' if revenue_growth >= 0 else 'danger'
         },
         'throughput': {
             'value': throughput_this_month,
@@ -235,7 +254,7 @@ def get_kpis():
             'change': round(throughput_growth, 1),
             'change_label': 'from last month',
             'icon': 'fa-gauge-high',
-            'color': 'success' if throughput_growth > 0 else 'danger'
+            'color': 'success' if throughput_growth >= 0 else 'danger'
         }
     }
 
@@ -377,33 +396,46 @@ def get_truck_traffic_chart():
     end_time = datetime.utcnow().replace(minute=0, second=0, microsecond=0)
     start_time = end_time - timedelta(hours=hours)
 
-    hourly_data = db.session.query(
-        func.extract('hour', Truck.gate_in_time).label('hour'),
-        func.count(Truck.id).label('count')
-    ).filter(
-        Truck.gate_in_time >= start_time,
-        Truck.gate_in_time.isnot(None)
-    ).group_by(func.extract('hour', Truck.gate_in_time)).all()
+    def hourly_counts(time_column):
+        rows = db.session.query(
+            func.extract('hour', time_column).label('hour'),
+            func.count(Truck.id).label('count')
+        ).filter(
+            time_column >= start_time,
+            time_column.isnot(None)
+        ).group_by(func.extract('hour', time_column)).all()
+        counts = {}
+        current = start_time
+        while current <= end_time:
+            row = next((r for r in rows if int(r.hour) == current.hour), None)
+            counts[current.strftime('%H:00')] = row.count if row else 0
+            current += timedelta(hours=1)
+        return counts
 
-    labels = []
-    data = []
-    current = start_time
-    while current <= end_time:
-        labels.append(current.strftime('%H:00'))
-        hour_data = next((d for d in hourly_data if int(d.hour) == current.hour), None)
-        data.append(hour_data.count if hour_data else 0)
-        current += timedelta(hours=1)
+    arrivals = hourly_counts(Truck.gate_in_time)
+    departures = hourly_counts(Truck.gate_out_time)
+    labels = list(arrivals.keys())
 
     return success_response({
         'labels': labels,
-        'datasets': [{
-            'label': 'Trucks',
-            'data': data,
-            'backgroundColor': 'rgba(255, 193, 7, 0.7)',
-            'borderColor': 'rgba(255, 193, 7, 1)',
-            'borderWidth': 1,
-            'borderRadius': 6
-        }]
+        'datasets': [
+            {
+                'label': 'Arrivals',
+                'data': list(arrivals.values()),
+                'backgroundColor': 'rgba(75, 192, 192, 0.8)',
+                'borderColor': 'rgba(75, 192, 192, 1)',
+                'borderWidth': 1,
+                'borderRadius': 4
+            },
+            {
+                'label': 'Departures',
+                'data': list(departures.values()),
+                'backgroundColor': 'rgba(255, 193, 7, 0.8)',
+                'borderColor': 'rgba(255, 193, 7, 1)',
+                'borderWidth': 1,
+                'borderRadius': 4
+            }
+        ]
     })
 
 
@@ -456,6 +488,20 @@ def get_environmental_trends():
         labels = [r.recorded_at.strftime('%H:%M') for r in readings]
         data = [r.aqi for r in readings]
         label = 'AQI'
+    elif parameter == 'pm25':
+        readings = AirQualityReading.query.filter(
+            AirQualityReading.recorded_at >= start_time
+        ).order_by(AirQualityReading.recorded_at).all()
+        labels = [r.recorded_at.strftime('%H:%M') for r in readings]
+        data = [r.pm25 for r in readings]
+        label = 'PM2.5 (µg/m³)'
+    elif parameter == 'pm10':
+        readings = AirQualityReading.query.filter(
+            AirQualityReading.recorded_at >= start_time
+        ).order_by(AirQualityReading.recorded_at).all()
+        labels = [r.recorded_at.strftime('%H:%M') for r in readings]
+        data = [r.pm10 for r in readings]
+        label = 'PM10 (µg/m³)'
     elif parameter == 'noise':
         readings = NoiseReading.query.filter(
             NoiseReading.recorded_at >= start_time
@@ -509,17 +555,22 @@ def get_vessel_status():
 @dashboard_bp.route('/berth-occupancy', methods=['GET'])
 @jwt_required()
 def get_berth_occupancy():
-    berths = ['Berth 1', 'Berth 2', 'Berth 3', 'Berth 4', 'Berth 5', 'Berth 6', 'Berth 7', 'Berth 8', 'Berth 9']
-    
+    berths = Berth.query.order_by(Berth.berth_id).all()
+
     occupancy = []
     for berth in berths:
-        ship = Ship.query.filter(Ship.current_berth == berth, Ship.status == ShipStatus.AT_BERTH).first()
+        ship = berth.current_ship
+        occupancy_pct = 0
+        if ship and berth.max_length:
+            occupancy_pct = round(min((ship.length_overall or 0) / berth.max_length * 100, 100), 1)
         occupancy.append({
-            'berth': berth,
+            'berth': berth.name,
+            'berth_id': berth.berth_id,
             'occupied': ship is not None,
             'ship': ship.name if ship else None,
             'ship_id': ship.ship_id if ship else None,
-            'occupancy_pct': 94 if berth == 'Berth 3' else 87 if berth == 'Berth 1' else 72 if berth == 'Berth 7' else 58 if berth == 'Berth 5' else 35
+            'occupied_since': berth.occupied_since.isoformat() if berth.occupied_since else None,
+            'occupancy_pct': occupancy_pct
         })
 
     return success_response(occupancy)

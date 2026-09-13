@@ -448,77 +448,62 @@
     loadEquipment();
     loadSchedule();
 
-    // TODO: no backend endpoint for cost aggregation by month yet, chart stays illustrative
-    // Maintenance Costs Bar Chart
-    const costCtx = document.getElementById('maintenanceCostChart').getContext('2d');
-    const costLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const preventiveData = [45000, 52000, 48000, 61000, 55000, 47000, 58000, 63000, 51000, 59000, 54000, 62000];
-    const correctiveData = [18000, 22000, 15000, 28000, 19000, 32000, 24000, 17000, 26000, 21000, 29000, 18000];
-    const predictiveData = [12000, 15000, 18000, 14000, 20000, 16000, 22000, 19000, 24000, 18000, 21000, 25000];
-
-    new Chart(costCtx, {
-      type: 'bar',
-      data: {
-        labels: costLabels,
-        datasets: [
-          {
-            label: 'Preventive',
-            data: preventiveData,
-            backgroundColor: 'rgba(54, 162, 235, 0.8)',
-            borderColor: 'rgba(54, 162, 235, 1)',
+    // Maintenance Costs Bar Chart — real monthly totals from actual/estimated schedule costs
+    async function loadMaintenanceCostChart() {
+      let labels = [];
+      let data = [];
+      try {
+        const res = await Api.request('/maintenance/cost-by-month?months=6');
+        labels = res.data.labels || [];
+        data = res.data.datasets[0]?.data || [];
+      } catch (err) {
+        App.showToast('Unable to load maintenance cost chart', 'warning');
+      }
+      const costCtx = document.getElementById('maintenanceCostChart').getContext('2d');
+      new Chart(costCtx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Maintenance Cost',
+            data: data,
+            backgroundColor: 'rgba(220, 53, 69, 0.7)',
+            borderColor: 'rgba(220, 53, 69, 1)',
             borderWidth: 1,
             borderRadius: 4
-          },
-          {
-            label: 'Corrective',
-            data: correctiveData,
-            backgroundColor: 'rgba(255, 99, 132, 0.8)',
-            borderColor: 'rgba(255, 99, 132, 1)',
-            borderWidth: 1,
-            borderRadius: 4
-          },
-          {
-            label: 'Predictive',
-            data: predictiveData,
-            backgroundColor: 'rgba(75, 192, 192, 0.8)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1,
-            borderRadius: 4
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: { padding: 20, usePointStyle: true }
-          },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
-              }
-            }
-          }
+          }]
         },
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: { color: 'rgba(0,0,0,0.05)' },
-            ticks: {
-              callback: function(value) {
-                return '$' + (value / 1000) + 'K';
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return 'Cost: ₹' + context.parsed.y.toLocaleString();
+                }
               }
             }
           },
-          x: {
-            grid: { display: false }
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(0,0,0,0.05)' },
+              ticks: {
+                callback: function(value) {
+                  return '₹' + (value / 1000) + 'K';
+                }
+              }
+            },
+            x: {
+              grid: { display: false }
+            }
           }
         }
-      }
-    });
+      });
+    }
+    loadMaintenanceCostChart();
   </script>
 </body>
 </html>

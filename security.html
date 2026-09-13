@@ -305,11 +305,10 @@
 
         <!-- Access Control & Chart Row -->
         <div class="charts-grid">
-          <!-- Access Control Logs -->
-          <!-- TODO: no backend endpoint for access logs yet, stays illustrative -->
+          <!-- Account Activity Log (real audit trail: login/logout/password events) -->
           <div class="card chart-card">
             <div class="card-header">
-              <h5 class="card-title"><i class="fas fa-door-open me-2"></i>Access Control Logs</h5>
+              <h5 class="card-title"><i class="fas fa-door-open me-2"></i>Account Activity Log</h5>
               <div class="card-actions">
                 <button class="btn btn-outline-secondary btn-sm" onclick="exportSecurity()">
                   <i class="fas fa-download me-1"></i>Export
@@ -321,56 +320,15 @@
                 <table class="table table-hover mb-0">
                   <thead>
                     <tr>
-                      <th>Person</th>
-                      <th>Zone</th>
+                      <th>User</th>
+                      <th>Action</th>
                       <th>Time</th>
-                      <th>Method</th>
+                      <th>IP Address</th>
                       <th>Status</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr>
-                      <td>Kumar S.</td>
-                      <td>Zone A - Berth 1-3</td>
-                      <td>08:12:34</td>
-                      <td><i class="fas fa-id-card text-primary me-1"></i>ID Card</td>
-                      <td><span class="badge bg-success">Granted</span></td>
-                    </tr>
-                    <tr>
-                      <td>Priya M.</td>
-                      <td>Zone B - Yard North</td>
-                      <td>08:05:17</td>
-                      <td><i class="fas fa-fingerprint text-success me-1"></i>Fingerprint</td>
-                      <td><span class="badge bg-success">Granted</span></td>
-                    </tr>
-                    <tr>
-                      <td>Vikram R.</td>
-                      <td>Zone C - Gate 2</td>
-                      <td>07:58:42</td>
-                      <td><i class="fas fa-key text-warning me-1"></i>Keycard</td>
-                      <td><span class="badge bg-danger">Denied</span></td>
-                    </tr>
-                    <tr>
-                      <td>Anitha K.</td>
-                      <td>Zone A - Berth 4-6</td>
-                      <td>07:44:09</td>
-                      <td><i class="fas fa-fingerprint text-success me-1"></i>Fingerprint</td>
-                      <td><span class="badge bg-success">Granted</span></td>
-                    </tr>
-                    <tr>
-                      <td>Ravi P.</td>
-                      <td>Zone D - Warehouse Row</td>
-                      <td>07:31:55</td>
-                      <td><i class="fas fa-id-card text-primary me-1"></i>ID Card</td>
-                      <td><span class="badge bg-success">Granted</span></td>
-                    </tr>
-                    <tr>
-                      <td>Suresh T.</td>
-                      <td>Zone B - Yard South</td>
-                      <td>07:22:38</td>
-                      <td><i class="fas fa-key text-warning me-1"></i>Keycard</td>
-                      <td><span class="badge bg-danger">Denied</span></td>
-                    </tr>
+                  <tbody id="accessLogTableBody">
+                    <tr><td colspan="5" class="text-center text-muted py-3">Loading...</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -577,11 +535,35 @@
       }
     }
 
+    async function loadAccessLogs() {
+      const tbody = document.getElementById('accessLogTableBody');
+      if (!tbody) return;
+      try {
+        const res = await Api.request('/security/access-logs?page=1&per_page=10');
+        const items = res.data.items || [];
+        if (items.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">No activity recorded yet</td></tr>';
+          return;
+        }
+        tbody.innerHTML = items.map(log => `
+          <tr>
+            <td>${log.user_name}</td>
+            <td>${log.description}</td>
+            <td>${Utils.formatDateTime(log.created_at)}</td>
+            <td>${log.ip_address || '—'}</td>
+            <td><span class="badge bg-${log.status === 'success' ? 'success' : 'danger'}">${log.status === 'success' ? 'Success' : 'Failed'}</span></td>
+          </tr>`).join('');
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Unable to load activity log</td></tr>';
+      }
+    }
+
     const incidentChartPeriod = document.getElementById('incidentChartPeriod');
     if (incidentChartPeriod) incidentChartPeriod.addEventListener('change', () => loadIncidentsChart(incidentChartPeriod.value));
     if (typeFilter) typeFilter.addEventListener('change', applyTypeFilter);
     loadIncidents();
     loadCameraCount();
+    loadAccessLogs();
   </script>
 </body>
 </html>

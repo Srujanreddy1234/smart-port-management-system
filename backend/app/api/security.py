@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.extensions import db
 from app.models import (
-    User,
+    User, AuditLog,
     SecurityIncident, IncidentType, IncidentSeverity, IncidentStatus,
     SecurityZone, Alert, AlertType, Camera
 )
@@ -338,6 +338,50 @@ def list_cameras():
 
     return success_response({
         'items': [c.to_dict() for c in pagination.items],
+        'total': pagination.total,
+        'page': pagination.page,
+        'per_page': pagination.per_page,
+        'pages': pagination.pages,
+        'has_next': pagination.has_next,
+        'has_prev': pagination.has_prev
+    })
+
+
+ACCESS_LOG_ACTIONS = ['login', 'logout', 'register', 'change_password', 'reset_password', 'update_profile']
+
+
+@security_bp.route('/access-logs', methods=['GET'])
+@jwt_required()
+def list_access_logs():
+    check_permission('audit.read')
+
+    query = AuditLog.query.filter(AuditLog.action.in_(ACCESS_LOG_ACTIONS))
+
+    status = request.args.get('status')
+    if status:
+        query = query.filter(AuditLog.status == status)
+
+    page = request.args.get('page', 1, type=int)
+    per_page = min(request.args.get('per_page', 20, type=int), 100)
+
+    pagination = query.order_by(desc(AuditLog.created_at)).paginate(page=page, per_page=per_page, error_out=False)
+
+    items = []
+    for log in pagination.items:
+        user = User.query.get(log.user_id) if log.user_id else None
+        items.append({
+            'id': log.id,
+            'user_name': user.get_full_name() if user else 'Unknown',
+            'user_email': user.email if user else None,
+            'action': log.action,
+            'status': log.status,
+            'description': log.description or log.action.replace('_', ' ').title(),
+            'ip_address': log.ip_address,
+            'created_at': log.created_at.isoformat()
+        })
+
+    return success_response({
+        'items': items,
         'total': pagination.total,
         'page': pagination.page,
         'per_page': pagination.per_page,

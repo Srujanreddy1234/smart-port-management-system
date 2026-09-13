@@ -261,6 +261,38 @@ def list_water_quality_readings():
     })
 
 
+@environment_bp.route('/emissions', methods=['GET'])
+@jwt_required()
+def list_emission_readings():
+    check_permission('environment.read')
+
+    query = EmissionReading.query
+
+    if request.args.get('station_id'):
+        query = query.filter(EmissionReading.station_id == request.args['station_id'])
+
+    sort_order = request.args.get('sort_order', 'desc')
+    if sort_order == 'desc':
+        query = query.order_by(desc(EmissionReading.recorded_at))
+    else:
+        query = query.order_by(asc(EmissionReading.recorded_at))
+
+    page = request.args.get('page', 1, type=int)
+    per_page = min(request.args.get('per_page', 50, type=int), 200)
+
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    return success_response({
+        'items': [r.to_dict() for r in pagination.items],
+        'total': pagination.total,
+        'page': pagination.page,
+        'per_page': pagination.per_page,
+        'pages': pagination.pages,
+        'has_next': pagination.has_next,
+        'has_prev': pagination.has_prev
+    })
+
+
 @environment_bp.route('/noise', methods=['GET'])
 @jwt_required()
 def list_noise_readings():
@@ -307,6 +339,52 @@ def list_noise_readings():
         'has_next': pagination.has_next,
         'has_prev': pagination.has_prev
     })
+
+
+@environment_bp.route('/emissions/by-source', methods=['GET'])
+@jwt_required()
+def get_emissions_by_source():
+    check_permission('environment.read')
+
+    rows = db.session.query(
+        EmissionReading.source_type, func.sum(EmissionReading.co2e)
+    ).filter(EmissionReading.source_type.isnot(None)).group_by(EmissionReading.source_type).all()
+
+    return success_response({
+        'labels': [r[0] for r in rows],
+        'datasets': [{
+            'data': [round(r[1] or 0, 2) for r in rows],
+            'backgroundColor': ['rgba(13,110,253,0.8)', 'rgba(255,193,7,0.8)', 'rgba(220,53,69,0.8)', 'rgba(25,135,84,0.8)', 'rgba(108,117,125,0.8)'],
+            'borderWidth': 0,
+            'hoverOffset': 8
+        }]
+    })
+
+
+@environment_bp.route('/noise/by-station', methods=['GET'])
+@jwt_required()
+def get_latest_noise_by_station():
+    check_permission('environment.read')
+
+    stations = MonitoringStation.query.filter_by(is_active=True).all()
+    results = []
+    for station in stations:
+        latest = NoiseReading.query.filter_by(station_id=station.id).order_by(
+            desc(NoiseReading.recorded_at)
+        ).first()
+        if latest is None:
+            continue
+        limit_db = 75.0
+        results.append({
+            'station_id': station.station_id,
+            'station_name': station.name,
+            'zone': station.zone,
+            'leq': latest.leq,
+            'recorded_at': latest.recorded_at.isoformat(),
+            'compliant': latest.leq is not None and latest.leq <= limit_db
+        })
+
+    return success_response({'items': results})
 
 
 @environment_bp.route('/weather', methods=['GET'])

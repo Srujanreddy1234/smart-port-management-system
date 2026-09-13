@@ -90,6 +90,7 @@ def login():
             action='login',
             resource_type='auth',
             status='failed',
+            description='Failed login attempt',
             error_message='Invalid credentials'
         )
         raise AuthenticationError('Invalid email or password')
@@ -134,7 +135,8 @@ def login():
         user_id=user.id,
         action='login',
         resource_type='auth',
-        status='success'
+        status='success',
+        description='Logged in successfully'
     )
 
     return success_response({
@@ -193,7 +195,7 @@ def register():
     db.session.add(session)
     db.session.commit()
 
-    AuthService._log_audit(user_id=user.id, action='register', resource_type='auth', status='success')
+    AuthService._log_audit(user_id=user.id, action='register', resource_type='auth', status='success', description='Account created')
 
     return success_response({
         'access_token': access_token,
@@ -219,7 +221,8 @@ def logout():
         user_id=current_user_id,
         action='logout',
         resource_type='auth',
-        status='success'
+        status='success',
+        description='Logged out'
     )
 
     return success_response(None, 'Logged out successfully')
@@ -299,10 +302,31 @@ def update_current_user():
         action='update_profile',
         resource_type='user',
         resource_id=str(user.id),
-        status='success'
+        status='success',
+        description='Profile updated'
     )
 
     return success_response(user.to_dict(), 'Profile updated successfully')
+
+
+@auth_bp.route('/my-activity', methods=['GET'])
+@jwt_required()
+def get_my_activity():
+    current_user_id = get_jwt_identity()
+    page = request.args.get('page', 1, type=int)
+    per_page = min(request.args.get('per_page', 10, type=int), 100)
+
+    pagination = AuditLog.query.filter_by(user_id=current_user_id).order_by(
+        AuditLog.created_at.desc()
+    ).paginate(page=page, per_page=per_page, error_out=False)
+
+    return success_response({
+        'items': [log.to_dict() for log in pagination.items],
+        'total': pagination.total,
+        'page': pagination.page,
+        'per_page': pagination.per_page,
+        'pages': pagination.pages
+    })
 
 
 @auth_bp.route('/change-password', methods=['POST'])
@@ -331,7 +355,8 @@ def change_password():
         action='change_password',
         resource_type='user',
         resource_id=str(user.id),
-        status='success'
+        status='success',
+        description='Password changed'
     )
 
     return success_response(None, 'Password changed successfully')
@@ -386,7 +411,8 @@ def reset_password():
         action='reset_password',
         resource_type='user',
         resource_id=str(user.id),
-        status='success'
+        status='success',
+        description='Password reset via forgot-password flow'
     )
 
     return success_response(None, 'Password reset successful')
@@ -504,6 +530,6 @@ def google_callback():
     db.session.add(session)
     db.session.commit()
 
-    AuthService._log_audit(user_id=user.id, action='login', resource_type='auth', status='success')
+    AuthService._log_audit(user_id=user.id, action='login', resource_type='auth', status='success', description='Logged in via Google')
 
     return redirect(f'{frontend_url}/oauth-callback.html?access_token={access_token}&refresh_token={refresh_token}')

@@ -186,33 +186,10 @@
         <div class="card" style="margin-top:24px;">
           <div class="card-header">
             <h6><i class="fas fa-clock-rotate-left" style="color:var(--info);margin-right:8px;"></i>Recent Activity</h6>
-            <button class="btn btn-sm btn-secondary">View All</button>
+            <button class="btn btn-sm btn-secondary" onclick="document.querySelector('.profile-tab[data-tab=activity]')?.click()">View All</button>
           </div>
-          <div class="card-body" style="max-height:400px;overflow-y:auto;">
-            <div class="activity-item">
-              <div class="activity-icon" style="background:rgba(13,110,253,0.12);color:#6ea8fe;"><i class="fas fa-right-to-bracket"></i></div>
-              <div class="activity-body"><h6>Logged in to the system</h6><p>Session started from admin workstation</p><small>Today, 06:12 AM</small></div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon" style="background:rgba(25,135,84,0.12);color:#75b798;"><i class="fas fa-file-lines"></i></div>
-              <div class="activity-body"><h6>Generated Monthly Throughput Report</h6><p>Report covers Jun 2026 — all berths and terminals</p><small>Yesterday, 03:45 PM</small></div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon" style="background:rgba(255,193,7,0.12);color:#ffda6a;"><i class="fas fa-check-circle"></i></div>
-              <div class="activity-body"><h6>Approved vessel arrival — MV Pacific Star</h6><p>Berth allocation confirmed at Berth 3</p><small>Yesterday, 11:20 AM</small></div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon" style="background:rgba(220,53,69,0.12);color:#ea868f;"><i class="fas fa-exclamation-triangle"></i></div>
-              <div class="activity-body"><h6>Acknowledged security alert in Zone B</h6><p>Response team dispatched — incident resolved</p><small>2 days ago</small></div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon" style="background:rgba(102,16,242,0.12);color:#a98eda;"><i class="fas fa-calendar-check"></i></div>
-              <div class="activity-body"><h6>Scheduled safety meeting with department heads</h6><p>Quarterly review — all department leads invited</p><small>3 days ago</small></div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-icon" style="background:rgba(13,202,240,0.12);color:#66d9f0;"><i class="fas fa-gear"></i></div>
-              <div class="activity-body"><h6>System updated to v4.2.1</h6><p>Applied security patches and performance improvements</p><small>5 days ago</small></div>
-            </div>
+          <div class="card-body" id="recentActivityBody" style="max-height:400px;overflow-y:auto;">
+            <p class="text-center text-muted py-3">Loading...</p>
           </div>
         </div>
       </div>
@@ -355,25 +332,8 @@
                   <th style="font-size:0.78rem;font-weight:600;color:var(--text-muted);padding:12px 16px;">Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr style="border-bottom:1px solid var(--border-color);">
-                  <td style="padding:12px 16px;font-size:0.85rem;"><i class="fas fa-desktop" style="color:var(--primary-light);margin-right:8px;"></i>Windows PC — Chrome</td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.102</td>
-                  <td style="padding:12px 16px;font-size:0.85rem;color:var(--success);">Active now</td>
-                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(25,135,84,0.12);color:var(--success);font-size:0.72rem;">Current</span></td>
-                </tr>
-                <tr style="border-bottom:1px solid var(--border-color);">
-                  <td style="padding:12px 16px;font-size:0.85rem;"><i class="fas fa-mobile-screen" style="color:var(--warning);margin-right:8px;"></i>iPhone — Safari</td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.118</td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">2 hours ago</td>
-                  <td style="padding:12px 16px;"><button class="btn btn-sm" style="background:rgba(220,53,69,0.12);color:var(--danger);font-size:0.75rem;" onclick="App.showToast('Session terminated','danger')"><i class="fas fa-right-from-bracket"></i> Revoke</button></td>
-                </tr>
-                <tr>
-                  <td style="padding:12px 16px;font-size:0.85rem;"><i class="fas fa-tablet-screen-button" style="color:var(--info);margin-right:8px;"></i>iPad — Safari</td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">10.0.0.55</td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">Yesterday, 11:42 PM</td>
-                  <td style="padding:12px 16px;"><button class="btn btn-sm" style="background:rgba(220,53,69,0.12);color:var(--danger);font-size:0.75rem;" onclick="App.showToast('Session terminated','danger')"><i class="fas fa-right-from-bracket"></i> Revoke</button></td>
-                </tr>
+              <tbody id="activeSessionsBody">
+                <tr><td colspan="4" class="text-center text-muted" style="padding:16px;">Loading...</td></tr>
               </tbody>
             </table>
           </div>
@@ -384,9 +344,6 @@
         <div class="card">
           <div class="card-header">
             <h6><i class="fas fa-clock-rotate-left" style="color:var(--info);margin-right:8px;"></i>Activity Log</h6>
-            <div style="display:flex;gap:8px;">
-              <button class="btn btn-sm btn-secondary"><i class="fas fa-download"></i> Export</button>
-            </div>
           </div>
           <div class="card-body" style="overflow-x:auto;">
             <table class="table" style="color:var(--text-primary);margin:0;">
@@ -398,55 +355,8 @@
                   <th style="font-size:0.78rem;font-weight:600;color:var(--text-muted);padding:12px 16px;">IP Address</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr style="border-bottom:1px solid var(--border-color);">
-                  <td style="padding:12px 16px;font-size:0.85rem;">Jul 24, 2026 — 06:12 AM</td>
-                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(13,110,253,0.12);color:var(--primary-light);font-size:0.75rem;">Login</span></td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">System login — session started</td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.102</td>
-                </tr>
-                <tr style="border-bottom:1px solid var(--border-color);">
-                  <td style="padding:12px 16px;font-size:0.85rem;">Jul 23, 2026 — 03:45 PM</td>
-                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(25,135,84,0.12);color:var(--success);font-size:0.75rem;">Report</span></td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">Generated Monthly Throughput Report for Jun 2026</td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.102</td>
-                </tr>
-                <tr style="border-bottom:1px solid var(--border-color);">
-                  <td style="padding:12px 16px;font-size:0.85rem;">Jul 23, 2026 — 11:20 AM</td>
-                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(255,193,7,0.12);color:var(--warning);font-size:0.75rem;">Approval</span></td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">Approved vessel arrival — MV Pacific Star, Berth 3</td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.102</td>
-                </tr>
-                <tr style="border-bottom:1px solid var(--border-color);">
-                  <td style="padding:12px 16px;font-size:0.85rem;">Jul 22, 2026 — 02:15 PM</td>
-                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(220,53,69,0.12);color:var(--danger);font-size:0.75rem;">Alert</span></td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">Acknowledged security alert in Zone B — incident resolved</td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.102</td>
-                </tr>
-                <tr style="border-bottom:1px solid var(--border-color);">
-                  <td style="padding:12px 16px;font-size:0.85rem;">Jul 21, 2026 — 10:00 AM</td>
-                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(102,16,242,0.12);color:#a98eda;font-size:0.75rem;">Meeting</span></td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">Scheduled safety meeting with all department heads</td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.102</td>
-                </tr>
-                <tr style="border-bottom:1px solid var(--border-color);">
-                  <td style="padding:12px 16px;font-size:0.85rem;">Jul 19, 2026 — 08:30 PM</td>
-                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(13,202,240,0.12);color:#66d9f0;font-size:0.75rem;">System</span></td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">System updated to v4.2.1 — security patches applied</td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.102</td>
-                </tr>
-                <tr style="border-bottom:1px solid var(--border-color);">
-                  <td style="padding:12px 16px;font-size:0.85rem;">Jul 18, 2026 — 01:42 PM</td>
-                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(255,193,7,0.12);color:var(--warning);font-size:0.75rem;">Approval</span></td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">Approved truck fleet expansion — 6 new vehicles registered</td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.118</td>
-                </tr>
-                <tr>
-                  <td style="padding:12px 16px;font-size:0.85rem;">Jul 16, 2026 — 09:05 AM</td>
-                  <td style="padding:12px 16px;"><span class="badge" style="background:rgba(13,110,253,0.12);color:var(--primary-light);font-size:0.75rem;">Login</span></td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">System login — mobile device session</td>
-                  <td style="padding:12px 16px;font-size:0.85rem;">192.168.1.118</td>
-                </tr>
+              <tbody id="activityLogTableBody">
+                <tr><td colspan="4" class="text-center text-muted" style="padding:16px;">Loading...</td></tr>
               </tbody>
             </table>
           </div>
@@ -479,7 +389,107 @@
          });
        });
        loadProfile();
+       loadRecentActivity();
+       loadActivityLog();
+       loadActiveSessions();
      });
+
+     function activityIcon(action) {
+       const map = {
+         login: { icon: 'fa-right-to-bracket', bg: 'rgba(13,110,253,0.12)', color: '#6ea8fe', badge: 'Login' },
+         logout: { icon: 'fa-right-from-bracket', bg: 'rgba(108,117,125,0.12)', color: '#adb5bd', badge: 'Logout' },
+         register: { icon: 'fa-user-plus', bg: 'rgba(25,135,84,0.12)', color: '#75b798', badge: 'Register' },
+         change_password: { icon: 'fa-key', bg: 'rgba(255,193,7,0.12)', color: '#ffda6a', badge: 'Password' },
+         reset_password: { icon: 'fa-key', bg: 'rgba(255,193,7,0.12)', color: '#ffda6a', badge: 'Password' },
+         update_profile: { icon: 'fa-user-pen', bg: 'rgba(102,16,242,0.12)', color: '#a98eda', badge: 'Profile' },
+       };
+       return map[action] || { icon: 'fa-clock-rotate-left', bg: 'rgba(13,202,240,0.12)', color: '#66d9f0', badge: action };
+     }
+
+     async function loadRecentActivity() {
+       const body = document.getElementById('recentActivityBody');
+       if (!body) return;
+       try {
+         const res = await Api.request('/auth/my-activity?page=1&per_page=6');
+         const items = res.data.items || [];
+         if (items.length === 0) {
+           body.innerHTML = '<p class="text-center text-muted py-3">No activity recorded yet</p>';
+           return;
+         }
+         body.innerHTML = items.map(log => {
+           const meta = activityIcon(log.action);
+           return `<div class="activity-item">
+             <div class="activity-icon" style="background:${meta.bg};color:${meta.color};"><i class="fas ${meta.icon}"></i></div>
+             <div class="activity-body"><h6>${meta.badge}${log.status !== 'success' ? ' (failed)' : ''}</h6><p>${log.description || ''}</p><small>${Utils.timeAgo(log.created_at)}</small></div>
+           </div>`;
+         }).join('');
+       } catch (err) {
+         body.innerHTML = '<p class="text-center text-muted py-3">Unable to load activity</p>';
+       }
+     }
+
+     async function loadActivityLog() {
+       const tbody = document.getElementById('activityLogTableBody');
+       if (!tbody) return;
+       try {
+         const res = await Api.request('/auth/my-activity?page=1&per_page=25');
+         const items = res.data.items || [];
+         if (items.length === 0) {
+           tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted" style="padding:16px;">No activity recorded yet</td></tr>';
+           return;
+         }
+         tbody.innerHTML = items.map(log => {
+           const meta = activityIcon(log.action);
+           return `<tr style="border-bottom:1px solid var(--border-color);">
+             <td style="padding:12px 16px;font-size:0.85rem;">${Utils.formatDateTime(log.created_at)}</td>
+             <td style="padding:12px 16px;"><span class="badge" style="background:${meta.bg};color:${meta.color};font-size:0.75rem;">${meta.badge}</span></td>
+             <td style="padding:12px 16px;font-size:0.85rem;">${log.description || ''}</td>
+             <td style="padding:12px 16px;font-size:0.85rem;">${log.ip_address || '—'}</td>
+           </tr>`;
+         }).join('');
+       } catch (err) {
+         tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted" style="padding:16px;">Unable to load activity log</td></tr>';
+       }
+     }
+
+     async function loadActiveSessions() {
+       const tbody = document.getElementById('activeSessionsBody');
+       if (!tbody) return;
+       try {
+         const res = await Api.request('/auth/sessions');
+         const items = res.data.items || [];
+         const currentToken = Api.getToken();
+         if (items.length === 0) {
+           tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted" style="padding:16px;">No active sessions</td></tr>';
+           return;
+         }
+         tbody.innerHTML = items.map(s => {
+           const isCurrent = s.token === currentToken;
+           const device = [s.device_info?.platform, s.device_info?.browser].filter(Boolean).join(' — ') || s.user_agent || 'Unknown device';
+           const action = isCurrent
+             ? '<span class="badge" style="background:rgba(25,135,84,0.12);color:var(--success);font-size:0.72rem;">Current</span>'
+             : `<button class="btn btn-sm" style="background:rgba(220,53,69,0.12);color:var(--danger);font-size:0.75rem;" onclick="revokeSession(${s.id})"><i class="fas fa-right-from-bracket"></i> Revoke</button>`;
+         return `<tr style="border-bottom:1px solid var(--border-color);">
+             <td style="padding:12px 16px;font-size:0.85rem;"><i class="fas fa-desktop" style="color:var(--primary-light);margin-right:8px;"></i>${device}</td>
+             <td style="padding:12px 16px;font-size:0.85rem;">${s.ip_address || '—'}</td>
+             <td style="padding:12px 16px;font-size:0.85rem;${isCurrent ? 'color:var(--success);' : ''}">${isCurrent ? 'Active now' : Utils.timeAgo(s.created_at)}</td>
+             <td style="padding:12px 16px;">${action}</td>
+           </tr>`;
+         }).join('');
+       } catch (err) {
+         tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted" style="padding:16px;">Unable to load sessions</td></tr>';
+       }
+     }
+
+     async function revokeSession(sessionId) {
+       try {
+         await Api.request(`/auth/sessions/${sessionId}`, { method: 'DELETE' });
+         App.showToast('Session revoked', 'success');
+         loadActiveSessions();
+       } catch (err) {
+         App.showToast(err.message || 'Failed to revoke session', 'danger');
+       }
+     }
 
      function loadProfile() {
        const user = Store.getUser();

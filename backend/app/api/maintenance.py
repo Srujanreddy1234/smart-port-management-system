@@ -369,3 +369,48 @@ def update_maintenance_schedule(schedule_id):
     db.session.commit()
 
     return success_response(schedule.to_dict(), 'Maintenance schedule updated successfully')
+
+
+@maintenance_bp.route('/cost-by-month', methods=['GET'])
+@jwt_required()
+def get_cost_by_month():
+    check_permission('maintenance.read')
+
+    months = min(request.args.get('months', 6, type=int), 24)
+    now = datetime.utcnow()
+
+    # Aggregated in Python rather than via a dialect-specific date-trunc function
+    # so this works identically on SQLite (dev) and Postgres (production).
+    rows = MaintenanceSchedule.query.with_entities(
+        MaintenanceSchedule.scheduled_date, MaintenanceSchedule.actual_cost, MaintenanceSchedule.cost_estimate
+    ).filter(MaintenanceSchedule.scheduled_date.isnot(None)).all()
+    cost_by_month = {}
+    for scheduled_date, actual_cost, cost_estimate in rows:
+        key = scheduled_date.strftime('%Y-%m')
+        cost = actual_cost if actual_cost is not None else (cost_estimate or 0.0)
+        cost_by_month[key] = cost_by_month.get(key, 0.0) + cost
+
+    labels = []
+    data = []
+    cursor = now.replace(day=1)
+    buckets = []
+    for _ in range(months):
+        buckets.append(cursor.strftime('%Y-%m'))
+        cursor = (cursor - timedelta(days=1)).replace(day=1)
+    buckets.reverse()
+
+    for key in buckets:
+        labels.append(datetime.strptime(key, '%Y-%m').strftime('%b %Y'))
+        data.append(round(cost_by_month.get(key, 0.0), 2))
+
+    return success_response({
+        'labels': labels,
+        'datasets': [{
+            'label': 'Maintenance Cost (INR)',
+            'data': data,
+            'backgroundColor': 'rgba(220, 53, 69, 0.7)',
+            'borderColor': 'rgba(220, 53, 69, 1)',
+            'borderWidth': 1,
+            'borderRadius': 6
+        }]
+    })

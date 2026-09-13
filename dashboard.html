@@ -319,49 +319,65 @@
     }
 
     async function loadKpis() {
-      const ships = Store.get('ships');
-      const containers = Store.get('containers');
-      const trucks = Store.get('trucks');
-      const alerts = Store.get('alerts');
-      const berths = Store.get('berths');
-
-      const activeShips = ships.filter(s => s.status !== 'Departed').length;
-      const atPortContainers = containers.filter(c => c.status === 'At Port' || c.status === 'In Transit').length;
-      const activeTrucks = trucks.filter(t => t.status !== 'Offline').length;
-      const activeAlerts = alerts.filter(a => a.status === 'Active').length;
-
       const setKpi = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
       const setChange = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
 
-      setKpi('kpiShips', activeShips);
-      setKpi('kpiContainers', atPortContainers);
-      setKpi('kpiTrucks', activeTrucks);
-      setKpi('kpiAlerts', activeAlerts);
+      try {
+        const res = await Api.request('/dashboard/kpis');
+        const k = res.data;
+        setKpi('kpiShips', k.total_ships.value);
+        setKpi('kpiContainers', k.total_containers.value);
+        setKpi('kpiTrucks', k.trucks_in_transit.value);
+        setKpi('kpiAlerts', k.active_alerts.value);
 
-      const readings = Store._get('env_readings') || Store.get('env_readings');
-      if (readings) {
-        const w = readings.weather;
-        setKpi('weatherTemp', Math.round(w.temperature) + '°C');
+        setChange('kpiShipsChange', k.total_ships.change != null ? `+${k.total_ships.change} ${k.total_ships.change_label}` : k.total_ships.change_label);
+        setChange('kpiContainersChange', k.total_containers.change != null ? `+${k.total_containers.change} ${k.total_containers.change_label}` : k.total_containers.change_label);
+        setChange('kpiTrucksChange', k.trucks_in_transit.change_label);
+        setChange('kpiAlertsChange', k.active_alerts.change != null ? `${k.active_alerts.change} ${k.active_alerts.change_label}` : k.active_alerts.change_label);
+
+        setKpi('weatherTemp', k.weather.temperature != null ? Math.round(k.weather.temperature) + '°C' : '--');
         const descEl = document.getElementById('weatherDesc');
-        if (descEl) descEl.textContent = w.condition || 'Partly Cloudy';
+        if (descEl) descEl.textContent = k.weather.condition || 'No data';
         const windEl = document.getElementById('weatherWind');
-        if (windEl) windEl.textContent = w.wind_speed + ' km/h';
+        if (windEl) windEl.textContent = k.weather.wind_speed != null ? k.weather.wind_speed + ' km/h' : '--';
         const humEl = document.getElementById('weatherHumidity');
-        if (humEl) humEl.textContent = w.humidity + '%';
+        if (humEl) humEl.textContent = k.weather.humidity != null ? k.weather.humidity + '%' : '--';
+        const visEl = document.getElementById('weatherVisibility');
+        if (visEl) visEl.textContent = k.weather.visibility != null ? Math.round(k.weather.visibility) + ' km' : '--';
 
-        const aqi = readings.air_quality;
-        setKpi('aqiValue', aqi.aqi);
+        setKpi('aqiValue', k.aqi.value != null ? k.aqi.value : '--');
         const aqiLabel = document.getElementById('aqiLabel');
         if (aqiLabel) {
-          aqiLabel.textContent = aqi.aqi <= 50 ? 'Good' : aqi.aqi <= 100 ? 'Moderate' : 'Unhealthy';
-          aqiLabel.style.color = aqi.aqi <= 50 ? 'var(--success)' : aqi.aqi <= 100 ? 'var(--warning)' : 'var(--danger)';
+          aqiLabel.textContent = k.aqi.category || 'No data';
+          aqiLabel.style.color = k.aqi.color === 'success' ? 'var(--success)' : k.aqi.color === 'warning' ? 'var(--warning)' : k.aqi.color === 'danger' ? 'var(--danger)' : 'var(--text-muted)';
         }
-      }
 
-      setChange('kpiShipsChange', '+12% from last month');
-      setChange('kpiContainersChange', '+8% from last month');
-      setChange('kpiTrucksChange', '+5% from last week');
-      setChange('kpiAlertsChange', '2 new today');
+        try {
+          const aqRes = await Api.request('/environment/air-quality?per_page=1');
+          const latest = aqRes.data?.items?.[0];
+          if (latest) {
+            setKpi('aqiPM25', latest.pm25 != null ? latest.pm25.toFixed(1) : '--');
+            setKpi('aqiPM10', latest.pm10 != null ? latest.pm10.toFixed(1) : '--');
+            setKpi('aqiNO2', latest.no2 != null ? latest.no2.toFixed(1) : '--');
+            setKpi('aqiCO', latest.co != null ? latest.co.toFixed(2) : '--');
+          }
+        } catch (err) { /* leave sub-metrics at their default placeholder */ }
+      } catch (err) {
+        // Fall back to raw record counts if the aggregated KPI endpoint is unreachable.
+        const ships = Store.get('ships');
+        const containers = Store.get('containers');
+        const trucks = Store.get('trucks');
+        const alerts = Store.get('alerts');
+
+        setKpi('kpiShips', ships.filter(s => s.status !== 'Departed').length);
+        setKpi('kpiContainers', containers.length);
+        setKpi('kpiTrucks', trucks.filter(t => t.status === 'In Transit').length);
+        setKpi('kpiAlerts', alerts.filter(a => a.status === 'Active').length);
+        setChange('kpiShipsChange', '--');
+        setChange('kpiContainersChange', '--');
+        setChange('kpiTrucksChange', '--');
+        setChange('kpiAlertsChange', '--');
+      }
     }
 
     function loadCharts(period) {
