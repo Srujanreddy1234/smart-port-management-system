@@ -19,11 +19,13 @@ from app.models.environment import (
     WaterQualityParameter,
     AirQualityParameter,
     NoiseParameter,
-    WeatherParameter
+    WeatherParameter,
+    MarineReading
 )
 from app.models.reports import Report, ReportType, ReportFormat, ReportStatus, ReportSchedule, ReportTemplate, DashboardWidget, UserDashboard
 from app.models.event_log import EventLog, EventType, EventSeverity
 from app.models.billing import Invoice, InvoiceStatus, BillingLine, BillingCategory, PaymentMethod
+from app.models.port_traffic import PortTrafficAnnual
 
 
 __all__ = [
@@ -35,8 +37,9 @@ __all__ = [
     'Alert', 'AlertType', 'SecurityZone', 'AccessLog', 'Camera', 'SecurityOfficer',
     'Equipment', 'EquipmentType', 'EquipmentStatus', 'MaintenanceType', 'MaintenancePriority', 'MaintenanceStatus', 'MaintenanceSchedule', 'ServiceLog', 'EquipmentHealthLog',
     'MonitoringStation', 'AirQualityReading', 'WaterQualityReading', 'NoiseReading', 'WeatherReading', 'EmissionReading', 'EnvironmentalAlert', 'ComplianceThreshold',
-    'WaterQualityParameter', 'AirQualityParameter', 'NoiseParameter', 'WeatherParameter',
+    'WaterQualityParameter', 'AirQualityParameter', 'NoiseParameter', 'WeatherParameter', 'MarineReading',
     'Report', 'ReportType', 'ReportFormat', 'ReportStatus', 'ReportSchedule', 'ReportTemplate', 'DashboardWidget', 'UserDashboard',
     'EventLog', 'EventType', 'EventSeverity',
     'Invoice', 'InvoiceStatus', 'BillingLine', 'BillingCategory', 'PaymentMethod',
+    'PortTrafficAnnual',
 ]

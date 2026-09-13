@@ -68,30 +68,10 @@ def create_app(config_name=None):
             'status': 'operational'
         }), 200
 
-    # Initialize database tables LAZILY (not at startup)
-    @app.before_request
-    def initialize_database():
-        if not hasattr(app, '_db_initialized'):
-            app._db_initialized = True
-            with app.app_context():
-                try:
-                    from app.models.user import User, Session, AuditLog, UserRole, UserStatus
-                    from app.models.ship import Ship, ShipStatus, VesselType
-                    from app.models.container import Container, ContainerStatus, ContainerType, ContainerHistory
-                    from app.models.truck import Truck, TruckStatus, TruckType
-                    from app.models.security import SecurityIncident, IncidentType, IncidentSeverity, IncidentStatus, Alert, AlertType, SecurityZone, AccessLog, Camera, SecurityOfficer
-                    from app.models.maintenance import Equipment, EquipmentType, EquipmentStatus, MaintenanceType, MaintenancePriority, MaintenanceStatus, ServiceLog
-                    from app.models.environment import (
-                        MonitoringStation, AirQualityReading, WaterQualityReading, NoiseReading,
-                        WeatherReading, EmissionReading, EnvironmentalAlert, ComplianceThreshold,
-                        WaterQualityParameter, AirQualityParameter, NoiseParameter, WeatherParameter
-                    )
-                    from app.models.reports import Report, ReportType, ReportFormat, ReportStatus, ReportSchedule, ReportTemplate, DashboardWidget, UserDashboard
-                    from app.models.event_log import EventLog, EventType, EventSeverity
-                    from app.models.billing import Invoice, InvoiceStatus, BillingLine, BillingCategory, PaymentMethod
-                    db.create_all()
-                except Exception:
-                    pass  # DB not ready yet, will retry on next request
+    # Schema is managed by Alembic (flask db upgrade), run as a release step
+    # before the app starts -- see Procfile/railway.toml. Not initialized here
+    # so a genuinely missing/incompatible schema fails loudly instead of a
+    # silent create_all() masking a migration that was never applied.
 
     FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
 

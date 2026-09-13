@@ -498,3 +498,38 @@ class ComplianceThreshold(db.Model):
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }
+
+
+class MarineReading(db.Model):
+    """Wave/sea-condition observations, sourced from the Open-Meteo Marine API.
+    Relevant to vessel approach/berthing safety alongside weather conditions."""
+    __tablename__ = 'marine_readings'
+
+    id = db.Column(db.Integer, primary_key=True)
+    station_id = db.Column(db.Integer, db.ForeignKey('monitoring_stations.id'), nullable=False, index=True)
+    wave_height_m = db.Column(db.Float)
+    wave_direction_deg = db.Column(db.Float)
+    wave_period_s = db.Column(db.Float)
+    sea_surface_temp_c = db.Column(db.Float)
+    sea_level_height_msl_m = db.Column(db.Float)
+    recorded_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    station = db.relationship('MonitoringStation', backref='marine_readings')
+
+    __table_args__ = (
+        Index('ix_marine_station_recorded', 'station_id', 'recorded_at'),
+    )
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'station_id': self.station_id,
+            'wave_height_m': self.wave_height_m,
+            'wave_direction_deg': self.wave_direction_deg,
+            'wave_period_s': self.wave_period_s,
+            'sea_surface_temp_c': self.sea_surface_temp_c,
+            'sea_level_height_msl_m': self.sea_level_height_msl_m,
+            'recorded_at': self.recorded_at.isoformat(),
+            'created_at': self.created_at.isoformat()
+        }
