@@ -6,7 +6,7 @@ from app.models.security import (
     SecurityIncident, IncidentType, IncidentSeverity, IncidentStatus,
     Alert, AlertType, SecurityZone, AccessLog, Camera, SecurityOfficer
 )
-from app.models.maintenance import Equipment, EquipmentType, EquipmentStatus, MaintenanceType, MaintenancePriority, MaintenanceStatus, ServiceLog, EquipmentHealthLog
+from app.models.maintenance import Equipment, EquipmentType, EquipmentStatus, MaintenanceType, MaintenancePriority, MaintenanceStatus, MaintenanceSchedule, ServiceLog, EquipmentHealthLog
 from app.models.environment import (
     MonitoringStation,
     AirQualityReading,
@@ -33,7 +33,7 @@ __all__ = [
     'Truck', 'TruckStatus', 'TruckType',
     'SecurityIncident', 'IncidentType', 'IncidentSeverity', 'IncidentStatus',
     'Alert', 'AlertType', 'SecurityZone', 'AccessLog', 'Camera', 'SecurityOfficer',
-    'Equipment', 'EquipmentType', 'EquipmentStatus', 'MaintenanceType', 'MaintenancePriority', 'MaintenanceStatus', 'ServiceLog', 'EquipmentHealthLog',
+    'Equipment', 'EquipmentType', 'EquipmentStatus', 'MaintenanceType', 'MaintenancePriority', 'MaintenanceStatus', 'MaintenanceSchedule', 'ServiceLog', 'EquipmentHealthLog',
     'MonitoringStation', 'AirQualityReading', 'WaterQualityReading', 'NoiseReading', 'WeatherReading', 'EmissionReading', 'EnvironmentalAlert', 'ComplianceThreshold',
     'WaterQualityParameter', 'AirQualityParameter', 'NoiseParameter', 'WeatherParameter',
     'Report', 'ReportType', 'ReportFormat', 'ReportStatus', 'ReportSchedule', 'ReportTemplate', 'DashboardWidget', 'UserDashboard',

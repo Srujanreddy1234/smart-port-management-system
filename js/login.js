@@ -44,20 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showError(loginForm, err.message || 'Login failed');
       }
     });
-  }
-
-  const mockLoginBtns = document.querySelectorAll('.mock-login-btn');
-  mockLoginBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const email = btn.dataset.email;
-      const password = btn.dataset.password;
-      const emailInput = document.getElementById('email');
-      const passInput = document.getElementById('password');
-      if (emailInput) emailInput.value = email;
-      if (passInput) passInput.value = password;
-      loginForm?.requestSubmit();
-    });
-  });
 
   document.querySelectorAll('.demo-btn').forEach(btn => {
     btn.addEventListener('click', () => {

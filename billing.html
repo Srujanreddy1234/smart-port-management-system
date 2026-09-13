@@ -64,7 +64,7 @@
       <div class="content-area">
         <div class="page-header">
           <div class="header-actions">
-            <button class="btn btn-primary" onclick="App.createModal({id:'createInvoiceModal',title:'Create Invoice',width:'700px',body:InvoiceForm.getFormHtml()})">
+            <button class="btn btn-primary" onclick="App.createModal({id:'createInvoiceModal',title:'Create Invoice',width:'700px',body:InvoiceForm.getFormHtml(), footer:'<button type=\"button\" class=\"btn btn-secondary\" onclick=\"this.closest(\'.modal-overlay\').remove()\">Cancel</button><button type=\"button\" class=\"btn btn-primary\" onclick=\"Billing.submitInvoice()\">Create Invoice</button>'})">
               <i class="fas fa-plus"></i> Create Invoice
             </button>
             <button class="btn btn-secondary" onclick="Billing.exportInvoices()">
@@ -505,6 +505,65 @@
         Status: inv.status,
       }));
       App.exportCSV(data, 'invoices.csv');
+    },
+
+    async submitInvoice() {
+      const form = document.getElementById('invoiceForm');
+      if (!form) return;
+      const data = InvoiceForm.getFormData(form);
+      if (!data.ship_id) { App.showToast('Please select a ship', 'danger'); return; }
+      const btn = document.querySelector('#createInvoiceModal .btn-primary');
+      const original = btn ? btn.innerHTML : '';
+      if (btn) { btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; btn.disabled = true; }
+      try {
+        const res = await Api.request('/billing', {
+          method: 'POST',
+          body: JSON.stringify(data)
+        });
+        App.showToast('Invoice created', 'success');
+        document.getElementById('createInvoiceModal')?.remove();
+        this.loadInvoices(this.currentPage);
+        this.loadStats();
+      } catch (e) {
+        App.showToast(e.message || 'Failed to create invoice', 'danger');
+      } finally {
+        if (btn) { btn.innerHTML = original; btn.disabled = false; }
+      }
+    },
+
+    async editInvoice(id) {
+      const inv = this.invoices.find(i => i.id === id);
+      if (!inv) return;
+      const modal = App.createModal({
+        id: 'editInvoiceModal',
+        title: `Edit Invoice ${inv.invoice_number}`,
+        width: '700px',
+        body: InvoiceForm.getFormHtml(inv),
+        footer: `<button type="button" class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button><button type="button" class="btn btn-primary" onclick="Billing.submitInvoice(${id})">Save Changes</button>`
+      });
+    },
+
+    async submitInvoice(id) {
+      const form = document.getElementById('invoiceForm');
+      if (!form) return;
+      const data = InvoiceForm.getFormData(form);
+      const btn = document.querySelector('#editInvoiceModal .btn-primary');
+      const original = btn ? btn.innerHTML : '';
+      if (btn) { btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; btn.disabled = true; }
+      try {
+        const res = await Api.request(`/billing/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(data)
+        });
+        App.showToast('Invoice updated', 'success');
+        document.getElementById('editInvoiceModal')?.remove();
+        this.loadInvoices(this.currentPage);
+        this.loadStats();
+      } catch (e) {
+        App.showToast(e.message || 'Failed to update invoice', 'danger');
+      } finally {
+        if (btn) { btn.innerHTML = original; btn.disabled = false; }
+      }
     }
   };
 

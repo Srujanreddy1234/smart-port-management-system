@@ -301,19 +301,6 @@ const Api = {
     return this.request('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password })
-    }).catch(err => {
-      const mockUser = MOCK_USERS[email];
-      if (mockUser && mockUser.password === password) {
-        const token = 'mock_' + btoa(JSON.stringify({ email, role: mockUser.role, exp: Date.now() + 7200000 }));
-        return {
-          data: {
-            access_token: token,
-            refresh_token: 'mock_refresh',
-            user: { ...mockUser, full_name: mockUser.first_name + ' ' + mockUser.last_name, must_change_password: false, two_factor_enabled: false, email_verified: true }
-          }
-        };
-      }
-      throw err;
     });
   },
 

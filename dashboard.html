@@ -132,8 +132,8 @@
           <div class="card-header">
             <h6><i class="fas fa-chart-area" style="color:var(--primary-light);margin-right:8px;"></i>Port Throughput — Last 7 Days</h6>
             <div style="display:flex;gap:6px;">
-              <button class="btn btn-sm btn-secondary">Daily</button>
-              <button class="btn btn-sm btn-primary">Weekly</button>
+              <button class="btn btn-sm btn-secondary" onclick="loadCharts('daily')">Daily</button>
+              <button class="btn btn-sm btn-primary" onclick="loadCharts('weekly')">Weekly</button>
             </div>
           </div>
           <div class="card-body"><div style="height:280px;"><canvas id="throughputChart"></canvas></div></div>
@@ -189,7 +189,7 @@
         <div class="card">
           <div class="card-header">
             <h6><i class="fas fa-chart-pie" style="color:var(--info);margin-right:8px;"></i>Container Distribution</h6>
-            <button class="btn btn-sm btn-secondary">View All</button>
+            <button class="btn btn-sm btn-secondary" onclick="window.location.href='reports.html'">View All</button>
           </div>
           <div class="card-body">
             <div style="height:240px;display:flex;align-items:center;justify-content:center;"><canvas id="containerDistChart"></canvas></div>
@@ -271,8 +271,8 @@
   <script src="js/app.js"></script>
   <script src="js/charts.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      Store.init();
+    document.addEventListener('DOMContentLoaded', async () => {
+      await Store.init();
       loadKpis();
       loadCharts();
       loadVesselStatus();
@@ -317,7 +317,7 @@
       }
     }
 
-    function loadKpis() {
+    async function loadKpis() {
       const ships = Store.get('ships');
       const containers = Store.get('containers');
       const trucks = Store.get('trucks');
@@ -337,7 +337,7 @@
       setKpi('kpiTrucks', activeTrucks);
       setKpi('kpiAlerts', activeAlerts);
 
-      const readings = Store._get('env_readings');
+      const readings = Store._get('env_readings') || Store.get('env_readings');
       if (readings) {
         const w = readings.weather;
         setKpi('weatherTemp', Math.round(w.temperature) + '°C');
@@ -363,7 +363,7 @@
       setChange('kpiAlertsChange', '2 new today');
     }
 
-    function loadCharts() {
+    function loadCharts(period) {
       const ships = Store.get('ships');
       const containers = Store.get('containers');
       const trucks = Store.get('trucks');
@@ -419,15 +419,18 @@
 
     function loadRecentActivity() {
       const activity = Store.get('activity_log');
+      const typeColorMap = { ship: 'primary', berth: 'success', container: 'info', truck: 'warning', billing: 'warning', security: 'danger', system: 'info' };
       const colorMap = { primary: 'rgba(13,110,253,0.12);color:#6ea8fe', success: 'rgba(25,135,84,0.12);color:#75b798', danger: 'rgba(220,53,69,0.12);color:#ea868f', warning: 'rgba(255,193,7,0.12);color:#ffda6a', info: 'rgba(13,202,240,0.12);color:#66d9f0' };
       const body = document.getElementById('recentActivityBody');
       if (!body) return;
       if (!activity || activity.length === 0) { body.innerHTML = '<p class="text-muted">No recent activity</p>'; return; }
-      body.innerHTML = activity.slice(0, 10).map(a => `
-        <div class="activity-item">
-          <div class="activity-icon" style="background:${colorMap[a.type] || colorMap.info};"><i class="fas fa-circle"></i></div>
+      body.innerHTML = activity.slice(0, 10).map(a => {
+        const colorKey = typeColorMap[a.type] || 'info';
+        return `<div class="activity-item">
+          <div class="activity-icon" style="background:${colorMap[colorKey]};"><i class="fas fa-circle"></i></div>
           <div class="activity-body"><h6>${a.action}</h6><p>${a.description || ''}</p><small>${Utils.timeAgo(a.timestamp)}</small></div>
-        </div>`).join('');
+        </div>`;
+      }).join('');
     }
 
     function loadBerthOccupancy() {
@@ -448,7 +451,6 @@
     }
 
     function refreshDashboard() {
-      Store.init();
       loadKpis();
       loadCharts();
       loadVesselStatus();

@@ -279,8 +279,8 @@
     let currentPage = 1;
     const perPage = 10;
 
-    document.addEventListener('DOMContentLoaded', () => {
-      Store.init();
+    document.addEventListener('DOMContentLoaded', async () => {
+      await Store.init();
       loadContainers();
       loadKpis();
       loadCharts();
@@ -453,6 +453,8 @@
     document.getElementById('statusFilter')?.addEventListener('change', applyFilters);
     document.getElementById('typeFilter')?.addEventListener('change', applyFilters);
     document.getElementById('sortFilter')?.addEventListener('change', applyFilters);
+    const flowPeriod = document.getElementById('flowChartPeriod');
+    if (flowPeriod) flowPeriod.addEventListener('change', () => loadCharts(flowPeriod.value));
   </script>
 </body>
 </html>

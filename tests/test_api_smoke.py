@@ -112,7 +112,7 @@ def test_auth():
         api("POST", "/auth/logout", expected=[200, 201, 401])
         api("POST", "/auth/refresh", expected=[200, 401])
 
-    api("POST", "/auth/change-password", {"old_password": "admin123", "new_password": "admin1234"}, expected=[200, 201, 401])
+    api("POST", "/auth/change-password", {"current_password": "admin123", "new_password": "admin1234", "confirm_password": "admin1234"}, expected=[200, 201, 401])
 
 
 # ============================================================

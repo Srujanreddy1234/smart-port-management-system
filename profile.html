@@ -98,7 +98,7 @@
           </div>
           <div class="profile-actions">
             <button class="btn btn-primary" onclick="App.editProfile()"><i class="fas fa-pen"></i> Edit Profile</button>
-            <button class="btn btn-secondary" onclick="App.showToast('Settings panel opened','info')"><i class="fas fa-cog"></i> Settings</button>
+            <button class="btn btn-secondary" onclick="document.querySelector('.profile-tab[data-tab=settings]')?.click()"><i class="fas fa-cog"></i> Settings</button>
             <button class="btn btn-outline-danger" onclick="Api.logout()"><i class="fas fa-right-from-bracket"></i> Sign Out</button>
           </div>
         </div>

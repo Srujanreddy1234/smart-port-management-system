@@ -1,7 +1,7 @@
 const App = {
-  init() {
+  async init() {
     if (!Api.requireAuth()) return;
-    Store.init();
+    await ApiStore.init();
     this.buildSidebar();
     this.initSidebar();
     this.initTopbar();
@@ -93,6 +93,20 @@ const App = {
         notifDrop.classList.toggle('show');
       });
       document.addEventListener('click', () => notifDrop.classList.remove('show'));
+    }
+
+    const fullscreenBtn = document.querySelector('.topbar-btn .fa-expand');
+    if (fullscreenBtn) {
+      const btn = fullscreenBtn.closest('.topbar-btn');
+      if (btn) {
+        btn.addEventListener('click', () => {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+          } else {
+            document.exitFullscreen().catch(() => {});
+          }
+        });
+      }
     }
   },
 
@@ -321,8 +335,16 @@ const App = {
   },
 
   exportTrucks() { App.exportCSV(Store.get('trucks'), 'trucks-export.csv'); App.showToast('Trucks exported', 'success'); },
-  exportSecurity() { App.exportCSV(Store.get('alerts'), 'security-alerts-export.csv'); App.showToast('Security alerts exported', 'success'); },
+  exportShips() { App.exportCSV(Store.get('ships'), 'ships-export.csv'); App.showToast('Ships exported', 'success'); },
+  exportContainers() { App.exportCSV(Store.get('containers'), 'containers-export.csv'); App.showToast('Containers exported', 'success'); },
   exportBerths() { App.exportCSV(Store.get('berths'), 'berths-export.csv'); App.showToast('Berths exported', 'success'); },
+  exportInvoices() { App.exportCSV(Store.get('invoices'), 'invoices-export.csv'); App.showToast('Invoices exported', 'success'); },
+  exportAlerts() { App.exportCSV(Store.get('alerts'), 'alerts-export.csv'); App.showToast('Alerts exported', 'success'); },
+  exportUsers() { App.exportCSV(Store.get('users'), 'users-export.csv'); App.showToast('Users exported', 'success'); },
+  exportMaintenance() { App.exportCSV(Store.get('maintenance_schedules'), 'maintenance-export.csv'); App.showToast('Maintenance exported', 'success'); },
+  exportEnvironment() { App.exportCSV(Store.get('env_readings') || [], 'environment-export.csv'); App.showToast('Environment data exported', 'success'); },
+  exportReports() { App.exportCSV(Store.get('reports'), 'reports-export.csv'); App.showToast('Reports exported', 'success'); },
+  exportActivity() { App.exportCSV(Store.get('activity_log'), 'activity-export.csv'); App.showToast('Activity log exported', 'success'); },
 
   showAddTruckModal() {
     App.createModal({

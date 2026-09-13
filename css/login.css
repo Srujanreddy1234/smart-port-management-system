@@ -182,7 +182,7 @@
 
 .login-form .input-icon-group input {
   width: 100%;
-  padding: 12px 14px 12px 42px;
+  padding: 12px 42px 12px 42px;
   background: var(--light);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);

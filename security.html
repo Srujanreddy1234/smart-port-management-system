@@ -572,10 +572,12 @@
         const res = await Api.request('/security/cameras?per_page=1');
         document.getElementById('activeCamerasStat').textContent = res.data.total || 0;
       } catch (err) {
-        // leave mock value
+        document.getElementById('activeCamerasStat').textContent = '0';
       }
     }
 
+    const incidentChartPeriod = document.getElementById('incidentChartPeriod');
+    if (incidentChartPeriod) incidentChartPeriod.addEventListener('change', () => loadIncidentsChart(incidentChartPeriod.value));
     if (typeFilter) typeFilter.addEventListener('change', applyTypeFilter);
     loadIncidents();
     loadCameraCount();

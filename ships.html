@@ -216,8 +216,8 @@
         <div class="card-header">
           <h6><i class="fas fa-chart-line" style="color:var(--primary-light);margin-right:8px;"></i>Vessel Arrivals — Last 30 Days</h6>
           <div style="display:flex;gap:6px;">
-            <button class="btn btn-sm btn-secondary">Daily</button>
-            <button class="btn btn-sm btn-primary">30 Days</button>
+            <button class="btn btn-sm btn-secondary" onclick="loadArrivalsChart(7)">Daily</button>
+            <button class="btn btn-sm btn-primary" onclick="loadArrivalsChart(30)">30 Days</button>
           </div>
         </div>
         <div class="card-body">
@@ -238,8 +238,8 @@
     var currentPage = 1;
     const rowsPerPage = 10;
 
-    document.addEventListener('DOMContentLoaded', () => {
-      Store.init();
+    document.addEventListener('DOMContentLoaded', async () => {
+      await Store.init();
       loadShips();
       loadKpis();
       loadArrivalsChart();
@@ -346,9 +346,9 @@
       }
     }
 
-    async function loadArrivalsChart() {
+    async function loadArrivalsChart(days = 30) {
       try {
-        const res = await Api.request('/ships/arrivals-chart?days=30');
+        const res = await Api.request(`/ships/arrivals-chart?days=${days}`);
         const ctx = document.getElementById('vesselArrivalsChart');
         if (!ctx) return;
         new Chart(ctx.getContext('2d'), {

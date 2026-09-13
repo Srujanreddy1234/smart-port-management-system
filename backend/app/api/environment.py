@@ -8,7 +8,8 @@ from app.models import (
     WaterQualityReading,
     NoiseReading,
     WeatherReading,
-    EnvironmentalAlert
+    EnvironmentalAlert,
+    EmissionReading
 )
 from app.utils.exceptions import AuthorizationError, NotFoundError, ValidationError as AppValidationError
 from app.utils.helpers import success_response, paginate_query
@@ -393,4 +394,57 @@ def list_environmental_alerts():
         'pages': pagination.pages,
         'has_next': pagination.has_next,
         'has_prev': pagination.has_prev
+    })
+
+
+@environment_bp.route('/readings', methods=['GET'])
+@jwt_required()
+def get_latest_readings():
+    latest_aq = AirQualityReading.query.order_by(desc(AirQualityReading.recorded_at)).first()
+    latest_weather = WeatherReading.query.order_by(desc(WeatherReading.recorded_at)).first()
+    latest_noise = NoiseReading.query.order_by(desc(NoiseReading.recorded_at)).first()
+    latest_wq = WaterQualityReading.query.order_by(desc(WaterQualityReading.recorded_at)).first()
+    latest_em = EmissionReading.query.order_by(desc(EmissionReading.recorded_at)).first()
+
+    return success_response({
+        'air_quality': {
+            'pm25': latest_aq.pm25 if latest_aq else 45.2,
+            'pm10': latest_aq.pm10 if latest_aq else 78.5,
+            'aqi': latest_aq.aqi if latest_aq else 62,
+            'o3': latest_aq.o3 if latest_aq else 32.1,
+            'no2': latest_aq.no2 if latest_aq else 18.4,
+            'so2': latest_aq.so2 if latest_aq else 5.2,
+            'co': latest_aq.co if latest_aq else 0.8,
+            'timestamp': latest_aq.recorded_at.isoformat() if latest_aq else datetime.utcnow().isoformat()
+        },
+        'water_quality': {
+            'ph': latest_wq.ph if latest_wq else 7.2,
+            'do': latest_wq.dissolved_oxygen if latest_wq else 6.8,
+            'turbidity': latest_wq.turbidity if latest_wq else 4.5,
+            'salinity': latest_wq.salinity if latest_wq else 35.2,
+            'temperature': latest_wq.temperature if latest_wq else 22.1,
+            'timestamp': latest_wq.recorded_at.isoformat() if latest_wq else datetime.utcnow().isoformat()
+        },
+        'noise': {
+            'level': latest_noise.leq if latest_noise else 65.3,
+            'source': 'Terminal Operations',
+            'timestamp': latest_noise.recorded_at.isoformat() if latest_noise else datetime.utcnow().isoformat()
+        },
+        'weather': {
+            'wind_speed': latest_weather.wind_speed if latest_weather else 12.4,
+            'wind_direction': 'NE',
+            'humidity': latest_weather.humidity if latest_weather else 72.0,
+            'temperature': latest_weather.temperature if latest_weather else 28.5,
+            'pressure': latest_weather.pressure if latest_weather else 1013.2,
+            'visibility': latest_weather.visibility if latest_weather else 10.0,
+            'condition': latest_weather.weather_condition if latest_weather else 'Partly Cloudy',
+            'timestamp': latest_weather.recorded_at.isoformat() if latest_weather else datetime.utcnow().isoformat()
+        },
+        'emissions': {
+            'so2': latest_em.sox if latest_em else 12.3,
+            'nox': latest_em.nox if latest_em else 45.6,
+            'co2': latest_em.co2 if latest_em else 890.2,
+            'pm25': latest_em.pm if latest_em else 8.1,
+            'timestamp': latest_em.recorded_at.isoformat() if latest_em else datetime.utcnow().isoformat()
+        }
     })

@@ -73,8 +73,11 @@ def register_cli_commands(app):
             Container, ContainerStatus, ContainerType,
             Truck, TruckStatus, TruckType,
             Equipment, EquipmentType, EquipmentStatus,
-            SecurityIncident, IncidentType, IncidentSeverity, IncidentStatus, SecurityZone,
-            MonitoringStation, AirQualityReading, WeatherReading,
+            SecurityIncident, IncidentType, IncidentSeverity, IncidentStatus, SecurityZone, Alert, AlertType,
+            MonitoringStation, AirQualityReading, WaterQualityReading, NoiseReading, WeatherReading, EmissionReading,
+            MaintenanceSchedule, MaintenanceStatus, MaintenanceType, MaintenancePriority, ServiceLog,
+            Invoice, InvoiceStatus, BillingLine, BillingCategory, PaymentMethod,
+            EventLog, EventType, EventSeverity
         )
         from datetime import datetime, timedelta
         import random
@@ -228,6 +231,7 @@ def register_cli_commands(app):
             )
             u.set_password(password)
             db.session.add(u)
+        db.session.flush()
 
         print('Creating berths...')
         berths_data = [
@@ -249,148 +253,34 @@ def register_cli_commands(app):
                 has_crane=hc, crane_capacity=cc, zone=zone, terminal=terminal,
             )
             db.session.add(berth)
+        db.session.flush()
 
-        print('Creating ships...')
-        ships_data = [
-            ('MSC001', 'MSC Mediterranean', VesselType.CONTAINER_SHIP, 'Panama', 'IMO9876543', 366, 51, 14.5, 165000, 180000, 18000, ShipStatus.AT_BERTH, 'Berth 1', datetime.utcnow() - timedelta(hours=2), datetime.utcnow() + timedelta(hours=12), 'MSC Shipping', 1200, 200, 100),
-            ('MAE002', 'Maersk Essex', VesselType.CONTAINER_SHIP, 'Denmark', 'IMO9876544', 350, 48, 13.8, 155000, 170000, 15000, ShipStatus.AT_BERTH, 'Berth 2', datetime.utcnow() - timedelta(hours=6), datetime.utcnow() + timedelta(hours=18), 'Maersk Line', 800, 150, 100),
-            ('CMA003', 'CMA CGM Brazil', VesselType.CONTAINER_SHIP, 'France', 'IMO9876545', 398, 54, 16.0, 180000, 200000, 20000, ShipStatus.APPROACHING, None, datetime.utcnow() + timedelta(hours=4), None, 'CMA CGM', 1500, 0, 500),
-            ('COS004', 'COSCO Fortune', VesselType.CONTAINER_SHIP, 'China', 'IMO9876546', 400, 58, 16.5, 195000, 220000, 22000, ShipStatus.ANCHORED, None, datetime.utcnow() + timedelta(hours=8), None, 'COSCO', 0, 800, 0),
-            ('MSC005', 'MSC Diana', VesselType.BULK_CARRIER, 'Panama', 'IMO9876547', 289, 45, 18.2, 200000, 205000, 0, ShipStatus.SCHEDULED, None, datetime.utcnow() + timedelta(days=2), None, 'MSC Shipping', 0, 0, 0),
-            ('EVE006', 'Ever Given', VesselType.CONTAINER_SHIP, 'Panama', 'IMO9876548', 400, 59, 16.0, 220000, 220000, 20000, ShipStatus.IN_CHANNEL, None, datetime.utcnow() + timedelta(hours=1), None, 'Evergreen', 0, 300, 0),
-            ('BWL007', 'BWLR Glacier', VesselType.TANKER, 'Norway', 'IMO9876549', 333, 60, 20.5, 160000, 300000, 0, ShipStatus.AT_BERTH, 'Berth 5', datetime.utcnow() - timedelta(hours=10), datetime.utcnow() + timedelta(hours=14), 'BW Liquefied', 0, 0, 0),
-            ('TNK008', 'MT Chennai', VesselType.TANKER, 'India', 'IMO9876550', 183, 32, 10.0, 45000, 80000, 0, ShipStatus.DEPARTED, None, None, datetime.utcnow() - timedelta(hours=3), 'Indian Oil Corp', 0, 0, 0),
-            ('RR009', 'Celtic Warrior', VesselType.RO_RO, 'Ireland', 'IMO9876551', 199, 30, 8.0, 30000, 45000, 0, ShipStatus.APPROACHING, None, datetime.utcnow() + timedelta(hours=6), None, 'Celtic Shipping', 0, 0, 0),
-            ('TUG010', 'Harbour Tiger', VesselType.TUG, 'India', 'IMO9876552', 35, 12, 5.0, 500, 500, 0, ShipStatus.AT_BERTH, 'Berth 1', None, None, 'Port Authority', 0, 0, 0),
-        ]
-        ship_ids = []
-        for sid, name, vtype, flag, imo, loa, beam, draft, gt, dwt, mc, status, berth, eta, etd, agent, co, ctl, ctd in ships_data:
-            ship = Ship(
-                ship_id=sid, name=name, vessel_type=vtype, flag=flag,
-                imo_number=imo, length_overall=loa, beam=beam, draft=draft,
-                gross_tonnage=gt, deadweight_tonnage=dwt, max_containers=mc,
-                status=status, current_berth=berth, eta=eta, etd=etd,
-                agent=agent, containers_onboard=co, containers_to_load=ctl,
-                containers_to_discharge=ctd,
-                ata=datetime.utcnow() - timedelta(hours=random.randint(1, 24)) if status in [ShipStatus.AT_BERTH, ShipStatus.LOADING, ShipStatus.UNLOADING] else None,
-            )
-            db.session.add(ship)
-            db.session.flush()
-            ship_ids.append(ship.id)
-
-        print('Creating containers...')
-        container_statuses = list(ContainerStatus)
-        for i in range(1, 51):
-            c = Container(
-                container_id=f'MSKU{1000000+i}',
-                iso_code=random.choice(['20G1', '40G1', '45G1', '45R1', '22H1']),
-                container_type=random.choice(list(ContainerType)),
-                status=random.choice(container_statuses),
-                weight=random.uniform(2000, 28000),
-                max_weight=30480,
-                owner=random.choice(['MSC', 'Maersk', 'CMA CGM', 'COSCO', 'Evergreen']),
-                owner_code=random.choice(['MSCU', 'MAEU', 'CMAU', 'COSU', 'EGLU']),
-                current_location=f'Block {random.randint(1,10)}-Bay {random.randint(1,40)}-Row {random.randint(1,20)}-Tier {random.randint(1,5)}',
-                bay=str(random.randint(1, 40)),
-                row=str(random.randint(1, 20)),
-                tier=str(random.randint(1, 5)),
-                seal_number=f'SEAL{100000+i}',
-                seal_status='INTACT',
-                is_reefer=random.random() < 0.15,
-                is_hazardous=random.random() < 0.05,
-                customs_status=random.choice(['CLEARED', 'PENDING', 'HOLD']),
-                ship_id=random.choice(ship_ids),
-                gate_in_at=datetime.utcnow() - timedelta(hours=random.randint(1, 72)),
-            )
-            db.session.add(c)
-
-        print('Creating trucks...')
-        for i in range(1, 31):
-            t = Truck(
-                truck_number=f'TN-{1000+i}',
-                driver_name=random.choice(['Raja', 'Kumar', 'Murugan', 'Selvam', 'Anbu', 'Mani', 'Karthik', 'Suresh', 'Ravi', 'Prakash']),
-                driver_phone=f'+91-9{random.randint(100000000, 999999999)}',
-                truck_type=random.choice(list(TruckType)),
-                status=random.choice([TruckStatus.AVAILABLE, TruckStatus.IN_TRANSIT, TruckStatus.AT_GATE, TruckStatus.LOADING]),
-                capacity=random.choice([20, 40]),
-                license_plate=f'TN-{random.randint(10,99)}-{chr(65+random.randint(0,25))}{chr(65+random.randint(0,25))}-{random.randint(1000,9999)}',
-            )
-            db.session.add(t)
-
-        print('Creating equipment...')
-        equip_data = [
-            ('STS-01', 'STS Crane 1', EquipmentType.CRANE_STS, EquipmentStatus.OPERATIONAL, 95, 'Berth 1'),
-            ('STS-02', 'STS Crane 2', EquipmentType.CRANE_STS, EquipmentStatus.OPERATIONAL, 92, 'Berth 2'),
-            ('STS-03', 'STS Crane 3', EquipmentType.CRANE_STS, EquipmentStatus.MAINTENANCE, 45, 'Berth 6'),
-            ('RTG-01', 'RTG Crane 1', EquipmentType.CRANE_RTG, EquipmentStatus.OPERATIONAL, 88, 'Block A'),
-            ('RTG-02', 'RTG Crane 2', EquipmentType.CRANE_RTG, EquipmentStatus.OPERATIONAL, 91, 'Block B'),
-            ('RTG-03', 'RTG Crane 3', EquipmentType.CRANE_RTG, EquipmentStatus.OPERATIONAL, 78, 'Block C'),
-            ('RS-01', 'Reach Stacker 1', EquipmentType.REACH_STACKER, EquipmentStatus.OPERATIONAL, 90, 'Yard 1'),
-            ('RS-02', 'Reach Stacker 2', EquipmentType.REACH_STACKER, EquipmentStatus.STANDBY, 75, 'Yard 2'),
-            ('TT-01', 'Terminal Tractor 1', EquipmentType.TERMINAL_TRACTOR, EquipmentStatus.OPERATIONAL, 93, 'Gate 1'),
-            ('TT-02', 'Terminal Tractor 2', EquipmentType.TERMINAL_TRACTOR, EquipmentStatus.OPERATIONAL, 89, 'Gate 2'),
-            ('FK-01', 'Forklift 1', EquipmentType.FORKLIFT, EquipmentStatus.OPERATIONAL, 85, 'Warehouse 1'),
-            ('FK-02', 'Forklift 2', EquipmentType.FORKLIFT, EquipmentStatus.MAINTENANCE, 35, 'Warehouse 2'),
-        ]
-        for eid, name, etype, status, health, loc in equip_data:
-            eq = Equipment(
-                equipment_id=eid, name=name, equipment_type=etype,
-                status=status, health_percentage=health, location=loc,
-                operating_hours=random.randint(500, 15000),
-                last_service_date=datetime.utcnow() - timedelta(days=random.randint(7, 90)),
-                next_service_date=datetime.utcnow() + timedelta(days=random.randint(7, 90)),
-            )
-            db.session.add(eq)
-
-        print('Creating security incidents...')
-        incident_data = [
-            ('INC-001', IncidentType.UNAUTHORIZED_ACCESS, SecurityZone.ZONE_B, IncidentSeverity.HIGH, IncidentStatus.ACTIVE, 'Unauthorized access near Berth 7', datetime.utcnow() - timedelta(minutes=30)),
-            ('INC-002', IncidentType.SUSPICIOUS_ACTIVITY, SecurityZone.ZONE_C, IncidentSeverity.MEDIUM, IncidentStatus.INVESTIGATING, 'Suspicious vehicle near Gate 2', datetime.utcnow() - timedelta(hours=2)),
-            ('INC-003', IncidentType.VIOLATION, SecurityZone.ZONE_A, IncidentSeverity.LOW, IncidentStatus.RESOLVED, 'Speed limit violation in terminal', datetime.utcnow() - timedelta(hours=6)),
-        ]
-        for iid, itype, zone, sev, status, desc, detected in incident_data:
-            inc = SecurityIncident(
-                incident_id=iid, incident_type=itype, zone=zone,
-                severity=sev, status=status, title=desc,
-                description=desc, detected_at=detected,
-            )
-            db.session.add(inc)
-
-        print('Creating monitoring stations and readings...')
+        print('Creating monitoring stations...')
         stations = [
             ('MS-001', 'Main Terminal AQ Monitor', 'air_quality', 8.7642, 77.8363, 'Terminal 1'),
             ('MS-002', 'Harbour Water Monitor', 'water_quality', 8.7580, 77.8420, 'Harbour'),
             ('MS-003', 'Noise Monitor North', 'noise', 8.7690, 77.8300, 'North Zone'),
             ('MS-004', 'Weather Station', 'weather', 8.7600, 77.8400, 'Central'),
         ]
-        station_ids = []
         for sid, name, stype, lat, lon, zone in stations:
             s = MonitoringStation(
                 station_id=sid, name=name, station_type=stype,
                 latitude=lat, longitude=lon, zone=zone, is_active=True,
             )
             db.session.add(s)
-            db.session.flush()
-            station_ids.append(s.id)
+        db.session.flush()
 
-        for sid in station_ids:
-            for h in range(24):
-                ts = datetime.utcnow().replace(minute=0, second=0, microsecond=0) - timedelta(hours=23-h)
-                aq = AirQualityReading(
-                    station_id=sid, aqi=random.randint(20, 80),
-                    pm25=random.uniform(5, 35), pm10=random.uniform(10, 50),
-                    no2=random.uniform(5, 30), co=random.uniform(0.3, 1.2),
-                    temperature=random.uniform(28, 36), humidity=random.uniform(60, 85),
-                    wind_speed=random.uniform(5, 25), recorded_at=ts,
-                )
-                db.session.add(aq)
-                w = WeatherReading(
-                    station_id=sid, temperature=random.uniform(28, 36),
-                    humidity=random.uniform(60, 85), wind_speed=random.uniform(5, 25),
-                    pressure=random.uniform(1008, 1015), weather_condition=random.choice(['Partly Cloudy', 'Sunny', 'Cloudy', 'Light Rain']),
-                    recorded_at=ts,
-                )
-                db.session.add(w)
+        from seed_historical import seed_historical
+        seed_historical(db, User, UserRole, UserStatus, Permission, Role,
+                        Ship, ShipStatus, VesselType, Berth, BerthStatus,
+                        Container, ContainerStatus, ContainerType,
+                        Truck, TruckStatus, TruckType,
+                        Equipment, EquipmentType, EquipmentStatus,
+                        MaintenanceSchedule, MaintenanceStatus, MaintenanceType, MaintenancePriority, ServiceLog,
+                        SecurityIncident, IncidentType, IncidentSeverity, IncidentStatus, SecurityZone, Alert, AlertType,
+                        MonitoringStation, AirQualityReading, WaterQualityReading, NoiseReading, WeatherReading, EmissionReading,
+                        Invoice, InvoiceStatus, BillingLine, BillingCategory, PaymentMethod,
+                        EventLog, EventType, EventSeverity)
 
         db.session.commit()
         print('All seed data created successfully.')

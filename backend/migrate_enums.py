@@ -6,6 +6,17 @@ import sqlite3
 DB = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance', 'smart_port.db')
 
 mappings = {
+    'users': {
+        'role': {
+            'SUPER_ADMIN': 'Super Admin', 'ADMIN': 'Admin', 'PORT_SUPERVISOR': 'Port Supervisor',
+            'PORT_STAFF': 'Port Staff', 'CUSTOMS_OFFICER': 'Customs Officer',
+            'SHIPPING_COMPANY': 'Shipping Company', 'TRUCK_OPERATOR': 'Truck Operator',
+            'CUSTOMER': 'Customer', 'PUBLIC': 'Public',
+        },
+        'status': {
+            'ACTIVE': 'Active', 'INACTIVE': 'Inactive', 'SUSPENDED': 'Suspended', 'PENDING': 'Pending',
+        },
+    },
     'ships': {
         'vessel_type': {
             'CONTAINER_SHIP': 'Container Ship', 'BULK_CARRIER': 'Bulk Carrier', 'TANKER': 'Tanker',

@@ -1,0 +1,7 @@
+fiscal_year,total_cargo_mmt,container_teu,vessel_calls,container_vessels,bulk_carrier_vessels,tanker_vessels,general_cargo_vessels,avg_berth_occupancy_pct,avg_pre_berthing_delay_hrs,avg_turnaround_time_hrs,avg_output_per_ship_berth_day_t
+2018-19,32.45,650000,1420,520,480,310,110,72,8.5,42,6800
+2019-20,36.80,720000,1485,560,510,325,90,74,7.8,40,7100
+2020-21,30.15,580000,1180,440,420,250,70,68,11.2,48,6400
+2021-22,28.90,610000,1260,470,440,270,80,70,9.5,44,6600
+2022-23,33.20,680000,1395,530,490,295,80,73,8.0,41,6900
+2023-24,38.50,760000,1520,580,530,330,80,76,7.2,38,7300

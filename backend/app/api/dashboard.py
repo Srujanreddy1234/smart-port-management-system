@@ -534,33 +534,39 @@ def get_recent_activity():
 
     recent_ships = Ship.query.filter(Ship.ata.isnot(None)).order_by(desc(Ship.ata)).limit(5).all()
     for ship in recent_ships:
+        title = f'{ship.name} berthed at {ship.current_berth}'
         activities.append({
             'type': 'ship_arrival',
             'icon': 'fa-ship',
             'color': 'primary',
-            'title': f'{ship.name} berthed at {ship.current_berth}',
+            'action': title,
+            'title': title,
             'description': 'Container discharge in progress',
             'timestamp': ship.ata.isoformat() if ship.ata else ship.created_at.isoformat()
         })
 
     recent_containers = Container.query.filter(Container.gate_out_at.isnot(None)).order_by(desc(Container.gate_out_at)).limit(3).all()
     for container in recent_containers:
+        title = f'Truck loaded with {container.container_id}'
         activities.append({
             'type': 'container_departure',
             'icon': 'fa-truck',
             'color': 'info',
-            'title': f'Truck loaded with {container.container_id}',
+            'action': title,
+            'title': title,
             'description': f'Heading to {container.destination_port}',
             'timestamp': container.gate_out_at.isoformat() if container.gate_out_at else container.updated_at.isoformat()
         })
 
     recent_incidents = SecurityIncident.query.order_by(desc(SecurityIncident.detected_at)).limit(2).all()
     for incident in recent_incidents:
+        title = f'{incident.incident_type.value} — {incident.zone.value}'
         activities.append({
             'type': 'security_alert',
             'icon': 'fa-exclamation',
             'color': 'danger',
-            'title': f'{incident.incident_type.value} — {incident.zone.value}',
+            'action': title,
+            'title': title,
             'description': incident.description,
             'timestamp': incident.detected_at.isoformat()
         })

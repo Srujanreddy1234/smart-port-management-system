@@ -6,6 +6,7 @@ services:
     rootDir: smart-port-management-system/backend
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120
+    postdeploy: flask seed-data
     envVars:
       - key: FLASK_ENV
         value: production
@@ -21,3 +22,5 @@ services:
         value: "*"
       - key: FRONTEND_URL
         value: ""
+      - key: FLASK_APP
+        value: wsgi.py
