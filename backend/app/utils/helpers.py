@@ -136,7 +136,14 @@ def register_cli_commands(app):
             ('customer@smartport.gov.in', 'Ananya', 'Reddy', UserRole.CUSTOMER, 'Client', 'Account Manager', 'CUS002'),
             ('public@smartport.gov.in', 'Demo', 'User', UserRole.PUBLIC, 'Public', 'Visitor', 'PUB001'),
         ]
-        password = 'admin123'
+        import os
+        password = os.environ.get('SEED_ADMIN_PASSWORD')
+        if not password:
+            password = 'admin123'
+            print('WARNING: SEED_ADMIN_PASSWORD not set -- using the default demo')
+            print('         password "admin123" for all seeded accounts, including')
+            print('         Super Admin. Fine for local development; set a real')
+            print('         SEED_ADMIN_PASSWORD before seeding a production database.')
         for email, first, last, role, dept, desig, eid in users_data:
             u = User(
                 email=email, first_name=first, last_name=last,
@@ -199,6 +206,6 @@ def register_cli_commands(app):
 
         db.session.commit()
         print('All seed data created successfully.')
-        print('Demo credentials (password: admin123):')
+        print(f'Demo credentials (password: {"admin123" if password == "admin123" else "<value of SEED_ADMIN_PASSWORD>"}):')
         for email, first, last, role, dept, desig, eid in users_data:
             print(f'  {email} ({role.value})')

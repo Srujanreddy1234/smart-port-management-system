@@ -234,7 +234,15 @@ def reset_user_password(user_id):
     user.must_change_password = True
     db.session.commit()
 
-    return success_response({'new_password': new_password}, 'Password reset successfully')
+    # Never return a plaintext password in an API response (network logs,
+    # browser history, and any admin-tool logging would all capture it).
+    # Same stopgap as forgot-password: log it server-side until outbound
+    # email is actually wired up, rather than deliver it to the affected
+    # user's inbox directly.
+    from flask import current_app
+    current_app.logger.info(f"Password reset for user {user.email} (id={user.id}): {new_password}")
+
+    return success_response(None, 'Password reset successfully. The new password has been logged for retrieval by an administrator.')
 
 
 @users_bp.route('/stats', methods=['GET'])
