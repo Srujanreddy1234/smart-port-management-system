@@ -332,6 +332,17 @@
           </div>
         </div>
 
+        <!-- AQI Forecast (ML Prediction) -->
+        <div class="card chart-card" style="margin-bottom:24px;">
+          <div class="card-header">
+            <h5 class="card-title"><i class="fas fa-robot me-2" style="color: var(--primary);"></i>AQI Forecast — Machine Learning Prediction</h5>
+            <span class="badge bg-primary">ML Model</span>
+          </div>
+          <div class="card-body" id="aqiForecastBody">
+            <p class="text-center text-muted" style="padding:12px 0;">Loading forecast...</p>
+          </div>
+        </div>
+
         <!-- Weather Section -->
         <div class="card" style="margin-bottom: 24px;">
           <div class="card-header">
@@ -648,6 +659,36 @@
       });
     }
     loadAqiTrendChart();
+
+    async function loadAqiForecast() {
+      const body = document.getElementById('aqiForecastBody');
+      if (!body) return;
+      try {
+        const res = await Api.request('/environment/air-quality/forecast');
+        const f = res.data;
+        if (!f.available) {
+          body.innerHTML = `<p class="text-center text-muted" style="padding:12px 0;">${f.message}</p>`;
+          return;
+        }
+        const catColor = { Good: 'success', Moderate: 'warning', 'Unhealthy for Sensitive Groups': 'warning', Unhealthy: 'danger', 'Very Unhealthy': 'danger', Hazardous: 'danger' }[f.predicted_category] || 'secondary';
+        body.innerHTML = `
+          <div style="display:flex;align-items:center;gap:32px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:2.2rem;font-weight:700;" class="text-${catColor}">${f.predicted_aqi}</div>
+              <div class="badge bg-${catColor}" style="font-size:0.75rem;">${f.predicted_category}</div>
+            </div>
+            <div style="font-size:0.85rem;color:var(--text-muted);flex:1;min-width:220px;">
+              <p style="margin-bottom:4px;"><strong>Forecast for:</strong> ${Utils.formatDateTime(f.forecast_for)} (${f.forecast_horizon_hours}h ahead)</p>
+              <p style="margin-bottom:4px;"><strong>Based on reading at:</strong> ${Utils.formatDateTime(f.based_on_reading_at)}</p>
+              <p style="margin-bottom:0;"><strong>Model accuracy (2025 held-out test):</strong> MAE ${f.model_metrics.model.mae}, R² ${f.model_metrics.model.r2} — beats naive "same as today" baseline (MAE ${f.model_metrics.persistence_baseline.mae})</p>
+            </div>
+          </div>
+          <p style="font-size:0.72rem;color:var(--text-muted);margin-top:12px;margin-bottom:0;"><i class="fas fa-circle-info me-1"></i>This is a statistical forecast (RandomForestRegressor trained on 2023-2024 real hourly air quality data, evaluated on unseen 2025 data), not a live sensor reading.</p>`;
+      } catch (err) {
+        body.innerHTML = '<p class="text-center text-muted" style="padding:12px 0;">Unable to load forecast</p>';
+      }
+    }
+    loadAqiForecast();
 
     // Emissions by Source Doughnut Chart — real aggregation (empty until emissions data is collected)
     async function loadEmissionsSourceChart() {

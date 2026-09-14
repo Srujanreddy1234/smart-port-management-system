@@ -1,0 +1,65 @@
+{
+  "trained_at": "2026-09-14T05:31:36.876564Z",
+  "forecast_horizon_hours": 24,
+  "feature_columns": [
+    "aqi_lag_1h",
+    "aqi_lag_24h",
+    "aqi_lag_168h",
+    "aqi_rolling_mean_24h",
+    "pm25",
+    "pm10",
+    "no2",
+    "so2",
+    "co",
+    "o3",
+    "temperature",
+    "humidity",
+    "wind_speed",
+    "pressure",
+    "hour",
+    "day_of_week",
+    "month"
+  ],
+  "train_range": [
+    "2023-01-08 00:00:00",
+    "2024-12-31 23:00:00"
+  ],
+  "test_range": [
+    "2025-01-01 00:00:00",
+    "2025-12-30 23:00:00"
+  ],
+  "train_rows": 17376,
+  "test_rows": 8736,
+  "metrics": {
+    "model": {
+      "mae": 9.397,
+      "rmse": 14.255,
+      "r2": 0.681
+    },
+    "persistence_baseline": {
+      "mae": 11.832,
+      "rmse": 17.849,
+      "r2": 0.5
+    }
+  },
+  "beats_baseline": true,
+  "feature_importances": {
+    "aqi_lag_1h": 0.0298,
+    "aqi_lag_24h": 0.0154,
+    "aqi_lag_168h": 0.0226,
+    "aqi_rolling_mean_24h": 0.0165,
+    "pm25": 0.7827,
+    "pm10": 0.0112,
+    "no2": 0.0091,
+    "so2": 0.0111,
+    "co": 0.0235,
+    "o3": 0.0112,
+    "temperature": 0.0133,
+    "humidity": 0.0044,
+    "wind_speed": 0.0083,
+    "pressure": 0.0081,
+    "hour": 0.0049,
+    "day_of_week": 0.0113,
+    "month": 0.0167
+  }
+}

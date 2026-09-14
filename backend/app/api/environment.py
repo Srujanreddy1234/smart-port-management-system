@@ -16,6 +16,7 @@ from app.utils.helpers import success_response, paginate_query
 from sqlalchemy import func, or_, and_, desc, asc
 from datetime import datetime, timedelta
 from marshmallow import Schema, fields, validate, ValidationError
+from ml import predict_aqi
 
 
 environment_bp = Blueprint('environment', __name__, url_prefix='/api/v1/environment')
@@ -210,6 +211,31 @@ def list_air_quality_readings():
         'pages': pagination.pages,
         'has_next': pagination.has_next,
         'has_prev': pagination.has_prev
+    })
+
+
+@environment_bp.route('/air-quality/forecast', methods=['GET'])
+@jwt_required()
+def get_air_quality_forecast():
+    check_permission('environment.read')
+
+    metadata = predict_aqi.get_metadata()
+    if metadata is None:
+        return success_response({
+            'available': False,
+            'message': 'No trained forecast model is available yet.'
+        })
+
+    prediction = predict_aqi.predict_next(AirQualityReading, WeatherReading)
+    if prediction is None:
+        return success_response({
+            'available': False,
+            'message': 'Not enough recent air quality history to produce a forecast.'
+        })
+
+    return success_response({
+        'available': True,
+        **prediction
     })
 
 
