@@ -52,45 +52,16 @@ class Config:
     
     RATELIMIT_STORAGE_URL = 'memory://'
     
+    # Flask enforces this on every request regardless of whether a dedicated
+    # upload endpoint exists -- kept as a real defensive limit, unlike the
+    # other settings that were removed here for being read nowhere in the app
+    # (UPLOAD_FOLDER/ALLOWED_EXTENSIONS with no upload endpoint,
+    # PAGINATION_DEFAULT_PER_PAGE/MAX_PER_PAGE and API_PREFIX with every
+    # blueprint hardcoding its own values instead, LOG_LEVEL/LOG_FORMAT never
+    # wired to the logging setup, and DEFAULT_ROLES/DEFAULT_PERMISSIONS -- a
+    # stale 4-role vocabulary from before the 9-role port-domain model in
+    # app/models/user.py::UserRole existed).
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
-    
-    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'uploads')
-    ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'csv', 'xlsx', 'json'}
-    
-    PAGINATION_DEFAULT_PER_PAGE = 20
-    PAGINATION_MAX_PER_PAGE = 100
-    
-    API_VERSION = 'v1'
-    API_PREFIX = f'/api/{API_VERSION}'
-    
-    LOG_LEVEL = 'INFO'
-    LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    
-    DEFAULT_ROLES = {
-        'admin': 'Admin',
-        'operations_officer': 'Operations Officer',
-        'security_officer': 'Security Officer',
-        'environmental_officer': 'Environmental Officer',
-    }
-    
-    DEFAULT_PERMISSIONS = {
-        'admin': ['all'],
-        'operations_officer': [
-            'dashboard.read', 'ships.read', 'ships.write', 'ships.delete',
-            'containers.read', 'containers.write', 'containers.delete',
-            'trucks.read', 'trucks.write', 'trucks.delete',
-            'maintenance.read', 'maintenance.write', 'maintenance.delete',
-            'reports.read', 'reports.write'
-        ],
-        'security_officer': [
-            'dashboard.read', 'security.read', 'security.write', 'security.delete',
-            'reports.read'
-        ],
-        'environmental_officer': [
-            'dashboard.read', 'environment.read', 'environment.write', 'environment.delete',
-            'reports.read'
-        ],
-    }
 
 
 class DevelopmentConfig(Config):

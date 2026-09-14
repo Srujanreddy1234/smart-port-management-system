@@ -9,7 +9,7 @@ from app.extensions import db, limiter, oauth
 from app.models import User, Session, AuditLog, UserRole, UserStatus
 from app.services.auth_service import AuthService
 from app.utils.exceptions import ValidationError as AppValidationError, AuthenticationError, AuthorizationError
-from app.utils.helpers import success_response, error_response, paginate_query
+from app.utils.helpers import success_response, error_response
 import uuid
 from datetime import datetime, timedelta
 

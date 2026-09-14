@@ -9,7 +9,7 @@ from app.models import (
     Report, ReportStatus, Berth, Invoice, InvoiceStatus
 )
 from app.utils.exceptions import AuthorizationError
-from app.utils.helpers import success_response, paginate_query
+from app.utils.helpers import success_response
 from sqlalchemy import func, and_, or_, desc
 from datetime import datetime, timedelta
 

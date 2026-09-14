@@ -1,16 +1,5 @@
 const API_BASE_URL = '/api/v1';
 
-const MOCK_USERS = {
-  'admin@smartport.gov.in': { password: 'admin123', role: 'Super Admin', role_raw: 'SUPER_ADMIN', first_name: 'Super', last_name: 'Admin', email: 'admin@smartport.gov.in', department: 'IT', designation: 'Super Administrator', employee_id: 'ADMIN001', phone: '+1-555-0100', id: 1 },
-  'admin2@smartport.gov.in': { password: 'admin123', role: 'Admin', role_raw: 'ADMIN', first_name: 'Admin', last_name: 'User', email: 'admin2@smartport.gov.in', department: 'Operations', designation: 'Operations Manager', employee_id: 'OPS001', phone: '+1-555-0101', id: 2 },
-  'supervisor@smartport.gov.in': { password: 'admin123', role: 'Port Supervisor', role_raw: 'PORT_SUPERVISOR', first_name: 'Port', last_name: 'Supervisor', email: 'supervisor@smartport.gov.in', department: 'Operations', designation: 'Port Supervisor', employee_id: 'SUP001', phone: '+1-555-0102', id: 3 },
-  'staff@smartport.gov.in': { password: 'admin123', role: 'Port Staff', role_raw: 'PORT_STAFF', first_name: 'Port', last_name: 'Staff', email: 'staff@smartport.gov.in', department: 'Operations', designation: 'Operations Officer', employee_id: 'OPS002', phone: '+1-555-0103', id: 4 },
-  'customs@smartport.gov.in': { password: 'admin123', role: 'Customs Officer', role_raw: 'CUSTOMS_OFFICER', first_name: 'Customs', last_name: 'Officer', email: 'customs@smartport.gov.in', department: 'Customs', designation: 'Customs Officer', employee_id: 'CUS001', phone: '+1-555-0104', id: 5 },
-  'shipping@smartport.gov.in': { password: 'admin123', role: 'Shipping Company', role_raw: 'SHIPPING_COMPANY', first_name: 'Shipping', last_name: 'Agent', email: 'shipping@smartport.gov.in', department: 'Operations', designation: 'Shipping Agent', employee_id: 'SHA001', phone: '+1-555-0105', id: 6 },
-  'truck@smartport.gov.in': { password: 'admin123', role: 'Truck Operator', role_raw: 'TRUCK_OPERATOR', first_name: 'Truck', last_name: 'Driver', email: 'truck@smartport.gov.in', department: 'Logistics', designation: 'Truck Driver', employee_id: 'TRK001', phone: '+1-555-0106', id: 7 },
-  'customer@smartport.gov.in': { password: 'admin123', role: 'Customer', role_raw: 'CUSTOMER', first_name: 'Customer', last_name: 'User', email: 'customer@smartport.gov.in', department: 'Sales', designation: 'Account Manager', employee_id: 'CUS002', phone: '+1-555-0107', id: 8 },
-};
-
 const ROLE_PERMISSIONS = {
   'Super Admin': ['all'],
   'Admin': [

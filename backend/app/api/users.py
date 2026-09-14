@@ -4,7 +4,7 @@ from marshmallow import Schema, fields, validate, ValidationError
 from app.extensions import db
 from app.models import User, UserRole, UserStatus
 from app.utils.exceptions import ValidationError as AppValidationError, NotFoundError, AuthorizationError
-from app.utils.helpers import success_response, paginate_query
+from app.utils.helpers import success_response
 from sqlalchemy import func, or_, desc
 from datetime import datetime
 

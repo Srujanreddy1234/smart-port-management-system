@@ -21,42 +21,6 @@ def error_response(message, status_code=400, errors=None, details=None):
     return jsonify(response), status_code
 
 
-def paginate_query(query, page=1, per_page=20, max_per_page=100):
-    page = max(1, int(page))
-    per_page = min(max(1, int(per_page)), max_per_page)
-    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
-    return {
-        'items': pagination.items,
-        'total': pagination.total,
-        'page': pagination.page,
-        'per_page': pagination.per_page,
-        'pages': pagination.pages,
-        'has_next': pagination.has_next,
-        'has_prev': pagination.has_prev,
-    }
-
-
-def apply_filters(query, model, filters, search_fields=None):
-    for key, value in filters.items():
-        if value is None or value == '':
-            continue
-        if hasattr(model, key):
-            column = getattr(model, key)
-            if isinstance(value, str) and value.startswith('%') and value.endswith('%'):
-                query = query.filter(column.ilike(value))
-            elif isinstance(value, str):
-                query = query.filter(column.ilike(f'%{value}%'))
-            else:
-                query = query.filter(column == value)
-    return query
-
-
-def get_sort_params(default_sort='created_at', default_order='desc'):
-    sort_by = request.args.get('sort_by', default_sort)
-    sort_order = request.args.get('sort_order', default_order).lower()
-    return sort_by, sort_order
-
-
 def register_cli_commands(app):
     @app.cli.command('init-db')
     def init_db():

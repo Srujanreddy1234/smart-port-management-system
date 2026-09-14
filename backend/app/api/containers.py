@@ -6,7 +6,7 @@ from app.models import (
     Ship, Truck
 )
 from app.utils.exceptions import AuthorizationError, NotFoundError, ValidationError as AppValidationError
-from app.utils.helpers import success_response, paginate_query
+from app.utils.helpers import success_response
 from sqlalchemy import func, or_, and_, desc, text
 from datetime import datetime, timedelta
 from marshmallow import Schema, fields, validate, ValidationError

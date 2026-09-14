@@ -7,7 +7,7 @@ from app.models.billing import Invoice, InvoiceStatus, BillingLine, BillingCateg
 from app.models.event_log import EventType, EventSeverity
 from app.api.sse import publish_event
 from app.utils.exceptions import NotFoundError, AuthorizationError, ValidationError as AppValidationError
-from app.utils.helpers import success_response, paginate_query
+from app.utils.helpers import success_response
 from sqlalchemy import func, or_, desc
 from datetime import datetime
 import uuid

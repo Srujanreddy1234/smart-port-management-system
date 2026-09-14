@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.extensions import db
 from app.models import User, Truck, TruckStatus, TruckType, Container
 from app.utils.exceptions import AuthorizationError, NotFoundError, ValidationError as AppValidationError
-from app.utils.helpers import success_response, paginate_query
+from app.utils.helpers import success_response
 from sqlalchemy import func, or_, and_, desc, asc
 from datetime import datetime, timedelta
 from marshmallow import Schema, fields, validate, ValidationError
