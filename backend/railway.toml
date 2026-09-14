@@ -3,12 +3,20 @@ builder = "NIXPACKS"
 buildCommand = "pip install -r requirements.txt"
 
 [deploy]
+# Runs once before each new deployment starts serving traffic: applies
+# Alembic migrations, seeds baseline roles/users/operational fixtures
+# (idempotent -- no-ops if data already exists), imports the real
+# historical weather/air-quality/marine/port-traffic datasets (idempotent --
+# clears and re-imports), and retrains the AQI forecast model against
+# whatever data is now in the database.
+preDeployCommand = "flask db upgrade && flask seed-data && python ../datasets/scripts/import_to_database.py && python ml/train_aqi_forecast.py"
 startCommand = "gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120"
 healthcheckPath = "/health"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 10
+restartPolicyMaxRetries = 3
 
 [env]
 FLASK_ENV = "production"
+FLASK_APP = "wsgi.py"
 PYTHONUNBUFFERED = "1"
