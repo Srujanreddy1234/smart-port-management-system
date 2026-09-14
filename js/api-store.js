@@ -34,11 +34,31 @@ const ApiStore = {
     return Date.now() - ts < this._cacheTTL;
   },
 
+  _hydrateFromSession(key) {
+    if (this._cache[key] !== undefined) return;
+    try {
+      const raw = sessionStorage.getItem('spm_cache_' + key);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed.ts === 'number') {
+        this._cache[key] = parsed.data;
+        this._cacheTimestamps[key] = parsed.ts;
+      }
+    } catch { /* sessionStorage unavailable or corrupt entry -- ignore, will re-fetch */ }
+  },
+
+  _persistToSession(key) {
+    try {
+      sessionStorage.setItem('spm_cache_' + key, JSON.stringify({ data: this._cache[key], ts: this._cacheTimestamps[key] }));
+    } catch { /* storage full or unavailable -- in-memory cache still works for this page load */ }
+  },
+
   async get(key) {
     if (key === 'user') {
       const user = Api.getUser();
       if (user) return user;
     }
+    this._hydrateFromSession(key);
     if (this._isCacheValid(key) && this._cache[key]) {
       return this._cache[key];
     }
@@ -60,6 +80,7 @@ const ApiStore = {
       const items = res.data?.items || res.data || [];
       this._cache[key] = items;
       this._cacheTimestamps[key] = Date.now();
+      this._persistToSession(key);
       return items;
     } catch {
       return this._cache[key] || [];
@@ -69,6 +90,7 @@ const ApiStore = {
   set(key, value) {
     this._cache[key] = value;
     this._cacheTimestamps[key] = Date.now();
+    this._persistToSession(key);
   },
 
   async add(key, item) {
@@ -86,7 +108,7 @@ const ApiStore = {
       item.id = item.id || Date.now();
       item.created_at = item.created_at || new Date().toISOString();
       arr.push(item);
-      this._cache[key] = arr;
+      this.set(key, arr);
       return item;
     }
     try {
@@ -97,15 +119,10 @@ const ApiStore = {
       const created = res.data;
       const arr = this._cache[key] || [];
       arr.push(created);
-      this._cache[key] = arr;
+      this.set(key, arr);
       return created;
-    } catch {
-      const arr = this._cache[key] || [];
-      item.id = item.id || Date.now();
-      item.created_at = item.created_at || new Date().toISOString();
-      arr.push(item);
-      this._cache[key] = arr;
-      return item;
+    } catch (err) {
+      throw err;
     }
   },
 
@@ -124,30 +141,21 @@ const ApiStore = {
       const idx = arr.findIndex(item => item.id == id);
       if (idx === -1) return null;
       arr[idx] = { ...arr[idx], ...updates, updated_at: new Date().toISOString() };
-      this._cache[key] = arr;
+      this.set(key, arr);
       return arr[idx];
     }
-    try {
-      const res = await this._apiRequest(endpoint, {
-        method: 'PUT',
-        body: JSON.stringify(updates)
-      });
-      const updated = res.data;
-      const arr = this._cache[key] || [];
-      const idx = arr.findIndex(item => item.id == id);
-      if (idx !== -1) {
-        arr[idx] = updated;
-        this._cache[key] = arr;
-      }
-      return updated;
-    } catch {
-      const arr = this._cache[key] || [];
-      const idx = arr.findIndex(item => item.id == id);
-      if (idx === -1) return null;
-      arr[idx] = { ...arr[idx], ...updates, updated_at: new Date().toISOString() };
-      this._cache[key] = arr;
-      return arr[idx];
+    const res = await this._apiRequest(endpoint, {
+      method: 'PUT',
+      body: JSON.stringify(updates)
+    });
+    const updated = res.data;
+    const arr = this._cache[key] || [];
+    const idx = arr.findIndex(item => item.id == id);
+    if (idx !== -1) {
+      arr[idx] = updated;
+      this.set(key, arr);
     }
+    return updated;
   },
 
   async remove(key, id) {
@@ -161,13 +169,11 @@ const ApiStore = {
     };
     const endpoint = endpoints[key];
     if (endpoint) {
-      try {
-        await this._apiRequest(endpoint, { method: 'DELETE' });
-      } catch { /* ignore */ }
+      await this._apiRequest(endpoint, { method: 'DELETE' });
     }
     const arr = this._cache[key] || [];
     const filtered = arr.filter(item => item.id != id);
-    this._cache[key] = filtered;
+    this.set(key, filtered);
     return filtered;
   },
 

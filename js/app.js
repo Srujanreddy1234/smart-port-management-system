@@ -353,72 +353,125 @@ const App = {
       body: `<form id="addTruckForm" class="modal-form">
         <div class="form-group"><label>Truck Number *</label><input type="text" id="atTruckNumber" class="form-control" placeholder="TN-2001" required></div>
         <div class="form-row"><div class="form-group"><label>Driver Name</label><input type="text" id="atDriver" class="form-control" placeholder="Driver name"></div><div class="form-group"><label>Phone</label><input type="tel" id="atPhone" class="form-control" placeholder="+1-555-0300"></div></div>
-        <div class="form-row"><div class="form-group"><label>Type</label><select id="atType" class="form-select"><option>Heavy</option><option>Medium</option><option>Light</option></select></div><div class="form-group"><label>Status</label><select id="atStatus" class="form-select"><option>Available</option><option>At Gate</option><option>Loading</option><option>In Transit</option></select></div></div>
+        <div class="form-row"><div class="form-group"><label>Type</label><select id="atType" class="form-select"><option value="Prime Mover">Prime Mover</option><option value="Trailer">Trailer</option><option value="Chassis">Chassis</option><option value="Reach Stacker">Reach Stacker</option><option value="Forklift">Forklift</option><option value="Empty Handler">Empty Handler</option><option value="Other">Other</option></select></div><div class="form-group"><label>Status</label><select id="atStatus" class="form-select"><option value="Available">Available</option><option value="At Gate">At Gate</option><option value="Loading">Loading</option><option value="Unloading">Unloading</option><option value="In Transit">In Transit</option><option value="Waiting">Waiting</option><option value="Maintenance">Maintenance</option></select></div></div>
       </form>`,
       footer: `<button class="btn btn-secondary" onclick="document.getElementById('addTruckModal').remove()">Cancel</button><button class="btn btn-primary" onclick="App.submitAddTruck()">Add Truck</button>`
     });
   },
 
-  submitAddTruck() {
+  async submitAddTruck() {
     const truckNumber = document.getElementById('atTruckNumber')?.value.trim();
     if (!truckNumber) { App.showToast('Truck number is required', 'danger'); return; }
-    Store.add('trucks', {
-      truck_number: truckNumber, driver_name: document.getElementById('atDriver')?.value || '',
-      driver_phone: document.getElementById('atPhone')?.value || '', type: document.getElementById('atType')?.value || 'Heavy',
-      status: document.getElementById('atStatus')?.value || 'Available', current_location: 'Yard',
-      assigned_container_id: null, gate_in_time: null, gate_out_time: null, created_at: new Date().toISOString()
-    });
-    document.getElementById('addTruckModal').remove();
-    App.showToast(`Truck ${truckNumber} added`, 'success');
+    const driverPhone = document.getElementById('atPhone')?.value.trim();
+    const payload = {
+      truck_number: truckNumber,
+      truck_type: document.getElementById('atType')?.value || 'Other',
+      status: document.getElementById('atStatus')?.value || 'Available',
+      current_location: 'Yard',
+    };
+    const driverName = document.getElementById('atDriver')?.value.trim();
+    if (driverName) payload.driver_name = driverName;
+    if (driverPhone) payload.driver_phone = driverPhone;
+
+    try {
+      await Api.request('/trucks', { method: 'POST', body: JSON.stringify(payload) });
+      document.getElementById('addTruckModal').remove();
+      App.showToast(`Truck ${truckNumber} added`, 'success');
+      if (typeof loadTrucks === 'function') loadTrucks();
+      if (typeof loadTruckKpis === 'function') loadTruckKpis();
+    } catch (err) {
+      App.showToast(err.message || 'Failed to add truck', 'danger');
+    }
   },
 
-  showAddAlertModal() {
+  showReportIncidentModal() {
     App.createModal({
-      id: 'addAlertModal', title: 'New Security Alert', width: '500px',
+      id: 'addAlertModal', title: 'Report Security Incident', width: '500px',
       body: `<form id="addAlertForm" class="modal-form">
-        <div class="form-group"><label>Title *</label><input type="text" id="aaTitle" class="form-control" placeholder="Alert title" required></div>
-        <div class="form-group"><label>Description</label><textarea id="aaDesc" class="form-control" rows="3" placeholder="Alert details"></textarea></div>
-        <div class="form-row"><div class="form-group"><label>Type</label><select id="aaType" class="form-select"><option>Security</option><option>Environmental</option><option>Maintenance</option><option>Operational</option></select></div><div class="form-group"><label>Severity</label><select id="aaSeverity" class="form-select"><option>Critical</option><option>Warning</option><option>Info</option></select></div></div>
+        <div class="form-group"><label>Title *</label><input type="text" id="aaTitle" class="form-control" placeholder="Incident title" required></div>
+        <div class="form-group"><label>Description</label><textarea id="aaDesc" class="form-control" rows="3" placeholder="Incident details"></textarea></div>
+        <div class="form-row"><div class="form-group"><label>Type</label><select id="aaType" class="form-select"><option value="Intrusion">Intrusion</option><option value="Perimeter Breach">Perimeter Breach</option><option value="Access Denied">Access Denied</option><option value="Suspicious Activity">Suspicious Activity</option><option value="Violation">Violation</option><option value="Theft">Theft</option><option value="Vandalism">Vandalism</option><option value="Fire">Fire</option><option value="Hazmat Incident">Hazmat Incident</option><option value="Other">Other</option></select></div><div class="form-group"><label>Severity</label><select id="aaSeverity" class="form-select"><option value="Medium">Medium</option><option value="Low">Low</option><option value="High">High</option><option value="Critical">Critical</option></select></div></div>
+        <div class="form-group"><label>Zone *</label><select id="aaZone" class="form-select"><option value="Zone A - Berth 1-3">Zone A - Berth 1-3</option><option value="Zone B - Berth 4-6">Zone B - Berth 4-6</option><option value="Zone C - Gate 1-2">Zone C - Gate 1-2</option><option value="Zone D - Warehouse Row">Zone D - Warehouse Row</option><option value="Zone E - Tank Farm">Zone E - Tank Farm</option><option value="Zone F - Admin Area">Zone F - Admin Area</option><option value="Zone G - Cold Storage">Zone G - Cold Storage</option><option value="Zone H - Container Yard">Zone H - Container Yard</option></select></div>
       </form>`,
-      footer: `<button class="btn btn-secondary" onclick="document.getElementById('addAlertModal').remove()">Cancel</button><button class="btn btn-primary" onclick="App.submitAddAlert()">Create Alert</button>`
+      footer: `<button class="btn btn-secondary" onclick="document.getElementById('addAlertModal').remove()">Cancel</button><button class="btn btn-primary" onclick="App.submitReportIncident()">Report Incident</button>`
     });
   },
 
-  submitAddAlert() {
+  async submitReportIncident() {
     const title = document.getElementById('aaTitle')?.value.trim();
     if (!title) { App.showToast('Title is required', 'danger'); return; }
-    Store.add('alerts', {
-      title, description: document.getElementById('aaDesc')?.value || '', type: document.getElementById('aaType')?.value || 'Security',
-      severity: document.getElementById('aaSeverity')?.value || 'Info', status: 'Active', detected_at: new Date().toISOString(),
-      resolved_at: null, detected_by: 'Manual Entry', zone: 'General', acknowledged: false
-    });
-    document.getElementById('addAlertModal').remove();
-    App.showToast(`Alert "${title}" created`, 'success');
+    const description = document.getElementById('aaDesc')?.value.trim();
+    const payload = {
+      incident_id: `INC-${Date.now()}`,
+      title,
+      incident_type: document.getElementById('aaType')?.value || 'Other',
+      severity: document.getElementById('aaSeverity')?.value || 'Medium',
+      zone: document.getElementById('aaZone')?.value || 'Zone A - Berth 1-3',
+      status: 'Active',
+    };
+    if (description) payload.description = description;
+
+    try {
+      await Api.request('/security', { method: 'POST', body: JSON.stringify(payload) });
+      document.getElementById('addAlertModal').remove();
+      App.showToast(`Incident "${title}" reported`, 'success');
+      if (typeof loadIncidents === 'function') loadIncidents();
+    } catch (err) {
+      App.showToast(err.message || 'Failed to report incident', 'danger');
+    }
   },
 
-  showAddScheduleModal() {
+  async showAddScheduleModal() {
     App.createModal({
       id: 'addScheduleModal', title: 'New Maintenance Schedule', width: '500px',
       body: `<form id="addScheduleForm" class="modal-form">
-        <div class="form-group"><label>Equipment *</label><input type="text" id="asEquipment" class="form-control" placeholder="Equipment name" required></div>
-        <div class="form-row"><div class="form-group"><label>Type</label><select id="asType" class="form-select"><option>Preventive</option><option>Corrective</option><option>Inspection</option></select></div><div class="form-group"><label>Priority</label><select id="asPriority" class="form-select"><option>High</option><option>Medium</option><option>Low</option></select></div></div>
-        <div class="form-group"><label>Scheduled Date</label><input type="datetime-local" id="asDate" class="form-control"></div>
+        <div class="form-group"><label>Title *</label><input type="text" id="asTitle" class="form-control" placeholder="e.g. Quarterly crane inspection" required></div>
+        <div class="form-group"><label>Equipment *</label><select id="asEquipment" class="form-select" required><option value="">Loading equipment...</option></select></div>
+        <div class="form-row"><div class="form-group"><label>Type</label><select id="asType" class="form-select"><option value="Preventive">Preventive</option><option value="Corrective">Corrective</option><option value="Predictive">Predictive</option><option value="Emergency">Emergency</option><option value="Overhaul">Overhaul</option><option value="Inspection">Inspection</option><option value="Calibration">Calibration</option></select></div><div class="form-group"><label>Priority</label><select id="asPriority" class="form-select"><option value="Medium">Medium</option><option value="Low">Low</option><option value="High">High</option><option value="Critical">Critical</option></select></div></div>
+        <div class="form-group"><label>Scheduled Date *</label><input type="datetime-local" id="asDate" class="form-control" required></div>
       </form>`,
       footer: `<button class="btn btn-secondary" onclick="document.getElementById('addScheduleModal').remove()">Cancel</button><button class="btn btn-primary" onclick="App.submitAddSchedule()">Create Schedule</button>`
     });
+    try {
+      const res = await Api.request('/maintenance?page=1&per_page=100');
+      const equipment = res.data.items || [];
+      const select = document.getElementById('asEquipment');
+      if (select) {
+        select.innerHTML = equipment.length
+          ? equipment.map(e => `<option value="${e.id}">${e.name || e.equipment_id}</option>`).join('')
+          : '<option value="">No equipment found</option>';
+      }
+    } catch (err) {
+      const select = document.getElementById('asEquipment');
+      if (select) select.innerHTML = '<option value="">Failed to load equipment</option>';
+    }
   },
 
-  submitAddSchedule() {
-    const equipment = document.getElementById('asEquipment')?.value.trim();
-    if (!equipment) { App.showToast('Equipment name is required', 'danger'); return; }
-    Store.add('maintenance_schedules', {
-      equipment, type: document.getElementById('asType')?.value || 'Preventive',
-      priority: document.getElementById('asPriority')?.value || 'Medium',
-      scheduled_date: document.getElementById('asDate')?.value || null,
-      status: 'Scheduled', created_at: new Date().toISOString()
-    });
-    document.getElementById('addScheduleModal').remove();
-    App.showToast(`Schedule for "${equipment}" created`, 'success');
+  async submitAddSchedule() {
+    const title = document.getElementById('asTitle')?.value.trim();
+    const equipmentId = document.getElementById('asEquipment')?.value;
+    const scheduledDate = document.getElementById('asDate')?.value;
+    if (!title) { App.showToast('Title is required', 'danger'); return; }
+    if (!equipmentId) { App.showToast('Equipment is required', 'danger'); return; }
+    if (!scheduledDate) { App.showToast('Scheduled date is required', 'danger'); return; }
+    try {
+      await Api.request('/maintenance/schedules', {
+        method: 'POST',
+        body: JSON.stringify({
+          title,
+          equipment_id: parseInt(equipmentId, 10),
+          maintenance_type: document.getElementById('asType')?.value || 'Preventive',
+          priority: document.getElementById('asPriority')?.value || 'Medium',
+          scheduled_date: new Date(scheduledDate).toISOString(),
+          status: 'Scheduled',
+        })
+      });
+      document.getElementById('addScheduleModal').remove();
+      App.showToast(`Schedule "${title}" created`, 'success');
+      if (typeof loadSchedule === 'function') loadSchedule();
+    } catch (err) {
+      App.showToast(err.message || 'Failed to create schedule', 'danger');
+    }
   },
 };
 

@@ -211,8 +211,16 @@
 }
 
 .table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--text-primary);
+  --bs-table-striped-bg: rgba(255,255,255,0.02);
+  --bs-table-striped-color: var(--text-primary);
+  --bs-table-hover-bg: rgba(255,255,255,0.04);
+  --bs-table-hover-color: var(--text-primary);
   width: 100%;
   border-collapse: collapse;
+  color: var(--text-primary);
+  background-color: transparent;
 }
 
 .table th {
@@ -221,8 +229,8 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--text-muted);
-  background: rgba(0,0,0,0.15);
+  color: var(--text-muted) !important;
+  background: rgba(0,0,0,0.15) !important;
   border-bottom: 1px solid var(--border-color);
   text-align: left;
   white-space: nowrap;
@@ -231,17 +239,20 @@
 .table td {
   padding: 12px 16px;
   font-size: 0.85rem;
-  color: var(--text-primary);
+  color: var(--text-primary) !important;
+  background-color: transparent !important;
   border-bottom: 1px solid var(--border-color);
   vertical-align: middle;
 }
 
 .table tbody tr {
   transition: var(--transition-fast);
+  color: var(--text-primary);
+  background-color: transparent;
 }
 
-.table tbody tr:hover {
-  background: rgba(255,255,255,0.02);
+.table tbody tr:hover td {
+  background: rgba(255,255,255,0.04) !important;
 }
 
 .table tbody tr:last-child td {

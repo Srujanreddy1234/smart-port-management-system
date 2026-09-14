@@ -127,6 +127,7 @@
           <div class="filter-group">
             <label class="filter-label">Sort:</label>
             <select class="filter-select" id="sortFilter">
+              <option value="newest">Newest First</option>
               <option value="id">Container ID</option>
               <option value="status">Status</option>
               <option value="type">Type</option>
@@ -278,7 +279,7 @@
     let containersData = [];
     let filteredData = [];
     let currentPage = 1;
-    const perPage = 10;
+    const perPage = 25;
 
     document.addEventListener('DOMContentLoaded', async () => {
       await Store.init();
@@ -361,15 +362,16 @@
       const type = document.getElementById('typeFilter').value;
       const sortVal = document.getElementById('sortFilter').value;
       filteredData = containersData.filter(c => {
-        const matchSearch = !search || [c.container_id, c.contents, c.current_location, c.owner].some(v => String(v || '').toLowerCase().includes(search));
-        const matchStatus = !status || c.status.toLowerCase() === status.toLowerCase();
-        const matchType = !type || c.type.toLowerCase().includes(type.toLowerCase());
+        const matchSearch = !search || [c.container_id, c.current_location, c.owner].some(v => String(v || '').toLowerCase().includes(search));
+        const matchStatus = !status || String(c.status || '').toLowerCase() === status.toLowerCase();
+        const matchType = !type || String(c.container_type || '').toLowerCase().includes(type.toLowerCase());
         return matchSearch && matchStatus && matchType;
       });
       if (sortVal === 'status') filteredData.sort((a, b) => String(a.status).localeCompare(String(b.status)));
-      else if (sortVal === 'type') filteredData.sort((a, b) => String(a.type).localeCompare(String(b.type)));
-      else if (sortVal === 'weight') filteredData.sort((a, b) => (a.gross_weight || 0) - (b.gross_weight || 0));
-      else filteredData.sort((a, b) => String(a.container_id).localeCompare(String(b.container_id)));
+      else if (sortVal === 'type') filteredData.sort((a, b) => String(a.container_type).localeCompare(String(b.container_type)));
+      else if (sortVal === 'weight') filteredData.sort((a, b) => (b.weight || 0) - (a.weight || 0));
+      else if (sortVal === 'id') filteredData.sort((a, b) => String(a.container_id).localeCompare(String(b.container_id)));
+      else filteredData.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
       currentPage = 1;
       renderPage();
     }

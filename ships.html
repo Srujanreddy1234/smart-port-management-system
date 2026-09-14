@@ -385,14 +385,36 @@
       });
     }
 
-    function submitRegisterShip() {
+    async function submitRegisterShip() {
       const shipId = document.getElementById('rsShipId')?.value.trim();
       const name = document.getElementById('rsName')?.value.trim();
       if (!shipId || !name) { App.showToast('Ship ID and Name are required', 'danger'); return; }
-      Store.add('ships', { ship_id: shipId, name, vessel_type: document.getElementById('rsType')?.value || 'Container Ship', flag: document.getElementById('rsFlag')?.value || 'Panama', length_overall: parseFloat(document.getElementById('rsLength')?.value) || 0, beam: parseFloat(document.getElementById('rsBeam')?.value) || 0, draft: parseFloat(document.getElementById('rsDraft')?.value) || 0, status: 'Scheduled', current_berth: null, agent: document.getElementById('rsAgent')?.value || '', eta: document.getElementById('rsEta')?.value || null, agent_contact: null, agent_email: null, imo_number: '', call_sign: '', gross_tonnage: 0, deadweight_tonnage: 0, max_containers: 0, containers_onboard: 0, containers_to_discharge: 0, containers_to_load: 0 });
-      document.getElementById('registerShipModal').remove();
-      loadShips(); loadKpis();
-      App.showToast(`Ship ${name} registered successfully`, 'success');
+      const payload = {
+        ship_id: shipId, name,
+        vessel_type: document.getElementById('rsType')?.value || 'Container Ship',
+        flag: document.getElementById('rsFlag')?.value || 'Panama',
+        status: 'Scheduled',
+      };
+      const length_overall = parseFloat(document.getElementById('rsLength')?.value);
+      const beam = parseFloat(document.getElementById('rsBeam')?.value);
+      const draft = parseFloat(document.getElementById('rsDraft')?.value);
+      const agent = document.getElementById('rsAgent')?.value.trim();
+      const eta = document.getElementById('rsEta')?.value;
+      if (!isNaN(length_overall)) payload.length_overall = length_overall;
+      if (!isNaN(beam)) payload.beam = beam;
+      if (!isNaN(draft)) payload.draft = draft;
+      if (agent) payload.agent = agent;
+      if (eta) payload.eta = eta;
+
+      try {
+        await Api.request('/ships', { method: 'POST', body: JSON.stringify(payload) });
+        document.getElementById('registerShipModal').remove();
+        await loadShips();
+        loadKpis();
+        App.showToast(`Ship ${name} registered successfully`, 'success');
+      } catch (err) {
+        App.showToast(err.message || 'Failed to register ship', 'danger');
+      }
     }
 
     function exportShips() { App.exportCSV(Store.get('ships'), 'ships-export.csv'); App.showToast('Ships exported', 'success'); }
