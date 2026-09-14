@@ -46,17 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  document.querySelectorAll('.demo-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const email = btn.dataset.email;
-      const pass = btn.dataset.password;
-      const emailInput = document.getElementById('email');
-      const passInput = document.getElementById('password');
-      if (emailInput) emailInput.value = email;
-      if (passInput) passInput.value = pass;
-    });
-  });
-
   const googleBtn = document.getElementById('googleSignInBtn');
   if (googleBtn) {
     fetch(`${API_BASE_URL}/auth/google/status`)
