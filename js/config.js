@@ -346,7 +346,17 @@ const Api = {
 };
 
 const NO_AUTH_PAGES = ['login.html', 'oauth-callback.html', 'signup.html'];
-const currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
-if (!NO_AUTH_PAGES.some(p => currentPage.endsWith(p))) {
-  Api.requireAuth();
-}
+(function () {
+  // Scoped to this IIFE rather than a bare top-level const: several pages
+  // (ships/containers/trucks/security/maintenance) declare their own
+  // page-local `currentPage` for pagination state in a separate <script>
+  // tag. Classic <script> tags share one global lexical scope, so a
+  // top-level `const currentPage` here previously collided with those and
+  // threw "Identifier 'currentPage' has already been declared" -- a
+  // SyntaxError that silently killed each of those pages' entire inline
+  // script (no listeners wired, no data ever rendered).
+  const currentPageFile = window.location.pathname.split('/').pop() || 'dashboard.html';
+  if (!NO_AUTH_PAGES.some(p => currentPageFile.endsWith(p))) {
+    Api.requireAuth();
+  }
+})();

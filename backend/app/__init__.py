@@ -77,6 +77,7 @@ def create_app(config_name=None):
 
     @app.route('/', defaults={'path': 'dashboard.html'})
     @app.route('/<path:path>')
+    @limiter.exempt
     def serve_frontend(path):
         if path.startswith('api/') or path.startswith('health'):
             return jsonify({'error': 'Not Found'}), 404

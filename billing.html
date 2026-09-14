@@ -64,7 +64,7 @@
       <div class="content-area">
         <div class="page-header">
           <div class="header-actions">
-            <button class="btn btn-primary" onclick="App.createModal({id:'createInvoiceModal',title:'Create Invoice',width:'700px',body:InvoiceForm.getFormHtml(), footer:'<button type=\"button\" class=\"btn btn-secondary\" onclick=\"this.closest(\'.modal-overlay\').remove()\">Cancel</button><button type=\"button\" class=\"btn btn-primary\" onclick=\"Billing.submitInvoice()\">Create Invoice</button>'})">
+            <button class="btn btn-primary" onclick="showCreateInvoiceModal()">
               <i class="fas fa-plus"></i> Create Invoice
             </button>
             <button class="btn btn-secondary" onclick="Billing.exportInvoices()">
@@ -152,6 +152,14 @@
   <script src="js/store.js"></script>
   <script src="js/app.js"></script>
   <script>
+  function showCreateInvoiceModal() {
+    App.createModal({
+      id: 'createInvoiceModal', title: 'Create Invoice', width: '700px',
+      body: InvoiceForm.getFormHtml(),
+      footer: `<button type="button" class="btn btn-secondary" onclick="document.getElementById('createInvoiceModal').remove()">Cancel</button><button type="button" class="btn btn-primary" onclick="Billing.submitInvoice()">Create Invoice</button>`
+    });
+  }
+
   const InvoiceForm = {
     getFormHtml(data = {}) {
       const ships = window.Billing.shipsCache || [];

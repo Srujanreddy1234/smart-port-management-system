@@ -288,16 +288,17 @@
     });
 
     function renderRow(c) {
-      const shipName = c.ship_id ? (c.current_location || 'Assigned') : '—';
       return `
         <tr>
           <td><span class="container-id">${c.container_id}</span></td>
-          <td><span class="type-badge ${c.type_category || 'type-other'}">${c.type}</span></td>
+          <td><span class="type-badge">${c.container_type || '—'}</span></td>
           <td><span class="status-badge">${c.status}</span></td>
-          <td>${c.vessel_id ? 'Ship #' + c.vessel_id : '—'}</td>
-          <td>${c.gross_weight ? c.gross_weight.toLocaleString() + ' kg' : '—'}</td>
-          <td>${c.contents || '—'}</td>
-          <td>${c.customs_status || '—'}</td>
+          <td>${c.ship_id ? 'Ship #' + c.ship_id : '—'}</td>
+          <td>${c.weight ? c.weight.toLocaleString() + ' kg' : '—'}</td>
+          <td>${c.origin_port || '—'}</td>
+          <td>${c.destination_port || '—'}</td>
+          <td>${c.owner || '—'}</td>
+          <td>${c.current_location || '—'}</td>
           <td>
             <div class="action-btns">
               <button class="btn btn-icon btn-view" title="View Details" onclick="App.showToast('Viewing ${c.container_id}','info')"><i class="fas fa-eye"></i></button>
@@ -422,30 +423,33 @@
         id: 'addContainerModal', title: 'Add New Container', width: '600px',
         body: `<form id="addContainerForm" class="modal-form">
           <div class="form-row"><div class="form-group"><label>Container ID *</label><input type="text" id="acContainerId" class="form-control" placeholder="e.g. CONT-100" required></div><div class="form-group"><label>ISO Code</label><select id="acIsoCode" class="form-select"><option>22G1</option><option>42G1</option><option>45G1</option><option>22R1</option><option>42R1</option></select></div></div>
-          <div class="form-row"><div class="form-group"><label>Type</label><select id="acType" class="form-select"><option>20ft Dry</option><option>40ft Dry</option><option>40ft High Cube</option><option>20ft Reefer</option><option>40ft Reefer</option></select></div><div class="form-group"><label>Category</label><select id="acCategory" class="form-select"><option>Dry</option><option>Reefer</option><option>Hazmat</option></select></div></div>
-          <div class="form-row"><div class="form-group"><label>Gross Weight (kg)</label><input type="number" id="acWeight" class="form-control" placeholder="20000"></div><div class="form-group"><label>Contents</label><input type="text" id="acContents" class="form-control" placeholder="Description"></div></div>
-          <div class="form-group"><label>Owner</label><input type="text" id="acOwner" class="form-control" placeholder="Owner company"></div>
+          <div class="form-group"><label>Type</label><select id="acType" class="form-select"><option value="20ft">20ft</option><option value="40ft">40ft</option><option value="40ft HC">40ft HC</option><option value="Reefer">Reefer</option><option value="Hazmat">Hazmat</option><option value="Tank">Tank</option><option value="Open Top">Open Top</option><option value="Flat Rack">Flat Rack</option></select></div>
+          <div class="form-row"><div class="form-group"><label>Weight (kg)</label><input type="number" id="acWeight" class="form-control" placeholder="20000"></div><div class="form-group"><label>Owner</label><input type="text" id="acOwner" class="form-control" placeholder="Owner company"></div></div>
         </form>`,
         footer: `<button class="btn btn-secondary" onclick="document.getElementById('addContainerModal').remove()">Cancel</button><button class="btn btn-primary" onclick="submitAddContainer()">Add Container</button>`
       });
     }
 
-    function submitAddContainer() {
+    async function submitAddContainer() {
       const containerId = document.getElementById('acContainerId')?.value.trim();
       if (!containerId) { App.showToast('Container ID is required', 'danger'); return; }
-      Store.add('containers', {
-        container_id: containerId, iso_code: document.getElementById('acIsoCode')?.value || '22G1',
-        type: document.getElementById('acType')?.value || '20ft Dry', type_category: document.getElementById('acCategory')?.value || 'Dry',
-        status: 'At Port', size: document.getElementById('acType')?.value.split(' ')[0] || '20ft',
-        gross_weight: parseInt(document.getElementById('acWeight')?.value) || 0, tare_weight: 2200,
-        net_weight: (parseInt(document.getElementById('acWeight')?.value) || 0) - 2200,
-        contents: document.getElementById('acContents')?.value || '', owner: document.getElementById('acOwner')?.value || '',
-        vessel_id: null, truck_id: null, berth_id: null, customs_status: 'Pending', seal_number: 'SEAL' + Date.now(),
-        created_at: new Date().toISOString()
-      });
-      document.getElementById('addContainerModal').remove();
-      loadContainers(); loadKpis();
-      App.showToast(`Container ${containerId} added successfully`, 'success');
+      try {
+        await Api.request('/containers', {
+          method: 'POST',
+          body: JSON.stringify({
+            container_id: containerId,
+            iso_code: document.getElementById('acIsoCode')?.value || '22G1',
+            container_type: document.getElementById('acType')?.value || '20ft',
+            weight: parseInt(document.getElementById('acWeight')?.value) || undefined,
+            owner: document.getElementById('acOwner')?.value || undefined,
+          })
+        });
+        document.getElementById('addContainerModal').remove();
+        loadContainers(); loadKpis();
+        App.showToast(`Container ${containerId} added successfully`, 'success');
+      } catch (err) {
+        App.showToast(err.message || 'Failed to add container', 'danger');
+      }
     }
 
     function exportContainers() { App.exportCSV(Store.get('containers'), 'containers-export.csv'); App.showToast('Containers exported', 'success'); }

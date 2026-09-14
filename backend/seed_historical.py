@@ -345,6 +345,14 @@ def seed_historical(db, User, UserRole, UserStatus, Permission, Role,
             db.session.add(line)
         db.session.flush()
         inv.calculate_totals()
+        # calculate_totals() derives balance_due from amount_paid, but that
+        # defaults to 0 -- an invoice already marked PAID (with a real
+        # payment_method/payment_date above) needs amount_paid actually set,
+        # or "collected" totals and per-invoice balances stay wrong (every
+        # "paid" invoice would still show its full amount as outstanding).
+        if status == InvoiceStatus.PAID:
+            inv.amount_paid = inv.total_amount
+            inv.balance_due = 0
 
     print('Creating environmental readings (noise only -- weather and air quality')
     print('come from real historical data via datasets/scripts/import_to_database.py)...')

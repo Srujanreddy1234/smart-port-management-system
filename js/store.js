@@ -113,9 +113,9 @@ const Store = {
     const byType = {};
     containers.forEach(c => {
       byStatus[c.status] = (byStatus[c.status] || 0) + 1;
-      byType[c.type_category || c.type] = (byType[c.type_category || c.type] || 0) + 1;
+      byType[c.container_type] = (byType[c.container_type] || 0) + 1;
     });
-    return { total: containers.length, by_status: byStatus, by_type: byType, loaded: byStatus['Delivered'] || 0 };
+    return { total: containers.length, by_status: byStatus, by_type: byType, loaded: byStatus['Loaded'] || 0 };
   },
 
   getTruckStats() {

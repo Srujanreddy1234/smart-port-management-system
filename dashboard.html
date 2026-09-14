@@ -391,7 +391,7 @@
       const statusValues = Object.values(byStatus);
 
       const byType = {};
-      containers.forEach(c => { byType[c.type_category || c.type] = (byType[c.type_category || c.type] || 0) + 1; });
+      containers.forEach(c => { byType[c.container_type] = (byType[c.container_type] || 0) + 1; });
       const typeLabels = Object.keys(byType);
       const typeValues = Object.values(byType);
 
