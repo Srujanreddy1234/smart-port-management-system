@@ -1,5 +1,6 @@
 backend/instance/
 backend/.env
+backend/.env.*
 backend/venv/
 __pycache__/
 *.pyc
@@ -7,3 +8,4 @@ backend/server.log
 *.log
 .pytest_cache/
 backend/ml/models/*.joblib
+/.secrets_local/

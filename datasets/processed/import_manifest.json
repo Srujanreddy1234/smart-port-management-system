@@ -1,25 +1,41 @@
 {
-  "generated_at": "2026-09-14T07:10:05.552535Z",
+  "generated_at": "2026-09-14T08:30:19.190243Z",
   "storage_audit": {
-    "measured_at": "2026-09-14",
-    "measurement_method": "Real PostgreSQL 15 instance (Docker, local), NOT estimated from CSV file size. Measured via pg_database_size() and pg_total_relation_size() after running the full migration + seed + import + ML training pipeline end to end.",
-    "total_database_size_bytes": 46316903,
-    "total_database_size_mb": 44.17,
-    "environmental_tables_mb": 28.14,
-    "application_operational_tables_mb": 16.03,
+    "measurement_history": [
+      {
+        "measured_at": "2026-09-14 (pre-production)",
+        "environment": "local Docker PostgreSQL 15 (audit copy)",
+        "total_database_size_mb": 44.17
+      },
+      {
+        "measured_at": "2026-09-14 (post-production import)",
+        "environment": "real Supabase Free PostgreSQL 17.6 (project bjxwxhvlkeysnobozseb)",
+        "total_database_size_bytes": 48974995,
+        "total_database_size_mb": 46.71,
+        "note": "Measured via pg_database_size(current_database()) directly against the live Supabase instance after migrate + seed + real historical data import. Matches the local pre-production estimate closely (44.17 MB vs 46.71 MB); the small difference is expected page/index bloat from live insert ordering, not missing or extra data."
+      }
+    ],
+    "authoritative_measurement": {
+      "source": "real Supabase Free PostgreSQL instance, measured after production import",
+      "total_database_size_mb": 46.71
+    },
     "supabase_free_tier_hard_limit_mb": 500,
     "target_budget_mb": 400,
-    "headroom_to_target_mb": 355.83,
-    "headroom_to_hard_limit_mb": 455.83,
+    "headroom_to_target_mb": 353.29,
+    "headroom_to_hard_limit_mb": 453.29,
     "optimization_phases_3_and_4_skipped": true,
-    "decision": "PRESERVE ALL DATA -- NO OPTIMIZATION PERFORMED. The measured PostgreSQL footprint (44.17 MB) uses only ~11% of the 400MB target budget and ~9% of the 500MB hard limit. Per the data-preservation rule (never destroy useful historical data to hit a storage number when the data already comfortably fits), column removal, deduplication, data-type optimization, and temporal downsampling were all evaluated and explicitly skipped as unnecessary. Every dataset is imported at its full originally-validated resolution, column set, and date range -- unchanged from the original import.",
-    "largest_tables": [
-      {"table": "weather_readings", "size_mb": 14.9, "rows": 52608},
-      {"table": "air_quality_readings", "size_mb": 6.8, "rows": 26304},
-      {"table": "marine_readings", "size_mb": 6.0, "rows": 35064},
-      {"table": "event_logs", "size_mb": 1.7},
-      {"table": "containers", "size_mb": 1.5},
-      {"table": "noise_readings", "size_mb": 1.0}
+    "decision": "PRESERVE ALL DATA -- NO OPTIMIZATION PERFORMED. The real, measured Supabase footprint (46.71 MB) uses only ~9% of the 500MB hard limit and ~12% of the 400MB target. Per the data-preservation rule (never destroy useful historical data to hit a storage number when the data already comfortably fits), column removal, deduplication, data-type optimization, and temporal downsampling were all evaluated and explicitly skipped as unnecessary. Every dataset is imported at its full originally-validated resolution, column set, and date range.",
+    "largest_tables_supabase": [
+      {"table": "weather_readings", "size_mb": 14.2},
+      {"table": "air_quality_readings", "size_mb": 6.68},
+      {"table": "marine_readings", "size_mb": 5.91},
+      {"table": "event_logs", "size_mb": 1.66},
+      {"table": "containers", "size_mb": 1.41},
+      {"table": "noise_readings", "size_mb": 0.98},
+      {"table": "invoices", "size_mb": 0.53},
+      {"table": "billing_lines", "size_mb": 0.48},
+      {"table": "trucks", "size_mb": 0.38},
+      {"table": "ships", "size_mb": 0.38}
     ]
   },
   "sources": {
@@ -37,12 +53,7 @@
       "records_imported": 52608,
       "model": "WeatherReading",
       "station": "MS-004",
-      "notes": "ERA5 reanalysis via Open-Meteo; fully populated for every downloaded year (2018-2025). A 6-year window is imported.",
-      "columns_removed": "none",
-      "duplicates_removed": "none",
-      "downsampling_performed": "none",
-      "final_measured_size_mb": 14.9,
-      "reason_for_no_reduction": "Dataset already comfortably fits the free-tier storage budget (44.17 MB actual measured PostgreSQL total vs. 400 MB target / 500 MB hard limit); no reduction needed or performed."
+      "notes": "ERA5 reanalysis via Open-Meteo; fully populated for every downloaded year (2018-2025). A 6-year window is imported."
     },
     "air_quality": {
       "years_imported": [
@@ -60,12 +71,7 @@
       "exclusion_reason": "2018-2021 have 0% AQI coverage in the downloaded CAMS reanalysis data; 2022 has only ~41% coverage (3,571/8,760 hours). Importing partial years would misrepresent them as complete, so only the fully-populated years are loaded.",
       "records_imported": 26304,
       "model": "AirQualityReading",
-      "station": "MS-001",
-      "columns_removed": "none",
-      "duplicates_removed": "none",
-      "downsampling_performed": "none",
-      "final_measured_size_mb": 6.8,
-      "reason_for_no_reduction": "Dataset already comfortably fits the free-tier storage budget (44.17 MB actual measured PostgreSQL total vs. 400 MB target / 500 MB hard limit); the years excluded above were excluded for data-quality reasons (incomplete coverage), not for storage reasons."
+      "station": "MS-001"
     },
     "marine": {
       "years_imported": [
@@ -79,23 +85,13 @@
       "records_imported": 35064,
       "model": "MarineReading",
       "station": "MS-005",
-      "notes": "Wave height/direction/period are populated from 2022 onward. sea_surface_temp_c and sea_level_height_msl_m are partially null in 2022-2023 (Open-Meteo Marine API backfill limitation) -- imported as NULL, not fabricated.",
-      "columns_removed": "none",
-      "duplicates_removed": "none",
-      "downsampling_performed": "none",
-      "final_measured_size_mb": 6.0,
-      "reason_for_no_reduction": "Dataset already comfortably fits the free-tier storage budget (44.17 MB actual measured PostgreSQL total vs. 400 MB target / 500 MB hard limit); no reduction needed or performed."
+      "notes": "Wave height/direction/period are populated from 2022 onward. sea_surface_temp_c and sea_level_height_msl_m are partially null in 2022-2023 (Open-Meteo Marine API backfill limitation) -- imported as NULL, not fabricated."
     },
     "port_traffic": {
       "years_imported": "FY2018-19 through FY2023-24 (6 fiscal years)",
       "records_imported": 6,
       "model": "PortTrafficAnnual",
-      "notes": "Annual aggregate statistics only (Indian Ports Association / port authority reports). Deliberately NOT used to derive any daily/hourly figure -- too coarse for that.",
-      "columns_removed": "none",
-      "duplicates_removed": "none",
-      "downsampling_performed": "none",
-      "final_measured_size_mb": "negligible (6 rows)",
-      "reason_for_no_reduction": "Dataset already comfortably fits the free-tier storage budget; annual aggregate table is negligibly small regardless."
+      "notes": "Annual aggregate statistics only (Indian Ports Association / port authority reports). Deliberately NOT used to derive any daily/hourly figure -- too coarse for that."
     }
   }
 }

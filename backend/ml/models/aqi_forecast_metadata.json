@@ -1,5 +1,5 @@
 {
-  "trained_at": "2026-09-14T06:30:20.366511Z",
+  "trained_at": "2026-09-14T08:32:03.057617Z",
   "forecast_horizon_hours": 24,
   "feature_columns": [
     "aqi_lag_1h",
