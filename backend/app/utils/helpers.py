@@ -133,61 +133,12 @@ def register_cli_commands(app):
             perms[name] = p
 
         print('Creating roles...')
-        role_permissions = {
-            'super_admin': ['all'],
-            'admin': [
-                'users.read', 'users.write', 'users.delete',
-                'roles.read', 'roles.write',
-                'ships.read', 'ships.write', 'ships.delete',
-                'containers.read', 'containers.write', 'containers.delete',
-                'trucks.read', 'trucks.write', 'trucks.delete',
-                'berths.read', 'berths.write',
-                'dashboard.read', 'dashboard.write',
-                'reports.read', 'reports.write', 'reports.delete',
-                'maintenance.read', 'maintenance.write',
-                'security.read', 'security.write',
-                'environment.read', 'environment.write',
-                'audit.read', 'settings.read', 'settings.write',
-            ],
-            'port_supervisor': [
-                'ships.read', 'ships.write',
-                'containers.read', 'containers.write',
-                'trucks.read', 'trucks.write',
-                'berths.read', 'berths.write',
-                'dashboard.read', 'reports.read',
-                'maintenance.read', 'maintenance.write',
-                'security.read', 'security.write',
-                'environment.read', 'audit.read',
-            ],
-            'port_staff': [
-                'ships.read', 'ships.write',
-                'containers.read', 'containers.write',
-                'trucks.read', 'trucks.write',
-                'berths.read',
-                'dashboard.read', 'reports.read',
-                'maintenance.read', 'maintenance.write',
-                'security.read',
-            ],
-            'customs_officer': [
-                'containers.read', 'containers.write',
-                'trucks.read', 'ships.read',
-                'dashboard.read', 'reports.read', 'security.read',
-            ],
-            'shipping_company': [
-                'ships.read', 'containers.read', 'containers.write',
-                'trucks.read', 'dashboard.read', 'reports.read', 'berths.read',
-            ],
-            'truck_operator': [
-                'trucks.read', 'trucks.write',
-                'containers.read', 'ships.read', 'dashboard.read', 'reports.read',
-            ],
-            'customer': [
-                'containers.read', 'ships.read', 'dashboard.read', 'reports.read',
-            ],
-            'public': [
-                'ships.read', 'dashboard.read',
-            ],
-        }
+        # Derived from User.ROLE_PERMISSIONS (the single source of truth for
+        # default role permissions) instead of a second hand-maintained copy
+        # -- a prior duplicate here had drifted from the model's dict (e.g.
+        # missing several .delete permissions for admin), which meant this
+        # seed data disagreed with the app's own default permission set.
+        role_permissions = {role.name.lower(): perms for role, perms in User.ROLE_PERMISSIONS.items()}
         role_names = {
             'super_admin': 'Super Admin',
             'admin': 'Admin',

@@ -25,6 +25,12 @@ class Config:
     JWT_COOKIE_SECURE = False
     JWT_COOKIE_CSRF_PROTECT = True
     JWT_CSRF_IN_COOKIES = False
+    # Without this, Flask-JWT-Extended never calls token_in_blocklist_loader
+    # at all (it defaults to False) -- logout/session-revocation would look
+    # like it worked (Session.is_revoked gets set) but every still-unexpired
+    # token would keep authorizing requests regardless.
+    JWT_BLOCKLIST_ENABLED = True
+    JWT_BLOCKLIST_TOKEN_CHECKS = ['access', 'refresh']
     
     BCRYPT_LOG_ROUNDS = 12
     

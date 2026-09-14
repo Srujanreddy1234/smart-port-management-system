@@ -154,7 +154,7 @@ class MaintenanceSchedule(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
-    equipment = db.relationship('Equipment', backref='maintenance_schedules')
+    equipment = db.relationship('Equipment', backref=db.backref('maintenance_schedules', cascade='all, delete-orphan'))
     assigned_technician = db.relationship('User', foreign_keys=[assigned_technician_id], backref='assigned_maintenance')
     supervisor = db.relationship('User', foreign_keys=[supervisor_id], backref='supervised_maintenance')
 
@@ -222,8 +222,8 @@ class ServiceLog(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
-    equipment = db.relationship('Equipment', backref='service_logs')
-    maintenance_schedule = db.relationship('MaintenanceSchedule', backref='service_logs')
+    equipment = db.relationship('Equipment', backref=db.backref('service_logs', cascade='all, delete-orphan'))
+    maintenance_schedule = db.relationship('MaintenanceSchedule', backref=db.backref('service_logs', cascade='all, delete-orphan'))
     performed_by = db.relationship('User', foreign_keys=[performed_by_id], backref='performed_services')
     supervisor = db.relationship('User', foreign_keys=[supervisor_id], backref='supervised_services')
 
@@ -280,7 +280,7 @@ class EquipmentHealthLog(db.Model):
     recorded_by = db.Column(db.String(100))
     notes = db.Column(db.Text)
 
-    equipment = db.relationship('Equipment', backref='health_logs')
+    equipment = db.relationship('Equipment', backref=db.backref('health_logs', cascade='all, delete-orphan'))
 
     __table_args__ = (
         Index('ix_health_equipment_recorded', 'equipment_id', 'recorded_at'),

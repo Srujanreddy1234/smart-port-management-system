@@ -9,8 +9,18 @@ def register_jwt_handlers(jwt: JWTManager):
     def check_if_token_revoked(jwt_header, jwt_payload):
         jti = jwt_payload['jti']
         token_type = jwt_payload.get('type', 'access')
-        
-        session = Session.query.filter_by(token=jti).first()
+
+        # Session.token/refresh_token store the full encoded JWT (used
+        # elsewhere to recover "this request's session" from a raw
+        # Authorization header); here we only have decoded claims, so the
+        # session must be looked up by its jti/refresh_jti column instead --
+        # matching jti against the full token string (as this used to do)
+        # can never succeed, which meant logout/session-revocation never
+        # actually invalidated any token.
+        if token_type == 'refresh':
+            session = Session.query.filter_by(refresh_jti=jti).first()
+        else:
+            session = Session.query.filter_by(jti=jti).first()
         if session is None:
             return False
         return session.is_revoked

@@ -145,8 +145,24 @@ class User(db.Model):
             return False
         return check_password_hash(self.password_hash, password)
 
+    def _role_permission_names(self):
+        # Cached per-instance so a request that calls has_permission() several
+        # times (most do at least once per endpoint) issues one query, not N.
+        if getattr(self, '_permission_names_cache', None) is not None:
+            return self._permission_names_cache
+        role_row = Role.query.filter_by(display_name=self.role.value).first()
+        if role_row is None:
+            # No matching DB role (e.g. a role was renamed/deleted) -- fall
+            # back to the hardcoded defaults rather than silently locking
+            # every user of that role out of everything.
+            names = set(self.ROLE_PERMISSIONS.get(self.role, []))
+        else:
+            names = {p.name for p in role_row.permissions}
+        self._permission_names_cache = names
+        return names
+
     def has_permission(self, permission):
-        permissions = self.ROLE_PERMISSIONS.get(self.role, [])
+        permissions = self._role_permission_names()
         if 'all' in permissions:
             return True
         return permission in permissions
@@ -257,6 +273,14 @@ class Session(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
     token = db.Column(db.String(1024), unique=True, nullable=False, index=True)
     refresh_token = db.Column(db.String(1024), unique=True, index=True)
+    # The JWT blocklist check (see jwt_handlers.py) only receives the decoded
+    # token's claims, not the original encoded string, so it must look up the
+    # session by jti -- not by re-matching the full token/refresh_token
+    # columns above (which those *do* serve a real purpose: recovering "this
+    # request's own session" from the raw Authorization header in
+    # logout()/refresh()).
+    jti = db.Column(db.String(36), unique=True, index=True)
+    refresh_jti = db.Column(db.String(36), unique=True, index=True)
     user_agent = db.Column(db.String(500))
     ip_address = db.Column(db.String(45))
     device_info = db.Column(db.JSON)

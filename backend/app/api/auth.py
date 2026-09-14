@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, current_app, redirect, url_for
 from flask_jwt_extended import (
     create_access_token, create_refresh_token, jwt_required,
-    get_jwt_identity, get_jwt, verify_jwt_in_request
+    get_jwt_identity, get_jwt, verify_jwt_in_request, get_jti
 )
 from marshmallow import Schema, fields, validate, ValidationError
 from werkzeug.security import check_password_hash
@@ -118,6 +118,8 @@ def login():
         user_id=user.id,
         token=access_token,
         refresh_token=refresh_token,
+        jti=get_jti(access_token),
+        refresh_jti=get_jti(refresh_token),
         user_agent=get_user_agent(),
         ip_address=get_client_ip(),
         device_info={
@@ -186,6 +188,8 @@ def register():
         user_id=user.id,
         token=access_token,
         refresh_token=refresh_token,
+        jti=get_jti(access_token),
+        refresh_jti=get_jti(refresh_token),
         user_agent=get_user_agent(),
         ip_address=get_client_ip(),
         device_info={'platform': request.user_agent.platform, 'browser': request.user_agent.browser, 'version': request.user_agent.version},
@@ -253,6 +257,7 @@ def refresh():
     
     if session and session.is_refresh_valid():
         session.token = access_token
+        session.jti = get_jti(access_token)
         session.expires_at = datetime.utcnow() + timedelta(hours=2)
         db.session.commit()
 
@@ -521,6 +526,8 @@ def google_callback():
         user_id=user.id,
         token=access_token,
         refresh_token=refresh_token,
+        jti=get_jti(access_token),
+        refresh_jti=get_jti(refresh_token),
         user_agent=get_user_agent(),
         ip_address=get_client_ip(),
         device_info={'platform': None, 'browser': None, 'version': None},

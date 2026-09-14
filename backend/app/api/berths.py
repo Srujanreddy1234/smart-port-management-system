@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from marshmallow import Schema, fields, validate, ValidationError
 from app.extensions import db
-from app.models import Berth, BerthStatus, Ship, ShipStatus, User
+from app.models import Berth, BerthStatus, Ship, ShipStatus, User, Invoice
 from app.utils.exceptions import ValidationError as AppValidationError, NotFoundError, AuthorizationError
 from app.utils.helpers import success_response, paginate_query
 from sqlalchemy import func, or_, desc
@@ -176,6 +176,10 @@ def delete_berth(berth_id):
 
     if berth.current_ship_id:
         raise AppValidationError('Cannot delete berth with assigned ship')
+
+    invoice_count = Invoice.query.filter_by(berth_id=berth_id).count()
+    if invoice_count:
+        raise AppValidationError(f'Cannot delete berth with {invoice_count} associated invoice(s)')
 
     db.session.delete(berth)
     db.session.commit()

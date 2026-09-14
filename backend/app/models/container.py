@@ -122,7 +122,7 @@ class ContainerHistory(db.Model):
     history_metadata = db.Column(db.JSON)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
 
-    container = relationship('Container', backref='history')
+    container = relationship('Container', backref=db.backref('history', cascade='all, delete-orphan'))
 
     __table_args__ = (
         Index('ix_container_history_container_date', 'container_id', 'created_at'),

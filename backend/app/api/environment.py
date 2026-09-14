@@ -9,7 +9,8 @@ from app.models import (
     NoiseReading,
     WeatherReading,
     EnvironmentalAlert,
-    EmissionReading
+    EmissionReading,
+    MarineReading
 )
 from app.utils.exceptions import AuthorizationError, NotFoundError, ValidationError as AppValidationError
 from app.utils.helpers import success_response, paginate_query
@@ -160,6 +161,19 @@ def delete_station(station_id):
     station = MonitoringStation.query.get(station_id)
     if not station:
         raise NotFoundError('Monitoring station not found')
+
+    reading_counts = {
+        'air quality': AirQualityReading.query.filter_by(station_id=station_id).count(),
+        'water quality': WaterQualityReading.query.filter_by(station_id=station_id).count(),
+        'noise': NoiseReading.query.filter_by(station_id=station_id).count(),
+        'weather': WeatherReading.query.filter_by(station_id=station_id).count(),
+        'emission': EmissionReading.query.filter_by(station_id=station_id).count(),
+        'marine': MarineReading.query.filter_by(station_id=station_id).count(),
+    }
+    non_empty = {k: v for k, v in reading_counts.items() if v > 0}
+    if non_empty:
+        summary = ', '.join(f'{v} {k}' for k, v in non_empty.items())
+        raise AppValidationError(f'Cannot delete a station with recorded readings ({summary})')
 
     db.session.delete(station)
     db.session.commit()

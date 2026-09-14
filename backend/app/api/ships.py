@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from marshmallow import Schema, fields, validate, ValidationError
 from app.extensions import db
-from app.models import Ship, ShipStatus, VesselType, User
+from app.models import Ship, ShipStatus, VesselType, User, Container, Invoice
 from app.utils.exceptions import ValidationError as AppValidationError, NotFoundError, AuthorizationError
 from app.utils.helpers import success_response, paginate_query, apply_filters
 from sqlalchemy import func, or_, desc, asc
@@ -183,6 +183,14 @@ def delete_ship(ship_id):
     ship = Ship.query.get(ship_id)
     if not ship:
         raise NotFoundError('Ship not found')
+
+    container_count = Container.query.filter_by(ship_id=ship_id).count()
+    invoice_count = Invoice.query.filter_by(ship_id=ship_id).count()
+    if container_count or invoice_count:
+        raise AppValidationError(
+            f'Cannot delete ship with {container_count} associated container(s) and '
+            f'{invoice_count} invoice(s) -- reassign or remove them first'
+        )
 
     db.session.delete(ship)
     db.session.commit()

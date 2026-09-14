@@ -90,21 +90,28 @@ def update_role(role_id):
     if not role:
         raise NotFoundError('Role not found')
 
-    if role.is_system:
-        raise AppValidationError('Cannot modify system roles')
-
     try:
         data = RoleCreateSchema().load(request.get_json() or {}, partial=True)
     except ValidationError as err:
         return jsonify({'success': False, 'errors': err.messages}), 400
 
-    if 'name' in data and data['name'] != role.name:
-        if Role.query.filter_by(name=data['name']).first():
-            raise AppValidationError('Role name already exists')
-        role.name = data['name']
+    # System roles' name/display_name are load-bearing: display_name is
+    # matched against UserRole.value to resolve a user's effective
+    # permissions (see User._role_permission_names()), so renaming one would
+    # silently strand every user of that role on the fallback default
+    # permissions. Their PERMISSIONS are exactly what this endpoint exists
+    # to let an admin change, so only identity fields are protected.
+    if role.is_system:
+        if ('name' in data and data['name'] != role.name) or ('display_name' in data and data['display_name'] != role.display_name):
+            raise AppValidationError('Cannot rename a system role (its name/display name is matched against user roles)')
+    else:
+        if 'name' in data and data['name'] != role.name:
+            if Role.query.filter_by(name=data['name']).first():
+                raise AppValidationError('Role name already exists')
+            role.name = data['name']
+        if 'display_name' in data:
+            role.display_name = data['display_name']
 
-    if 'display_name' in data:
-        role.display_name = data['display_name']
     if 'description' in data:
         role.description = data['description']
 

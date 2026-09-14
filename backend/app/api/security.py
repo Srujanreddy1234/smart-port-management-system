@@ -210,6 +210,10 @@ def delete_incident(incident_id):
     if not incident:
         raise NotFoundError('Incident not found')
 
+    alert_count = Alert.query.filter_by(related_incident_id=incident_id).count()
+    if alert_count:
+        raise AppValidationError(f'Cannot delete incident with {alert_count} related alert(s)')
+
     db.session.delete(incident)
     db.session.commit()
     return success_response(None, 'Incident deleted successfully')
