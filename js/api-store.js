@@ -180,14 +180,16 @@ const ApiStore = {
   setUser(user) { Api.setUser(user); },
 
   async init() {
-    await this.get('ships');
-    await this.get('containers');
-    await this.get('trucks');
-    await this.get('berths');
-    await this.get('alerts');
-    await this.get('users');
-    await this.get('activity_log');
-    await this.get('env_readings');
+    await Promise.all([
+      this.get('ships'),
+      this.get('containers'),
+      this.get('trucks'),
+      this.get('berths'),
+      this.get('alerts'),
+      this.get('users'),
+      this.get('activity_log'),
+      this.get('env_readings'),
+    ]);
   },
 
   getShipStats() {
