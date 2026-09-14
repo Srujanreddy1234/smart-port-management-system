@@ -121,8 +121,6 @@ def upgrade():
     sa.Column('gate_out_at', sa.DateTime(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['ship_id'], ['ships.id'], ),
-    sa.ForeignKeyConstraint(['truck_id'], ['trucks.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('containers', schema=None) as batch_op:
@@ -351,7 +349,6 @@ def upgrade():
     sa.Column('assigned_at', sa.DateTime(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['assigned_container_id'], ['containers.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('trucks', schema=None) as batch_op:
@@ -398,7 +395,6 @@ def upgrade():
     sa.Column('user_metadata', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['manager_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('users', schema=None) as batch_op:
@@ -431,7 +427,6 @@ def upgrade():
     sa.Column('station_reading_alert_compliance_metadata', sa.JSON(), nullable=True),
     sa.Column('recorded_at', sa.DateTime(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['station_id'], ['monitoring_stations.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('air_quality_readings', schema=None) as batch_op:
@@ -466,7 +461,6 @@ def upgrade():
     sa.Column('occupied_since', sa.DateTime(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['current_ship_id'], ['ships.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('berths', schema=None) as batch_op:
@@ -488,7 +482,6 @@ def upgrade():
     sa.Column('performed_by', sa.String(length=255), nullable=True),
     sa.Column('history_metadata', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['container_id'], ['containers.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('container_history', schema=None) as batch_op:
@@ -516,7 +509,6 @@ def upgrade():
     sa.Column('station_reading_alert_compliance_metadata', sa.JSON(), nullable=True),
     sa.Column('recorded_at', sa.DateTime(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['station_id'], ['monitoring_stations.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('emission_readings', schema=None) as batch_op:
@@ -549,9 +541,6 @@ def upgrade():
     sa.Column('station_reading_alert_compliance_metadata', sa.JSON(), nullable=True),
     sa.Column('triggered_at', sa.DateTime(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['acknowledged_by_id'], ['users.id'], ),
-    sa.ForeignKeyConstraint(['resolved_by_id'], ['users.id'], ),
-    sa.ForeignKeyConstraint(['station_id'], ['monitoring_stations.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('environmental_alerts', schema=None) as batch_op:
@@ -583,7 +572,6 @@ def upgrade():
     sa.Column('recorded_at', sa.DateTime(), nullable=False),
     sa.Column('recorded_by', sa.String(length=100), nullable=True),
     sa.Column('notes', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['equipment_id'], ['equipment.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('equipment_health_logs', schema=None) as batch_op:
@@ -603,7 +591,6 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('ip_address', sa.String(length=50), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('event_logs', schema=None) as batch_op:
@@ -644,9 +631,6 @@ def upgrade():
     sa.Column('recurrence_pattern', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['assigned_technician_id'], ['users.id'], ),
-    sa.ForeignKeyConstraint(['equipment_id'], ['equipment.id'], ),
-    sa.ForeignKeyConstraint(['supervisor_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('maintenance_schedules', schema=None) as batch_op:
@@ -670,7 +654,6 @@ def upgrade():
     sa.Column('sea_level_height_msl_m', sa.Float(), nullable=True),
     sa.Column('recorded_at', sa.DateTime(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['station_id'], ['monitoring_stations.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('marine_readings', schema=None) as batch_op:
@@ -693,7 +676,6 @@ def upgrade():
     sa.Column('station_reading_alert_compliance_metadata', sa.JSON(), nullable=True),
     sa.Column('recorded_at', sa.DateTime(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['station_id'], ['monitoring_stations.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('noise_readings', schema=None) as batch_op:
@@ -716,7 +698,6 @@ def upgrade():
     sa.Column('created_by_id', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['created_by_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('report_templates', schema=None) as batch_op:
@@ -748,7 +729,6 @@ def upgrade():
     sa.Column('report_metadata', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['generated_by_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('reports', schema=None) as batch_op:
@@ -769,8 +749,6 @@ def upgrade():
     sa.Column('role_id', sa.Integer(), nullable=False),
     sa.Column('permission_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['permission_id'], ['permissions.id'], ),
-    sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('role_id', 'permission_id', name='uq_role_permission')
     )
@@ -801,7 +779,6 @@ def upgrade():
     sa.Column('is_false_alarm', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['assigned_officer_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('security_incidents', schema=None) as batch_op:
@@ -829,7 +806,6 @@ def upgrade():
     sa.Column('officer_metadata', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('user_id')
     )
@@ -850,7 +826,6 @@ def upgrade():
     sa.Column('revoked_at', sa.DateTime(), nullable=True),
     sa.Column('revoked_reason', sa.String(length=255), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('sessions', schema=None) as batch_op:
@@ -872,7 +847,6 @@ def upgrade():
     sa.Column('widgets', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('user_dashboards', schema=None) as batch_op:
@@ -906,7 +880,6 @@ def upgrade():
     sa.Column('station_reading_alert_compliance_metadata', sa.JSON(), nullable=True),
     sa.Column('recorded_at', sa.DateTime(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['station_id'], ['monitoring_stations.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('water_quality_readings', schema=None) as batch_op:
@@ -937,7 +910,6 @@ def upgrade():
     sa.Column('station_reading_alert_compliance_metadata', sa.JSON(), nullable=True),
     sa.Column('recorded_at', sa.DateTime(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['station_id'], ['monitoring_stations.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('weather_readings', schema=None) as batch_op:
@@ -961,8 +933,6 @@ def upgrade():
     sa.Column('related_incident_id', sa.Integer(), nullable=True),
     sa.Column('alert_metadata', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['acknowledged_by_id'], ['users.id'], ),
-    sa.ForeignKeyConstraint(['related_incident_id'], ['security_incidents.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('alerts', schema=None) as batch_op:
@@ -995,8 +965,6 @@ def upgrade():
     sa.Column('duration_ms', sa.Integer(), nullable=True),
     sa.Column('audit_metadata', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['session_id'], ['sessions.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('audit_logs', schema=None) as batch_op:
@@ -1037,9 +1005,6 @@ def upgrade():
     sa.Column('issued_by', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['berth_id'], ['berths.id'], ),
-    sa.ForeignKeyConstraint(['issued_by'], ['users.id'], ),
-    sa.ForeignKeyConstraint(['ship_id'], ['ships.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('invoices', schema=None) as batch_op:
@@ -1075,10 +1040,6 @@ def upgrade():
     sa.Column('attachments', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['equipment_id'], ['equipment.id'], ),
-    sa.ForeignKeyConstraint(['maintenance_schedule_id'], ['maintenance_schedules.id'], ),
-    sa.ForeignKeyConstraint(['performed_by_id'], ['users.id'], ),
-    sa.ForeignKeyConstraint(['supervisor_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('service_logs', schema=None) as batch_op:
@@ -1102,7 +1063,6 @@ def upgrade():
     sa.Column('amount', sa.Float(), nullable=False),
     sa.Column('notes', sa.Text(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['invoice_id'], ['invoices.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('billing_lines', schema=None) as batch_op:
@@ -1111,11 +1071,96 @@ def upgrade():
         batch_op.create_index(batch_op.f('ix_billing_lines_category'), ['category'], unique=False)
         batch_op.create_index(batch_op.f('ix_billing_lines_invoice_id'), ['invoice_id'], unique=False)
 
+
+    # Foreign keys are added after all tables exist to avoid ordering
+    # issues (containers/trucks have a circular FK) and forward references
+    # that Postgres enforces strictly at CREATE TABLE time (SQLite does not).
+    op.create_foreign_key('fk_containers_ship_id', 'containers', 'ships', ['ship_id'], ['id'])
+    op.create_foreign_key('fk_containers_truck_id', 'containers', 'trucks', ['truck_id'], ['id'])
+    op.create_foreign_key('fk_trucks_assigned_container_id', 'trucks', 'containers', ['assigned_container_id'], ['id'])
+    op.create_foreign_key('fk_users_manager_id', 'users', 'users', ['manager_id'], ['id'])
+    op.create_foreign_key('fk_air_quality_readings_station_id', 'air_quality_readings', 'monitoring_stations', ['station_id'], ['id'])
+    op.create_foreign_key('fk_berths_current_ship_id', 'berths', 'ships', ['current_ship_id'], ['id'])
+    op.create_foreign_key('fk_container_history_container_id', 'container_history', 'containers', ['container_id'], ['id'])
+    op.create_foreign_key('fk_emission_readings_station_id', 'emission_readings', 'monitoring_stations', ['station_id'], ['id'])
+    op.create_foreign_key('fk_environmental_alerts_acknowledged_by_id', 'environmental_alerts', 'users', ['acknowledged_by_id'], ['id'])
+    op.create_foreign_key('fk_environmental_alerts_resolved_by_id', 'environmental_alerts', 'users', ['resolved_by_id'], ['id'])
+    op.create_foreign_key('fk_environmental_alerts_station_id', 'environmental_alerts', 'monitoring_stations', ['station_id'], ['id'])
+    op.create_foreign_key('fk_equipment_health_logs_equipment_id', 'equipment_health_logs', 'equipment', ['equipment_id'], ['id'])
+    op.create_foreign_key('fk_event_logs_user_id', 'event_logs', 'users', ['user_id'], ['id'])
+    op.create_foreign_key('fk_maintenance_schedules_assigned_technician_id', 'maintenance_schedules', 'users', ['assigned_technician_id'], ['id'])
+    op.create_foreign_key('fk_maintenance_schedules_equipment_id', 'maintenance_schedules', 'equipment', ['equipment_id'], ['id'])
+    op.create_foreign_key('fk_maintenance_schedules_supervisor_id', 'maintenance_schedules', 'users', ['supervisor_id'], ['id'])
+    op.create_foreign_key('fk_marine_readings_station_id', 'marine_readings', 'monitoring_stations', ['station_id'], ['id'])
+    op.create_foreign_key('fk_noise_readings_station_id', 'noise_readings', 'monitoring_stations', ['station_id'], ['id'])
+    op.create_foreign_key('fk_report_templates_created_by_id', 'report_templates', 'users', ['created_by_id'], ['id'])
+    op.create_foreign_key('fk_reports_generated_by_id', 'reports', 'users', ['generated_by_id'], ['id'])
+    op.create_foreign_key('fk_role_permissions_permission_id', 'role_permissions', 'permissions', ['permission_id'], ['id'])
+    op.create_foreign_key('fk_role_permissions_role_id', 'role_permissions', 'roles', ['role_id'], ['id'])
+    op.create_foreign_key('fk_security_incidents_assigned_officer_id', 'security_incidents', 'users', ['assigned_officer_id'], ['id'])
+    op.create_foreign_key('fk_security_officers_user_id', 'security_officers', 'users', ['user_id'], ['id'])
+    op.create_foreign_key('fk_sessions_user_id', 'sessions', 'users', ['user_id'], ['id'])
+    op.create_foreign_key('fk_user_dashboards_user_id', 'user_dashboards', 'users', ['user_id'], ['id'])
+    op.create_foreign_key('fk_water_quality_readings_station_id', 'water_quality_readings', 'monitoring_stations', ['station_id'], ['id'])
+    op.create_foreign_key('fk_weather_readings_station_id', 'weather_readings', 'monitoring_stations', ['station_id'], ['id'])
+    op.create_foreign_key('fk_alerts_acknowledged_by_id', 'alerts', 'users', ['acknowledged_by_id'], ['id'])
+    op.create_foreign_key('fk_alerts_related_incident_id', 'alerts', 'security_incidents', ['related_incident_id'], ['id'])
+    op.create_foreign_key('fk_audit_logs_session_id', 'audit_logs', 'sessions', ['session_id'], ['id'])
+    op.create_foreign_key('fk_audit_logs_user_id', 'audit_logs', 'users', ['user_id'], ['id'])
+    op.create_foreign_key('fk_invoices_berth_id', 'invoices', 'berths', ['berth_id'], ['id'])
+    op.create_foreign_key('fk_invoices_issued_by', 'invoices', 'users', ['issued_by'], ['id'])
+    op.create_foreign_key('fk_invoices_ship_id', 'invoices', 'ships', ['ship_id'], ['id'])
+    op.create_foreign_key('fk_service_logs_equipment_id', 'service_logs', 'equipment', ['equipment_id'], ['id'])
+    op.create_foreign_key('fk_service_logs_maintenance_schedule_id', 'service_logs', 'maintenance_schedules', ['maintenance_schedule_id'], ['id'])
+    op.create_foreign_key('fk_service_logs_performed_by_id', 'service_logs', 'users', ['performed_by_id'], ['id'])
+    op.create_foreign_key('fk_service_logs_supervisor_id', 'service_logs', 'users', ['supervisor_id'], ['id'])
+    op.create_foreign_key('fk_billing_lines_invoice_id', 'billing_lines', 'invoices', ['invoice_id'], ['id'])
+
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_constraint('fk_billing_lines_invoice_id', 'billing_lines', type_='foreignkey')
+    op.drop_constraint('fk_service_logs_supervisor_id', 'service_logs', type_='foreignkey')
+    op.drop_constraint('fk_service_logs_performed_by_id', 'service_logs', type_='foreignkey')
+    op.drop_constraint('fk_service_logs_maintenance_schedule_id', 'service_logs', type_='foreignkey')
+    op.drop_constraint('fk_service_logs_equipment_id', 'service_logs', type_='foreignkey')
+    op.drop_constraint('fk_invoices_ship_id', 'invoices', type_='foreignkey')
+    op.drop_constraint('fk_invoices_issued_by', 'invoices', type_='foreignkey')
+    op.drop_constraint('fk_invoices_berth_id', 'invoices', type_='foreignkey')
+    op.drop_constraint('fk_audit_logs_user_id', 'audit_logs', type_='foreignkey')
+    op.drop_constraint('fk_audit_logs_session_id', 'audit_logs', type_='foreignkey')
+    op.drop_constraint('fk_alerts_related_incident_id', 'alerts', type_='foreignkey')
+    op.drop_constraint('fk_alerts_acknowledged_by_id', 'alerts', type_='foreignkey')
+    op.drop_constraint('fk_weather_readings_station_id', 'weather_readings', type_='foreignkey')
+    op.drop_constraint('fk_water_quality_readings_station_id', 'water_quality_readings', type_='foreignkey')
+    op.drop_constraint('fk_user_dashboards_user_id', 'user_dashboards', type_='foreignkey')
+    op.drop_constraint('fk_sessions_user_id', 'sessions', type_='foreignkey')
+    op.drop_constraint('fk_security_officers_user_id', 'security_officers', type_='foreignkey')
+    op.drop_constraint('fk_security_incidents_assigned_officer_id', 'security_incidents', type_='foreignkey')
+    op.drop_constraint('fk_role_permissions_role_id', 'role_permissions', type_='foreignkey')
+    op.drop_constraint('fk_role_permissions_permission_id', 'role_permissions', type_='foreignkey')
+    op.drop_constraint('fk_reports_generated_by_id', 'reports', type_='foreignkey')
+    op.drop_constraint('fk_report_templates_created_by_id', 'report_templates', type_='foreignkey')
+    op.drop_constraint('fk_noise_readings_station_id', 'noise_readings', type_='foreignkey')
+    op.drop_constraint('fk_marine_readings_station_id', 'marine_readings', type_='foreignkey')
+    op.drop_constraint('fk_maintenance_schedules_supervisor_id', 'maintenance_schedules', type_='foreignkey')
+    op.drop_constraint('fk_maintenance_schedules_equipment_id', 'maintenance_schedules', type_='foreignkey')
+    op.drop_constraint('fk_maintenance_schedules_assigned_technician_id', 'maintenance_schedules', type_='foreignkey')
+    op.drop_constraint('fk_event_logs_user_id', 'event_logs', type_='foreignkey')
+    op.drop_constraint('fk_equipment_health_logs_equipment_id', 'equipment_health_logs', type_='foreignkey')
+    op.drop_constraint('fk_environmental_alerts_station_id', 'environmental_alerts', type_='foreignkey')
+    op.drop_constraint('fk_environmental_alerts_resolved_by_id', 'environmental_alerts', type_='foreignkey')
+    op.drop_constraint('fk_environmental_alerts_acknowledged_by_id', 'environmental_alerts', type_='foreignkey')
+    op.drop_constraint('fk_emission_readings_station_id', 'emission_readings', type_='foreignkey')
+    op.drop_constraint('fk_container_history_container_id', 'container_history', type_='foreignkey')
+    op.drop_constraint('fk_berths_current_ship_id', 'berths', type_='foreignkey')
+    op.drop_constraint('fk_air_quality_readings_station_id', 'air_quality_readings', type_='foreignkey')
+    op.drop_constraint('fk_users_manager_id', 'users', type_='foreignkey')
+    op.drop_constraint('fk_trucks_assigned_container_id', 'trucks', type_='foreignkey')
+    op.drop_constraint('fk_containers_truck_id', 'containers', type_='foreignkey')
+    op.drop_constraint('fk_containers_ship_id', 'containers', type_='foreignkey')
     with op.batch_alter_table('billing_lines', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_billing_lines_invoice_id'))
         batch_op.drop_index(batch_op.f('ix_billing_lines_category'))
