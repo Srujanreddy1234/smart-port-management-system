@@ -32,6 +32,14 @@ def _load():
             _metadata = json.load(f)
 
 
+def preload():
+    """Load the model at process startup instead of on a random user's
+    first request -- deserializing the joblib file takes several seconds,
+    and paying that cost during boot (once per worker) rather than during
+    a live request keeps forecast latency consistent for every user."""
+    _load()
+
+
 def aqi_category(aqi):
     if aqi is None:
         return None

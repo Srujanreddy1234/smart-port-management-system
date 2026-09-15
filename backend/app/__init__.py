@@ -73,6 +73,15 @@ def create_app(config_name=None):
     # so a genuinely missing/incompatible schema fails loudly instead of a
     # silent create_all() masking a migration that was never applied.
 
+    # Load the AQI forecast model now (at worker boot) instead of lazily on
+    # whichever user's request happens to hit it first -- deserializing it
+    # takes several seconds and shouldn't be a random user's problem.
+    try:
+        from ml import predict_aqi
+        predict_aqi.preload()
+    except Exception:
+        pass
+
     FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
 
     @app.route('/', defaults={'path': 'dashboard.html'})
