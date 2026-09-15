@@ -26,6 +26,7 @@ from app.models.reports import Report, ReportType, ReportFormat, ReportStatus, R
 from app.models.event_log import EventLog, EventType, EventSeverity
 from app.models.billing import Invoice, InvoiceStatus, BillingLine, BillingCategory, PaymentMethod
 from app.models.port_traffic import PortTrafficAnnual
+from app.models.gate import Gate, GateStatus, GateType, GateBooking, BookingStatus, BookingPurpose
 
 
 __all__ = [
@@ -42,4 +43,5 @@ __all__ = [
     'EventLog', 'EventType', 'EventSeverity',
     'Invoice', 'InvoiceStatus', 'BillingLine', 'BillingCategory', 'PaymentMethod',
     'PortTrafficAnnual',
+    'Gate', 'GateStatus', 'GateType', 'GateBooking', 'BookingStatus', 'BookingPurpose',
 ]

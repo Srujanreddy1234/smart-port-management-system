@@ -17,6 +17,7 @@ def register_blueprints(app):
     from app.api.search import search_bp
     from app.api.sse import sse_bp
     from app.api.billing import billing_bp
+    from app.api.gates import gates_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(ships_bp)
@@ -33,3 +34,4 @@ def register_blueprints(app):
     app.register_blueprint(search_bp)
     app.register_blueprint(sse_bp)
     app.register_blueprint(billing_bp)
+    app.register_blueprint(gates_bp)

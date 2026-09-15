@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gate Routing — AI PORT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/variables.css" rel="stylesheet">
+  <link href="css/main.css" rel="stylesheet">
+  <link href="css/layout.css" rel="stylesheet">
+  <link href="css/components.css" rel="stylesheet">
+  <link href="css/pages.css" rel="stylesheet">
+  <link href="css/responsive.css" rel="stylesheet">
+  <style>
+    .gate-card { border-radius: var(--radius-md); padding: 18px; background: var(--card-bg); border: 1px solid var(--card-border); }
+    .gate-card.congestion-low { border-left: 4px solid var(--success); }
+    .gate-card.congestion-medium { border-left: 4px solid var(--warning); }
+    .gate-card.congestion-high { border-left: 4px solid var(--danger); }
+    .gate-card.congestion-closed { border-left: 4px solid var(--text-muted); opacity: 0.7; }
+    .congestion-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+    .congestion-dot.low { background: var(--success); }
+    .congestion-dot.medium { background: var(--warning); }
+    .congestion-dot.high { background: var(--danger); }
+    .congestion-dot.closed { background: var(--text-muted); }
+    .recommend-banner { background: var(--gradient-primary); border-radius: var(--radius-lg); padding: 24px; color: #fff; margin-bottom: 24px; }
+    .slot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; }
+    .slot-btn { padding: 8px 4px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--lighter); color: var(--text-primary); font-size: 0.78rem; cursor: pointer; text-align: center; transition: var(--transition-fast); }
+    .slot-btn:hover:not(:disabled) { border-color: var(--primary); background: rgba(13,110,253,0.12); }
+    .slot-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .slot-btn.past { text-decoration: line-through; }
+  </style>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon"><i class="fas fa-anchor"></i></div>
+      <div class="sidebar-brand-text">
+        <h5>Smart Port</h5>
+        <small>Thoothukudi</small>
+      </div>
+    </div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar"></div>
+        <div class="sidebar-user-info">
+          <h6>Loading...</h6>
+          <small></small>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        <div>
+          <div class="page-title">Gate Routing</div>
+          <div class="breadcrumb">
+            <a href="dashboard.html">Home</a>
+            <span class="separator">/</span>
+            <span>Gate Routing</span>
+          </div>
+        </div>
+      </div>
+      <div class="topbar-center">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search gates...">
+          <span class="search-shortcut">Ctrl+K</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span id="liveClock" style="font-size:0.82rem;color:var(--text-muted);font-family:monospace;margin-right:8px;"></span>
+        <button class="topbar-btn"><i class="fas fa-expand"></i></button>
+        <button class="topbar-btn" id="notifBtn">
+          <i class="fas fa-bell"></i>
+          <span class="badge-count" id="notifBadge" style="display:none;">0</span>
+        </button>
+        <div class="notification-dropdown" id="notifDropdown">
+          <div class="dropdown-header">
+            <h6>Notifications</h6>
+            <a href="#" id="markAllRead" style="font-size:0.78rem;">Mark all read</a>
+          </div>
+          <div class="notification-list" id="notifList"></div>
+        </div>
+        <button class="topbar-btn"><i class="fas fa-cog"></i></button>
+        <a href="profile.html" class="topbar-btn" style="text-decoration:none;">
+          <div class="avatar avatar-sm" style="background:var(--gradient-primary);font-size:0.7rem;"></div>
+        </a>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="page-header">
+        <div>
+          <h2>Gate Routing &amp; Time Slots</h2>
+          <p>Live gate congestion, the best gate to use right now, and appointment slots to avoid queueing</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button class="btn btn-secondary" onclick="refreshEverything()"><i class="fas fa-sync-alt"></i> Refresh</button>
+          <button class="btn btn-primary" id="bookSlotBtn" onclick="showBookModal()" style="display:none;"><i class="fas fa-calendar-plus"></i> Book a Time Slot</button>
+          <button class="btn btn-outline-primary" id="manageGatesBtn" onclick="showManageGateModal()" style="display:none;"><i class="fas fa-sliders-h"></i> Manage Gates</button>
+        </div>
+      </div>
+
+      <div class="recommend-banner" id="recommendBanner">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.5px;opacity:0.85;margin-bottom:4px;">
+              <i class="fas fa-route"></i> Recommended Gate Right Now
+            </div>
+            <div id="recommendGateName" style="font-size:1.6rem;font-weight:700;">Loading...</div>
+            <div id="recommendGateMeta" style="font-size:0.85rem;opacity:0.9;margin-top:4px;"></div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.78rem;opacity:0.85;">Updated</div>
+            <div id="recommendTimestamp" style="font-size:0.9rem;font-family:monospace;">--</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-header">
+          <h6><i class="fas fa-traffic-light" style="color:var(--primary-light);margin-right:8px;"></i>Live Gate Status</h6>
+        </div>
+        <div class="card-body">
+          <div id="gatesGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;">
+            <div style="text-align:center;padding:40px;color:var(--text-muted);grid-column:1/-1;">Loading gates...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-header">
+          <h6><i class="fas fa-calendar-days" style="color:var(--primary-light);margin-right:8px;"></i>Available Time Slots</h6>
+          <div style="display:flex;gap:6px;">
+            <select class="form-select" id="availGateSelect" style="width:auto;font-size:0.82rem;"></select>
+            <input type="date" class="form-control" id="availDate" style="width:auto;font-size:0.82rem;">
+          </div>
+        </div>
+        <div class="card-body">
+          <p style="color:var(--text-muted);font-size:0.82rem;margin-bottom:12px;">Each slot is 30 minutes. Click an open slot to book it instantly.</p>
+          <div class="slot-grid" id="slotGrid"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-header">
+          <h6><i class="fas fa-clipboard-list" style="color:var(--primary-light);margin-right:8px;"></i><span id="bookingsTitle">My Bookings</span></h6>
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;color:var(--text-muted);" id="showAllToggleWrap">
+            <input type="checkbox" id="showAllBookings"> Show all drivers' bookings
+          </label>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Gate</th>
+                <th>Driver</th>
+                <th>Truck</th>
+                <th>Purpose</th>
+                <th>Slot</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bookingsTableBody">
+              <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/utils.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api-store.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    let gatesData = [];
+    const canBook = Api.hasPermission('gates.book');
+    const canManage = Api.hasPermission('gates.manage');
+
+    function congestionClass(c) { return (c || 'low').toLowerCase(); }
+
+    function renderRecommend(rec) {
+      const banner = document.getElementById('recommendBanner');
+      const nameEl = document.getElementById('recommendGateName');
+      const metaEl = document.getElementById('recommendGateMeta');
+      const tsEl = document.getElementById('recommendTimestamp');
+      if (!rec.available) {
+        nameEl.textContent = 'No gates currently open';
+        metaEl.textContent = rec.message || '';
+        return;
+      }
+      const g = rec.recommended_gate;
+      nameEl.innerHTML = `<i class="fas fa-door-open"></i> ${g.name}`;
+      metaEl.textContent = `${g.live.congestion} congestion · ${g.live.trucks_at_gate} trucks queued · ${g.zone || ''}`;
+      tsEl.textContent = new Date(rec.generated_at).toLocaleTimeString();
+    }
+
+    function renderGatesGrid(gates) {
+      const grid = document.getElementById('gatesGrid');
+      const select = document.getElementById('availGateSelect');
+      if (!gates.length) {
+        grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);grid-column:1/-1;">No gates configured</div>';
+        return;
+      }
+      grid.innerHTML = gates.map(g => {
+        const c = congestionClass(g.status !== 'Open' ? 'closed' : g.live.congestion);
+        return `
+        <div class="gate-card congestion-${c}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+            <div style="min-width:0;flex:1;">
+              <div style="font-weight:600;font-size:1rem;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${g.name}</div>
+              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">${g.gate_type} · ${g.zone || '—'}</div>
+            </div>
+            <span class="badge badge-${g.status === 'Open' ? 'success' : 'secondary'}" style="flex-shrink:0;">${g.status}</span>
+          </div>
+          <div style="margin-top:12px;font-size:0.85rem;color:var(--text-primary);">
+            <span class="congestion-dot ${c}"></span>
+            <strong style="color:var(--text-primary);">${g.status === 'Open' ? g.live.congestion : 'Closed'} congestion</strong>
+          </div>
+          <div style="margin-top:8px;font-size:0.78rem;color:var(--text-muted);display:flex;justify-content:space-between;">
+            <span>${g.live.trucks_at_gate} trucks at gate</span>
+            <span>${g.live.bookings_this_hour}/${g.live.capacity_per_hour} booked this hour</span>
+          </div>
+          ${canManage ? `<button class="btn btn-sm btn-outline-primary" style="margin-top:12px;width:100%;" onclick="showManageGateModal(${g.id})"><i class="fas fa-pen"></i> Edit Gate</button>` : ''}
+        </div>`;
+      }).join('');
+
+      select.innerHTML = gates.filter(g => g.status === 'Open').map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+    }
+
+    async function loadGates() {
+      try {
+        const res = await Api.request('/gates');
+        gatesData = res.data || [];
+        renderGatesGrid(gatesData);
+      } catch (err) {
+        App.showToast('Failed to load gates: ' + err.message, 'danger');
+      }
+    }
+
+    async function loadRecommendation() {
+      try {
+        const res = await Api.request('/gates/recommend');
+        renderRecommend(res.data);
+      } catch (err) {
+        document.getElementById('recommendGateName').textContent = 'Unable to load recommendation';
+      }
+    }
+
+    function renderSlots(slots) {
+      const grid = document.getElementById('slotGrid');
+      if (!slots.length) { grid.innerHTML = '<p style="color:var(--text-muted);">No slots for this date.</p>'; return; }
+      grid.innerHTML = slots.map(s => {
+        const time = new Date(s.slot_start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const disabled = s.is_past || s.available <= 0 || !canBook;
+        const pastClass = s.is_past ? 'past' : '';
+        const label = s.is_past ? time : (s.available > 0 ? `${time}<br><small>${s.available} open</small>` : `${time}<br><small>Full</small>`);
+        return `<button class="slot-btn ${pastClass}" ${disabled ? 'disabled' : ''} onclick="bookSlot('${s.slot_start}')">${label}</button>`;
+      }).join('');
+    }
+
+    async function loadAvailability() {
+      const gateId = document.getElementById('availGateSelect').value;
+      const date = document.getElementById('availDate').value;
+      if (!gateId || !date) return;
+      try {
+        const res = await Api.request(`/gates/${gateId}/availability?date=${date}`);
+        renderSlots(res.data.slots);
+      } catch (err) {
+        App.showToast('Failed to load availability: ' + err.message, 'danger');
+      }
+    }
+
+    function statusBadge(status) {
+      const map = { 'Booked': 'info', 'Checked In': 'warning', 'Completed': 'success', 'Cancelled': 'secondary', 'No Show': 'danger' };
+      return `<span class="badge badge-${map[status] || 'secondary'}">${status}</span>`;
+    }
+
+    function renderBookings(items) {
+      const tbody = document.getElementById('bookingsTableBody');
+      if (!items.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">No bookings found</td></tr>';
+        return;
+      }
+      const user = Api.getUser();
+      tbody.innerHTML = items.map(b => {
+        const isMine = user && b.booked_by_user_id === user.id;
+        const canCancel = (isMine || canManage) && ['Booked', 'Checked In'].includes(b.status);
+        const canCheckIn = canManage && b.status === 'Booked';
+        const canComplete = canManage && b.status === 'Checked In';
+        return `
+        <tr>
+          <td>${b.gate ? b.gate.name : '—'}</td>
+          <td>${b.driver_name || '—'}</td>
+          <td>${b.truck_number || '—'}</td>
+          <td>${b.purpose}</td>
+          <td>${new Date(b.slot_start).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</td>
+          <td>${statusBadge(b.status)}</td>
+          <td>
+            <div style="display:flex;gap:4px;">
+              ${canCheckIn ? `<button class="btn btn-sm btn-warning" onclick="checkInBooking(${b.id})" title="Check In"><i class="fas fa-right-to-bracket"></i></button>` : ''}
+              ${canComplete ? `<button class="btn btn-sm btn-success" onclick="completeBooking(${b.id})" title="Complete"><i class="fas fa-check"></i></button>` : ''}
+              ${canCancel ? `<button class="btn btn-sm btn-danger" onclick="cancelBooking(${b.id})" title="Cancel"><i class="fas fa-times"></i></button>` : ''}
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function loadBookings() {
+      const showAll = document.getElementById('showAllBookings').checked;
+      try {
+        const res = await Api.request(`/gates/bookings?upcoming=false&per_page=50${showAll ? '' : '&mine=true'}`);
+        renderBookings(res.data.items || []);
+      } catch (err) {
+        App.showToast('Failed to load bookings: ' + err.message, 'danger');
+      }
+    }
+
+    async function bookSlot(slotStart) {
+      if (!canBook) return;
+      showBookModal(slotStart);
+    }
+
+    function showBookModal(prefilledSlot) {
+      const gateOptions = gatesData.filter(g => g.status === 'Open').map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+      App.createModal({
+        id: 'bookSlotModal', title: 'Book a Gate Time Slot', width: '500px',
+        body: `<form class="modal-form">
+          <div class="form-group"><label>Gate *</label><select id="bsGate" class="form-select">${gateOptions}</select></div>
+          <div class="form-row">
+            <div class="form-group"><label>Date *</label><input type="date" id="bsDate" class="form-control" value="${prefilledSlot ? prefilledSlot.split('T')[0] : new Date().toISOString().split('T')[0]}"></div>
+            <div class="form-group"><label>Time *</label><input type="time" id="bsTime" class="form-control" value="${prefilledSlot ? prefilledSlot.split('T')[1].slice(0,5) : '09:00'}"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Truck Number</label><input type="text" id="bsTruck" class="form-control" placeholder="TN-01-1234"></div>
+            <div class="form-group"><label>Purpose</label><select id="bsPurpose" class="form-select">
+              <option value="Container Pickup">Container Pickup</option>
+              <option value="Container Delivery">Container Delivery</option>
+              <option value="Cargo Pickup">Cargo Pickup</option>
+              <option value="Cargo Delivery">Cargo Delivery</option>
+              <option value="Empty Return">Empty Return</option>
+              <option value="Other">Other</option>
+            </select></div>
+          </div>
+          <div id="bookSlotError" style="color:var(--danger);font-size:0.82rem;display:none;"></div>
+        </form>`,
+        footer: `<button class="btn btn-secondary" onclick="document.getElementById('bookSlotModal').remove()">Cancel</button><button class="btn btn-primary" onclick="submitBooking()">Book Slot</button>`
+      });
+    }
+
+    async function submitBooking() {
+      const gateId = document.getElementById('bsGate').value;
+      const date = document.getElementById('bsDate').value;
+      const time = document.getElementById('bsTime').value;
+      if (!gateId || !date || !time) {
+        document.getElementById('bookSlotError').textContent = 'Gate, date and time are required';
+        document.getElementById('bookSlotError').style.display = 'block';
+        return;
+      }
+      try {
+        await Api.request('/gates/bookings', {
+          method: 'POST',
+          body: JSON.stringify({
+            gate_id: parseInt(gateId),
+            purpose: document.getElementById('bsPurpose').value,
+            truck_number: document.getElementById('bsTruck').value || undefined,
+            slot_start: `${date}T${time}:00`,
+          })
+        });
+        document.getElementById('bookSlotModal').remove();
+        App.showToast('Time slot booked successfully', 'success');
+        refreshEverything();
+      } catch (err) {
+        document.getElementById('bookSlotError').textContent = err.message;
+        document.getElementById('bookSlotError').style.display = 'block';
+      }
+    }
+
+    async function cancelBooking(id) {
+      if (!confirm('Cancel this booking?')) return;
+      try {
+        await Api.request(`/gates/bookings/${id}/cancel`, { method: 'POST' });
+        App.showToast('Booking cancelled', 'success');
+        loadBookings();
+        loadGates();
+      } catch (err) {
+        App.showToast(err.message, 'danger');
+      }
+    }
+
+    async function checkInBooking(id) {
+      try {
+        await Api.request(`/gates/bookings/${id}/check-in`, { method: 'POST' });
+        App.showToast('Truck checked in', 'success');
+        refreshEverything();
+      } catch (err) {
+        App.showToast(err.message, 'danger');
+      }
+    }
+
+    async function completeBooking(id) {
+      try {
+        await Api.request(`/gates/bookings/${id}/complete`, { method: 'POST' });
+        App.showToast('Booking completed', 'success');
+        refreshEverything();
+      } catch (err) {
+        App.showToast(err.message, 'danger');
+      }
+    }
+
+    function showManageGateModal(gateId) {
+      const gate = gatesData.find(g => g.id === gateId);
+      App.createModal({
+        id: 'manageGateModal', title: gate ? `Edit ${gate.name}` : 'Add New Gate', width: '500px',
+        body: `<form class="modal-form">
+          ${!gate ? `<div class="form-group"><label>Gate Code *</label><input type="text" id="mgCode" class="form-control" placeholder="GATE-5"></div>
+          <div class="form-group"><label>Name *</label><input type="text" id="mgName" class="form-control" placeholder="Gate 5"></div>
+          <div class="form-group"><label>Type *</label><select id="mgType" class="form-select">
+            <option value="Container Terminal">Container Terminal</option>
+            <option value="Bulk Cargo">Bulk Cargo</option>
+            <option value="General / Mixed">General / Mixed</option>
+            <option value="Tanker / Liquid Cargo">Tanker / Liquid Cargo</option>
+          </select></div>` : ''}
+          <div class="form-row">
+            <div class="form-group"><label>Status</label><select id="mgStatus" class="form-select">
+              <option value="Open" ${gate && gate.status === 'Open' ? 'selected' : ''}>Open</option>
+              <option value="Closed" ${gate && gate.status === 'Closed' ? 'selected' : ''}>Closed</option>
+              <option value="Maintenance" ${gate && gate.status === 'Maintenance' ? 'selected' : ''}>Maintenance</option>
+            </select></div>
+            <div class="form-group"><label>Capacity/hour</label><input type="number" id="mgCapacity" class="form-control" value="${gate ? gate.capacity_per_hour : 20}"></div>
+          </div>
+          <div id="manageGateError" style="color:var(--danger);font-size:0.82rem;display:none;"></div>
+        </form>`,
+        footer: `<button class="btn btn-secondary" onclick="document.getElementById('manageGateModal').remove()">Cancel</button><button class="btn btn-primary" onclick="submitManageGate(${gateId || 'null'})">${gate ? 'Save' : 'Create'}</button>`
+      });
+    }
+
+    async function submitManageGate(gateId) {
+      const payload = {
+        status: document.getElementById('mgStatus').value,
+        capacity_per_hour: parseInt(document.getElementById('mgCapacity').value) || 20,
+      };
+      if (!gateId) {
+        payload.gate_code = document.getElementById('mgCode').value;
+        payload.name = document.getElementById('mgName').value;
+        payload.gate_type = document.getElementById('mgType').value;
+      }
+      try {
+        if (gateId) {
+          await Api.request(`/gates/${gateId}`, { method: 'PUT', body: JSON.stringify(payload) });
+        } else {
+          await Api.request('/gates', { method: 'POST', body: JSON.stringify(payload) });
+        }
+        document.getElementById('manageGateModal').remove();
+        App.showToast('Gate saved', 'success');
+        refreshEverything();
+      } catch (err) {
+        document.getElementById('manageGateError').textContent = err.message;
+        document.getElementById('manageGateError').style.display = 'block';
+      }
+    }
+
+    function refreshEverything() {
+      loadGates().then(loadAvailability);
+      loadRecommendation();
+      loadBookings();
+    }
+
+    document.getElementById('availGateSelect').addEventListener('change', loadAvailability);
+    document.getElementById('availDate').addEventListener('change', loadAvailability);
+    document.getElementById('showAllBookings').addEventListener('change', loadBookings);
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('availDate').value = new Date().toISOString().split('T')[0];
+      if (canBook) document.getElementById('bookSlotBtn').style.display = '';
+      if (canManage) {
+        document.getElementById('manageGatesBtn').style.display = '';
+        document.getElementById('bookingsTitle').textContent = 'Gate Booking Queue';
+      } else {
+        document.getElementById('showAllToggleWrap').style.display = 'none';
+      }
+      await loadGates();
+      loadAvailability();
+      loadRecommendation();
+      loadBookings();
+    });
+  </script>
+</body>
+</html>

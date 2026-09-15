@@ -202,16 +202,24 @@ const ApiStore = {
   setUser(user) { Api.setUser(user); },
 
   async init() {
-    await Promise.all([
-      this.get('ships'),
-      this.get('containers'),
-      this.get('trucks'),
-      this.get('berths'),
-      this.get('alerts'),
-      this.get('users'),
-      this.get('activity_log'),
-      this.get('env_readings'),
-    ]);
+    // Only fetch resources the logged-in role can actually read -- e.g.
+    // a Truck Operator has no users.read/security.read, so blindly
+    // fetching those on every page load just produced 403s in the
+    // console for no benefit.
+    const resourcePermissions = {
+      ships: 'ships.read',
+      containers: 'containers.read',
+      trucks: 'trucks.read',
+      berths: 'berths.read',
+      alerts: 'security.read',
+      users: 'users.read',
+      activity_log: 'dashboard.read',
+      env_readings: 'environment.read',
+    };
+    const fetches = Object.entries(resourcePermissions)
+      .filter(([, perm]) => Api.hasPermission(perm))
+      .map(([key]) => this.get(key));
+    await Promise.all(fetches);
   },
 
   getShipStats() {

@@ -41,7 +41,8 @@ def register_cli_commands(app):
             MonitoringStation, AirQualityReading, WaterQualityReading, NoiseReading, WeatherReading, EmissionReading,
             MaintenanceSchedule, MaintenanceStatus, MaintenanceType, MaintenancePriority, ServiceLog,
             Invoice, InvoiceStatus, BillingLine, BillingCategory, PaymentMethod,
-            EventLog, EventType, EventSeverity
+            EventLog, EventType, EventSeverity,
+            Gate, GateType, GateStatus
         )
         from datetime import datetime, timedelta
         import random
@@ -88,6 +89,9 @@ def register_cli_commands(app):
             ('audit.read', 'View audit logs', 'audit', 'read'),
             ('settings.read', 'View settings', 'settings', 'read'),
             ('settings.write', 'Modify settings', 'settings', 'write'),
+            ('gates.read', 'View gates, congestion, and time slots', 'gates', 'read'),
+            ('gates.book', 'Book/cancel own gate time slots', 'gates', 'book'),
+            ('gates.manage', 'Manage gates and check in/complete any booking', 'gates', 'manage'),
         ]
         perms = {}
         for name, desc, module, action in permissions_data:
@@ -175,6 +179,21 @@ def register_cli_commands(app):
                 has_crane=hc, crane_capacity=cc, zone=zone, terminal=terminal,
             )
             db.session.add(berth)
+        db.session.flush()
+
+        print('Creating gates...')
+        gates_data = [
+            ('GATE-1', 'Gate 1 - Container Terminal', GateType.CONTAINER, 'Terminal 1', 40, 8.7615, 77.8370),
+            ('GATE-2', 'Gate 2 - Bulk Cargo', GateType.BULK_CARGO, 'Terminal 2', 24, 8.7660, 77.8410),
+            ('GATE-3', 'Gate 3 - General / Mixed', GateType.GENERAL, 'Terminal 3', 20, 8.7700, 77.8330),
+            ('GATE-4', 'Gate 4 - Tanker / Liquid Cargo', GateType.TANKER, 'Harbour', 16, 8.7580, 77.8450),
+        ]
+        for code, name, gtype, zone, cap, lat, lon in gates_data:
+            g = Gate(
+                gate_code=code, name=name, gate_type=gtype, status=GateStatus.OPEN,
+                zone=zone, capacity_per_hour=cap, latitude=lat, longitude=lon, is_active=True,
+            )
+            db.session.add(g)
         db.session.flush()
 
         print('Creating monitoring stations...')

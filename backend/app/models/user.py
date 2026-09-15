@@ -83,6 +83,7 @@ class User(db.Model):
             'security.read', 'security.write', 'security.delete',
             'environment.read', 'environment.write', 'environment.delete',
             'audit.read', 'settings.read', 'settings.write',
+            'gates.read', 'gates.book', 'gates.manage',
         ],
         UserRole.PORT_SUPERVISOR: [
             'ships.read', 'ships.write',
@@ -94,6 +95,7 @@ class User(db.Model):
             'security.read', 'security.write',
             'environment.read',
             'audit.read',
+            'gates.read', 'gates.book', 'gates.manage',
         ],
         UserRole.PORT_STAFF: [
             'ships.read', 'ships.write',
@@ -103,6 +105,7 @@ class User(db.Model):
             'dashboard.read', 'reports.read',
             'maintenance.read', 'maintenance.write',
             'security.read',
+            'gates.read', 'gates.book', 'gates.manage',
         ],
         UserRole.CUSTOMS_OFFICER: [
             'containers.read', 'containers.write',
@@ -110,6 +113,7 @@ class User(db.Model):
             'ships.read',
             'dashboard.read', 'reports.read',
             'security.read',
+            'gates.read', 'gates.book',
         ],
         UserRole.SHIPPING_COMPANY: [
             'ships.read',
@@ -117,21 +121,25 @@ class User(db.Model):
             'trucks.read',
             'dashboard.read', 'reports.read',
             'berths.read',
+            'gates.read', 'gates.book',
         ],
         UserRole.TRUCK_OPERATOR: [
             'trucks.read', 'trucks.write',
             'containers.read',
             'ships.read',
             'dashboard.read', 'reports.read',
+            'gates.read', 'gates.book',
         ],
         UserRole.CUSTOMER: [
             'containers.read',
             'ships.read',
             'dashboard.read', 'reports.read',
+            'gates.read',
         ],
         UserRole.PUBLIC: [
             'ships.read',
             'dashboard.read',
+            'gates.read',
         ],
     }
 

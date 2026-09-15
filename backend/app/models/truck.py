@@ -43,6 +43,7 @@ class Truck(db.Model):
     owner_contact = db.Column(db.String(255))
     assigned_container_id = db.Column(db.Integer, ForeignKey('containers.id'), index=True)
     current_location = db.Column(db.String(255), index=True)
+    current_gate_id = db.Column(db.Integer, ForeignKey('gates.id'), index=True)
     gate_in_time = db.Column(db.DateTime, index=True)
     gate_out_time = db.Column(db.DateTime, index=True)
     assigned_at = db.Column(db.DateTime)
@@ -50,6 +51,7 @@ class Truck(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     assigned_container = relationship('Container', foreign_keys=[assigned_container_id], backref='assigned_truck')
+    current_gate = relationship('Gate', foreign_keys=[current_gate_id])
 
     __table_args__ = (
         Index('ix_truck_status_location', 'status', 'current_location'),
@@ -71,6 +73,7 @@ class Truck(db.Model):
             'owner_contact': self.owner_contact,
             'assigned_container_id': self.assigned_container_id,
             'current_location': self.current_location,
+            'current_gate_id': self.current_gate_id,
             'gate_in_time': self.gate_in_time.isoformat() if self.gate_in_time else None,
             'gate_out_time': self.gate_out_time.isoformat() if self.gate_out_time else None,
             'assigned_at': self.assigned_at.isoformat() if self.assigned_at else None,

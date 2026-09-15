@@ -15,6 +15,7 @@ const ROLE_PERMISSIONS = {
     'security.read', 'security.write', 'security.delete',
     'environment.read', 'environment.write', 'environment.delete',
     'audit.read', 'settings.read', 'settings.write',
+    'gates.read', 'gates.book', 'gates.manage',
   ],
   'Port Supervisor': [
     'ships.read', 'ships.write',
@@ -25,6 +26,7 @@ const ROLE_PERMISSIONS = {
     'maintenance.read', 'maintenance.write',
     'security.read', 'security.write',
     'environment.read', 'audit.read',
+    'gates.read', 'gates.book', 'gates.manage',
   ],
   'Port Staff': [
     'ships.read', 'ships.write',
@@ -34,27 +36,32 @@ const ROLE_PERMISSIONS = {
     'dashboard.read', 'reports.read',
     'maintenance.read', 'maintenance.write',
     'security.read',
+    'gates.read', 'gates.book', 'gates.manage',
   ],
   'Customs Officer': [
     'containers.read', 'containers.write',
     'trucks.read', 'ships.read',
     'dashboard.read', 'reports.read', 'security.read',
+    'gates.read', 'gates.book',
   ],
   'Shipping Company': [
     'ships.read', 'containers.read', 'containers.write',
     'trucks.read', 'dashboard.read', 'reports.read', 'berths.read',
+    'gates.read', 'gates.book',
   ],
   'Truck Operator': [
     'trucks.read', 'trucks.write',
     'containers.read', 'ships.read',
     'dashboard.read', 'reports.read',
+    'gates.read', 'gates.book',
   ],
   'Customer': [
     'containers.read', 'ships.read',
     'dashboard.read', 'reports.read',
+    'gates.read',
   ],
   'Public': [
-    'ships.read', 'dashboard.read',
+    'ships.read', 'dashboard.read', 'gates.read',
   ],
 };
 
@@ -78,6 +85,7 @@ const ROLE_NAV_ITEMS = {
       { href: 'containers.html', icon: 'fa-boxes-stacked', label: 'Container Ops' },
       { href: 'trucks.html', icon: 'fa-truck', label: 'Truck Operations' },
       { href: 'berths.html', icon: 'fa-anchor', label: 'Berth Management' },
+      { href: 'gates.html', icon: 'fa-route', label: 'Gate Routing' },
     ]},
     { section: 'Management', items: [
       { href: 'security.html', icon: 'fa-shield-halved', label: 'Security Center' },
@@ -102,6 +110,7 @@ const ROLE_NAV_ITEMS = {
       { href: 'containers.html', icon: 'fa-boxes-stacked', label: 'Container Ops' },
       { href: 'trucks.html', icon: 'fa-truck', label: 'Truck Operations' },
       { href: 'berths.html', icon: 'fa-anchor', label: 'Berth Management' },
+      { href: 'gates.html', icon: 'fa-route', label: 'Gate Routing' },
     ]},
     { section: 'Management', items: [
       { href: 'security.html', icon: 'fa-shield-halved', label: 'Security Center' },
@@ -126,6 +135,7 @@ const ROLE_NAV_ITEMS = {
       { href: 'containers.html', icon: 'fa-boxes-stacked', label: 'Container Ops' },
       { href: 'trucks.html', icon: 'fa-truck', label: 'Truck Operations' },
       { href: 'berths.html', icon: 'fa-anchor', label: 'Berth Management' },
+      { href: 'gates.html', icon: 'fa-route', label: 'Gate Routing' },
     ]},
     { section: 'Management', items: [
       { href: 'security.html', icon: 'fa-shield-halved', label: 'Security Center' },
@@ -148,6 +158,7 @@ const ROLE_NAV_ITEMS = {
       { href: 'containers.html', icon: 'fa-boxes-stacked', label: 'Containers' },
       { href: 'trucks.html', icon: 'fa-truck', label: 'Trucks' },
       { href: 'berths.html', icon: 'fa-anchor', label: 'Berths' },
+      { href: 'gates.html', icon: 'fa-route', label: 'Gate Routing' },
     ]},
     { section: 'Management', items: [
       { href: 'maintenance.html', icon: 'fa-wrench', label: 'Maintenance' },
@@ -162,6 +173,7 @@ const ROLE_NAV_ITEMS = {
       { href: 'containers.html', icon: 'fa-boxes-stacked', label: 'Containers' },
       { href: 'ships.html', icon: 'fa-ship', label: 'Ships' },
       { href: 'trucks.html', icon: 'fa-truck', label: 'Trucks' },
+      { href: 'gates.html', icon: 'fa-route', label: 'Gate Routing' },
     ]},
     { section: 'Account', items: [
       { href: 'profile.html', icon: 'fa-user-circle', label: 'Profile' },
@@ -173,6 +185,7 @@ const ROLE_NAV_ITEMS = {
       { href: 'ships.html', icon: 'fa-ship', label: 'My Ships' },
       { href: 'containers.html', icon: 'fa-boxes-stacked', label: 'My Containers' },
       { href: 'berths.html', icon: 'fa-anchor', label: 'Berth Status' },
+      { href: 'gates.html', icon: 'fa-route', label: 'Gate Routing' },
     ]},
     { section: 'Account', items: [
       { href: 'profile.html', icon: 'fa-user-circle', label: 'Profile' },
@@ -181,6 +194,7 @@ const ROLE_NAV_ITEMS = {
   'Truck Operator': [
     { section: 'Main', items: [{ href: 'dashboard.html', icon: 'fa-th-large', label: 'Dashboard' }] },
     { section: 'My Operations', items: [
+      { href: 'gates.html', icon: 'fa-route', label: 'Gate Routing & Slots' },
       { href: 'trucks.html', icon: 'fa-truck', label: 'My Trucks' },
       { href: 'containers.html', icon: 'fa-boxes-stacked', label: 'Containers' },
       { href: 'ships.html', icon: 'fa-ship', label: 'Vessels' },
@@ -194,6 +208,7 @@ const ROLE_NAV_ITEMS = {
     { section: 'My Shipments', items: [
       { href: 'containers.html', icon: 'fa-boxes-stacked', label: 'Containers' },
       { href: 'ships.html', icon: 'fa-ship', label: 'Vessels' },
+      { href: 'gates.html', icon: 'fa-route', label: 'Gate Routing' },
     ]},
     { section: 'Account', items: [
       { href: 'profile.html', icon: 'fa-user-circle', label: 'Profile' },
@@ -203,6 +218,7 @@ const ROLE_NAV_ITEMS = {
     { section: 'Main', items: [
       { href: 'dashboard.html', icon: 'fa-th-large', label: 'Dashboard' },
       { href: 'ships.html', icon: 'fa-ship', label: 'Ship Tracker' },
+      { href: 'gates.html', icon: 'fa-route', label: 'Gate Routing' },
     ]},
   ],
 };
