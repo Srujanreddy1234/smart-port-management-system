@@ -11,11 +11,27 @@ const ApiStore = {
     };
   },
 
-  async _apiRequest(path, options = {}) {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-      ...options,
-      headers: { ...this._headers(), ...(options.headers || {}) }
-    });
+  async _apiRequest(path, options = {}, _isRetry = false) {
+    let response;
+    try {
+      response = await fetch(`${API_BASE_URL}${path}`, {
+        ...options,
+        headers: { ...this._headers(), ...(options.headers || {}) }
+      });
+    } catch (err) {
+      // Network-level failure -- one silent retry covers a transient
+      // blip (e.g. a free-tier instance mid-restart) instead of leaving
+      // a page's cards permanently blank from a single failed fetch.
+      if (!_isRetry) {
+        await new Promise(r => setTimeout(r, 1200));
+        return this._apiRequest(path, options, true);
+      }
+      throw err;
+    }
+    if ([502, 503, 504].includes(response.status) && !_isRetry) {
+      await new Promise(r => setTimeout(r, 1200));
+      return this._apiRequest(path, options, true);
+    }
     if (response.status === 401) {
       Api.clearSession();
       window.location.href = 'login.html';

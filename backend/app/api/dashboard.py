@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from app.extensions import db
+from app.extensions import db, cache
 from app.models import (
     User, Ship, ShipStatus, Container, ContainerStatus,
     Truck, TruckStatus, SecurityIncident, IncidentStatus, IncidentSeverity,
@@ -34,6 +34,7 @@ def require_permission(permission):
 
 @dashboard_bp.route('/kpis', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=20)
 def get_kpis():
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
@@ -263,6 +264,7 @@ def get_kpis():
 
 @dashboard_bp.route('/charts/throughput', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=30, query_string=True)
 def get_throughput_chart():
     days = int(request.args.get('days', 30))
     end_date = datetime.utcnow()
@@ -302,6 +304,7 @@ def get_throughput_chart():
 
 @dashboard_bp.route('/charts/vessel-arrivals', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=30, query_string=True)
 def get_vessel_arrivals_chart():
     days = int(request.args.get('days', 30))
     end_date = datetime.utcnow()
@@ -360,6 +363,7 @@ def get_vessel_arrivals_chart():
 
 @dashboard_bp.route('/charts/container-distribution', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=30, query_string=True)
 def get_container_distribution():
     distribution = db.session.query(
         Container.container_type,
@@ -391,6 +395,7 @@ def get_container_distribution():
 
 @dashboard_bp.route('/charts/truck-traffic', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=30, query_string=True)
 def get_truck_traffic_chart():
     hours = 24
     end_time = datetime.utcnow().replace(minute=0, second=0, microsecond=0)
@@ -441,6 +446,7 @@ def get_truck_traffic_chart():
 
 @dashboard_bp.route('/charts/equipment-health', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=30, query_string=True)
 def get_equipment_health():
     health_ranges = [
         (90, 100, 'Excellent'),
@@ -474,6 +480,7 @@ def get_equipment_health():
 
 @dashboard_bp.route('/charts/environmental-trends', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=30, query_string=True)
 def get_environmental_trends():
     parameter = request.args.get('parameter', 'aqi')
     hours = int(request.args.get('hours', 24))
@@ -515,6 +522,7 @@ def get_environmental_trends():
 
 @dashboard_bp.route('/vessel-status', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=20)
 def get_vessel_status():
     status_counts = db.session.query(
         Ship.status,
@@ -530,6 +538,7 @@ def get_vessel_status():
 
 @dashboard_bp.route('/berth-occupancy', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=20)
 def get_berth_occupancy():
     berths = Berth.query.order_by(Berth.berth_id).all()
 

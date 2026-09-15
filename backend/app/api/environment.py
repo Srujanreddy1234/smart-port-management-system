@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from app.extensions import db
+from app.extensions import db, cache
 from app.models import (
     User,
     MonitoringStation,
@@ -182,6 +182,7 @@ def delete_station(station_id):
 
 @environment_bp.route('/air-quality', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=30, query_string=True)
 def list_air_quality_readings():
     check_permission('environment.read')
 
@@ -230,6 +231,7 @@ def list_air_quality_readings():
 
 @environment_bp.route('/air-quality/forecast', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=60)
 def get_air_quality_forecast():
     check_permission('environment.read')
 
@@ -255,6 +257,7 @@ def get_air_quality_forecast():
 
 @environment_bp.route('/water-quality', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=30, query_string=True)
 def list_water_quality_readings():
     check_permission('environment.read')
 
@@ -303,6 +306,7 @@ def list_water_quality_readings():
 
 @environment_bp.route('/emissions', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=30, query_string=True)
 def list_emission_readings():
     check_permission('environment.read')
 
@@ -335,6 +339,7 @@ def list_emission_readings():
 
 @environment_bp.route('/noise', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=30, query_string=True)
 def list_noise_readings():
     check_permission('environment.read')
 
@@ -383,6 +388,7 @@ def list_noise_readings():
 
 @environment_bp.route('/emissions/by-source', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=30, query_string=True)
 def get_emissions_by_source():
     check_permission('environment.read')
 
@@ -403,6 +409,7 @@ def get_emissions_by_source():
 
 @environment_bp.route('/noise/by-station', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=30, query_string=True)
 def get_latest_noise_by_station():
     check_permission('environment.read')
 
@@ -429,6 +436,7 @@ def get_latest_noise_by_station():
 
 @environment_bp.route('/weather', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=30, query_string=True)
 def list_weather_readings():
     check_permission('environment.read')
 
@@ -517,6 +525,7 @@ def list_environmental_alerts():
 
 @environment_bp.route('/readings', methods=['GET'])
 @jwt_required()
+@cache.cached(timeout=20, query_string=True)
 def get_latest_readings():
     latest_aq = AirQualityReading.query.order_by(desc(AirQualityReading.recorded_at)).first()
     latest_weather = WeatherReading.query.order_by(desc(WeatherReading.recorded_at)).first()

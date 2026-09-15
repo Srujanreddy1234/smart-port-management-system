@@ -270,7 +270,7 @@ const Api = {
     return ROLE_NAV_ITEMS[role] || ROLE_NAV_ITEMS['Public'];
   },
 
-  async request(path, options = {}) {
+  async request(path, options = {}, _isRetry = false) {
     const token = this.getToken();
     const headers = {
       'Content-Type': 'application/json',
@@ -278,27 +278,47 @@ const Api = {
       ...(options.headers || {})
     };
 
+    let response;
     try {
-      const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
-      const body = await response.json().catch(() => ({}));
-
-      if (response.status === 401) {
-        this.clearSession();
-        window.location.href = 'login.html';
-        throw new Error(body.message || 'Session expired');
-      }
-
-      if (!response.ok) {
-        throw new Error(body.message || 'Request failed');
-      }
-
-      return body;
+      response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
     } catch (err) {
-      if (err.message === 'Failed to fetch') {
-        throw new Error('Server unreachable. Please check your connection.');
+      // Network-level failure (server unreachable, DNS, offline, or the
+      // brief window a free-tier instance is mid-restart). One silent
+      // retry after a short pause covers that transient case instead of
+      // pages permanently showing blank data on a single hiccup.
+      if (!_isRetry) {
+        await new Promise(r => setTimeout(r, 1200));
+        return this.request(path, options, true);
       }
-      throw err;
+      if (typeof App !== 'undefined' && App.showToast) {
+        App.showToast('Connection issue reaching the server. Please try again.', 'danger');
+      }
+      throw new Error('Server unreachable. Please check your connection.');
     }
+
+    // 502/503/504 from the platform proxy (e.g. a transient restart) --
+    // same one-time-retry treatment as a network failure.
+    if ([502, 503, 504].includes(response.status) && !_isRetry) {
+      await new Promise(r => setTimeout(r, 1200));
+      return this.request(path, options, true);
+    }
+
+    const body = await response.json().catch(() => ({}));
+
+    if (response.status === 401) {
+      this.clearSession();
+      window.location.href = 'login.html';
+      throw new Error(body.message || 'Session expired');
+    }
+
+    if (!response.ok) {
+      if ([502, 503, 504].includes(response.status) && typeof App !== 'undefined' && App.showToast) {
+        App.showToast('The server was briefly unavailable -- some data may be incomplete. Try refreshing.', 'warning');
+      }
+      throw new Error(body.message || 'Request failed');
+    }
+
+    return body;
   },
 
   login(email, password) {
