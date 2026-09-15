@@ -91,10 +91,18 @@ class ProductionConfig(Config):
     SESSION_COOKIE_SAMESITE = 'Lax'
     
     LOG_LEVEL = 'WARNING'
-    
-    RATELIMIT_STORAGE_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
-    CACHE_TYPE = 'redis'
-    CACHE_REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+
+    # Use Redis only when one is actually configured (e.g. a paid add-on).
+    # Defaulting to a Redis URL that points nowhere when REDIS_URL is unset
+    # meant this silently fell back to a no-op cache and put rate-limit
+    # storage at risk of connection errors on any free-tier deploy that
+    # never provisions Redis -- fall back to the same in-process storage
+    # the base Config already uses instead.
+    _redis_url = os.getenv('REDIS_URL')
+    if _redis_url:
+        RATELIMIT_STORAGE_URL = _redis_url
+        CACHE_TYPE = 'redis'
+        CACHE_REDIS_URL = _redis_url
 
 
 config = {
