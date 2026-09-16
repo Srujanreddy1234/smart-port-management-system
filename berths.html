@@ -301,10 +301,11 @@
         id: 'addBerthModal',
         title: 'Add New Berth',
         body: `
+          <form id="addBerthForm">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
             <div class="form-group">
               <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">Berth ID *</label>
-              <input type="text" id="newBerthId" class="form-control" placeholder="BERTH-10">
+              <input type="text" id="newBerthId" class="form-control" placeholder="BERTH-10" style="text-transform:uppercase;" oninput="this.value = this.value.toUpperCase(); App.clearFieldError('newBerthId');">
             </div>
             <div class="form-group">
               <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">Name *</label>
@@ -312,7 +313,7 @@
             </div>
             <div class="form-group">
               <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">Code *</label>
-              <input type="text" id="newBerthCode" class="form-control" placeholder="B10">
+              <input type="text" id="newBerthCode" class="form-control" placeholder="B10" style="text-transform:uppercase;" oninput="this.value = this.value.toUpperCase(); App.clearFieldError('newBerthCode');">
             </div>
             <div class="form-group">
               <label style="font-size:0.82rem;font-weight:500;margin-bottom:4px;display:block;">Max Length (m)</label>
@@ -332,6 +333,7 @@
             </div>
           </div>
           <div id="addBerthError" style="color:var(--danger);font-size:0.82rem;display:none;margin-top:8px;"></div>
+          </form>
         `,
         footer: `
           <button class="btn btn-secondary" onclick="document.getElementById('addBerthModal').remove()">Cancel</button>
@@ -341,10 +343,25 @@
     }
 
     async function submitNewBerth() {
+      const form = document.getElementById('addBerthForm');
+      App.clearFormErrors(form);
+      const berthId = document.getElementById('newBerthId').value.trim().toUpperCase();
+      const code = document.getElementById('newBerthCode').value.trim().toUpperCase();
+      const name = document.getElementById('newBerthName').value.trim();
+      let hasError = false;
+      const idPattern = /^[A-Z][A-Z0-9-]{2,49}$/;
+      const codePattern = /^[A-Z][A-Z0-9-]{1,19}$/;
+      if (!berthId) { App.showFieldError('newBerthId', 'Berth ID is required'); hasError = true; }
+      else if (!idPattern.test(berthId)) { App.showFieldError('newBerthId', 'Uppercase letters, numbers, and hyphens only, e.g. BERTH-10'); hasError = true; }
+      if (!name) { App.showFieldError('newBerthName', 'Name is required'); hasError = true; }
+      if (!code) { App.showFieldError('newBerthCode', 'Code is required'); hasError = true; }
+      else if (!codePattern.test(code)) { App.showFieldError('newBerthCode', 'Uppercase letters and numbers only, e.g. B10'); hasError = true; }
+      if (hasError) return;
+
       const data = {
-        berth_id: document.getElementById('newBerthId').value,
-        name: document.getElementById('newBerthName').value,
-        code: document.getElementById('newBerthCode').value,
+        berth_id: berthId,
+        name,
+        code,
         max_length: parseFloat(document.getElementById('newMaxLength').value) || null,
         max_draft: parseFloat(document.getElementById('newMaxDraft').value) || null,
         zone: document.getElementById('newZone').value,
@@ -356,8 +373,18 @@
         loadBerths();
         loadBerthStats();
       } catch (err) {
-        document.getElementById('addBerthError').textContent = err.message;
-        document.getElementById('addBerthError').style.display = 'block';
+        if (/berth id.*already exists/i.test(err.message || '')) {
+          App.showFieldError('newBerthId', err.message);
+          return;
+        }
+        if (/berth code.*already exists/i.test(err.message || '')) {
+          App.showFieldError('newBerthCode', err.message);
+          return;
+        }
+        App.applyFieldErrors(form, err, {
+          berth_id: 'newBerthId', name: 'newBerthName', code: 'newBerthCode',
+          max_length: 'newMaxLength', max_draft: 'newMaxDraft', zone: 'newZone',
+        });
       }
     }
 

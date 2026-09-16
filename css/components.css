@@ -337,6 +337,30 @@
   color: var(--text-muted);
 }
 
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 1px var(--danger);
+}
+
+.form-control.is-invalid:focus,
+.form-select.is-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(220,53,69,0.25);
+}
+
+.field-invalid-feedback {
+  display: none;
+  color: var(--danger);
+  font-size: 0.76rem;
+  margin-top: 4px;
+}
+
+.field-invalid-feedback.show {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .form-select {
   background: var(--light);
   border: 1px solid var(--border-color);

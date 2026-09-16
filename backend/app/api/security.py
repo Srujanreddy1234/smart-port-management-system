@@ -8,6 +8,7 @@ from app.models import (
 )
 from app.utils.exceptions import AuthorizationError, NotFoundError, ValidationError as AppValidationError
 from app.utils.helpers import success_response
+from app.utils.validators import asset_id
 from sqlalchemy import func, or_, and_, desc, asc
 from datetime import datetime, timedelta
 from marshmallow import Schema, fields, validate, ValidationError
@@ -17,7 +18,7 @@ security_bp = Blueprint('security', __name__, url_prefix='/api/v1/security')
 
 
 class IncidentSchema(Schema):
-    incident_id = fields.Str(required=True, validate=validate.Length(max=50))
+    incident_id = fields.Str(required=True, validate=[validate.Length(min=3, max=50), asset_id()])
     incident_type = fields.Str(required=True, validate=validate.OneOf([t.value for t in IncidentType]))
     zone = fields.Str(required=True, validate=validate.OneOf([z.value for z in SecurityZone]))
     severity = fields.Str(required=True, validate=validate.OneOf([s.value for s in IncidentSeverity]))

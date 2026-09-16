@@ -424,7 +424,7 @@
       App.createModal({
         id: 'addContainerModal', title: 'Add New Container', width: '600px',
         body: `<form id="addContainerForm" class="modal-form">
-          <div class="form-row"><div class="form-group"><label>Container ID *</label><input type="text" id="acContainerId" class="form-control" placeholder="e.g. CONT-100" required></div><div class="form-group"><label>ISO Code</label><select id="acIsoCode" class="form-select"><option>22G1</option><option>42G1</option><option>45G1</option><option>22R1</option><option>42R1</option></select></div></div>
+          <div class="form-row"><div class="form-group"><label>Container ID *</label><input type="text" id="acContainerId" class="form-control" placeholder="e.g. CONT-000100" style="text-transform:uppercase;" oninput="this.value = this.value.toUpperCase(); App.clearFieldError('acContainerId');" required></div><div class="form-group"><label>ISO Code</label><select id="acIsoCode" class="form-select"><option>22G1</option><option>42G1</option><option>45G1</option><option>22R1</option><option>42R1</option></select></div></div>
           <div class="form-group"><label>Type</label><select id="acType" class="form-select"><option value="20ft">20ft</option><option value="40ft">40ft</option><option value="40ft HC">40ft HC</option><option value="Reefer">Reefer</option><option value="Hazmat">Hazmat</option><option value="Tank">Tank</option><option value="Open Top">Open Top</option><option value="Flat Rack">Flat Rack</option></select></div>
           <div class="form-row"><div class="form-group"><label>Weight (kg)</label><input type="number" id="acWeight" class="form-control" placeholder="20000"></div><div class="form-group"><label>Owner</label><input type="text" id="acOwner" class="form-control" placeholder="Owner company"></div></div>
         </form>`,
@@ -433,8 +433,14 @@
     }
 
     async function submitAddContainer() {
-      const containerId = document.getElementById('acContainerId')?.value.trim();
-      if (!containerId) { App.showToast('Container ID is required', 'danger'); return; }
+      const form = document.getElementById('addContainerForm');
+      App.clearFormErrors(form);
+      const containerId = document.getElementById('acContainerId')?.value.trim().toUpperCase();
+      if (!containerId) { App.showFieldError('acContainerId', 'Container ID is required'); return; }
+      if (!/^[A-Z][A-Z0-9-]{2,49}$/.test(containerId)) {
+        App.showFieldError('acContainerId', 'Uppercase letters, numbers, and hyphens only, e.g. CONT-000100');
+        return;
+      }
       try {
         await Api.request('/containers', {
           method: 'POST',
@@ -450,7 +456,14 @@
         loadContainers(); loadKpis();
         App.showToast(`Container ${containerId} added successfully`, 'success');
       } catch (err) {
-        App.showToast(err.message || 'Failed to add container', 'danger');
+        if (/container id.*already exists/i.test(err.message || '')) {
+          App.showFieldError('acContainerId', err.message);
+          return;
+        }
+        App.applyFieldErrors(form, err, {
+          container_id: 'acContainerId', iso_code: 'acIsoCode', container_type: 'acType',
+          weight: 'acWeight', owner: 'acOwner',
+        });
       }
     }
 

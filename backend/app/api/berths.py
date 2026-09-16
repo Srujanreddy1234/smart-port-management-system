@@ -5,6 +5,7 @@ from app.extensions import db
 from app.models import Berth, BerthStatus, Ship, ShipStatus, User, Invoice
 from app.utils.exceptions import ValidationError as AppValidationError, NotFoundError, AuthorizationError
 from app.utils.helpers import success_response
+from app.utils.validators import asset_id
 from sqlalchemy import func, or_, desc
 from datetime import datetime
 
@@ -14,9 +15,9 @@ berths_bp = Blueprint('berths', __name__, url_prefix='/api/v1/berths')
 
 class BerthSchema(Schema):
     id = fields.Int(dump_only=True)
-    berth_id = fields.Str(required=True, validate=validate.Length(max=50))
+    berth_id = fields.Str(required=True, validate=[validate.Length(min=3, max=50), asset_id()])
     name = fields.Str(required=True, validate=validate.Length(max=255))
-    code = fields.Str(required=True, validate=validate.Length(max=20))
+    code = fields.Str(required=True, validate=[validate.Length(min=2, max=20), asset_id()])
     status = fields.Str(validate=validate.OneOf([s.value for s in BerthStatus]))
     max_length = fields.Float()
     max_beam = fields.Float()

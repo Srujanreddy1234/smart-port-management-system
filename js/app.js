@@ -290,6 +290,64 @@ const App = {
     return container;
   },
 
+  // Marks a single form field as invalid: red border on the input plus
+  // an inline message right under it, instead of only a toast the user
+  // has to connect back to which field caused it.
+  showFieldError(inputId, message) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.classList.add('is-invalid');
+    let feedback = input.nextElementSibling;
+    if (!feedback || !feedback.classList.contains('field-invalid-feedback')) {
+      feedback = document.createElement('div');
+      feedback.className = 'field-invalid-feedback';
+      input.insertAdjacentElement('afterend', feedback);
+    }
+    feedback.innerHTML = `<i class="fas fa-circle-exclamation"></i> ${message}`;
+    feedback.classList.add('show');
+  },
+
+  clearFieldError(inputId) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.classList.remove('is-invalid');
+    const feedback = input.nextElementSibling;
+    if (feedback && feedback.classList.contains('field-invalid-feedback')) {
+      feedback.classList.remove('show');
+    }
+  },
+
+  clearFormErrors(formEl) {
+    if (!formEl) return;
+    formEl.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+    formEl.querySelectorAll('.field-invalid-feedback.show').forEach(el => el.classList.remove('show'));
+  },
+
+  // Maps a backend { success:false, message, errors|details: { field: [...] } }
+  // validation response onto the matching input(s) by id, falling back to
+  // a toast for anything that isn't a per-field message (e.g. a plain
+  // "Ship ID already exists" conflict, or a field the form doesn't render).
+  applyFieldErrors(formEl, err, fieldIdMap) {
+    const fieldErrors = (err && (err.fieldErrors || err.errors || err.details)) || null;
+    if (!fieldErrors || typeof fieldErrors !== 'object') {
+      App.showToast((err && err.message) || 'Please check the form and try again', 'danger');
+      return;
+    }
+    let anyMapped = false;
+    for (const [field, messages] of Object.entries(fieldErrors)) {
+      const inputId = (fieldIdMap && fieldIdMap[field]) || field;
+      const input = document.getElementById(inputId);
+      const message = Array.isArray(messages) ? messages[0] : String(messages);
+      if (input) {
+        App.showFieldError(inputId, message);
+        anyMapped = true;
+      }
+    }
+    if (!anyMapped) {
+      App.showToast((err && err.message) || 'Please check the form and try again', 'danger');
+    }
+  },
+
   createModal(config) {
     const existing = document.getElementById(config.id);
     if (existing) existing.remove();
@@ -351,8 +409,8 @@ const App = {
     App.createModal({
       id: 'addTruckModal', title: 'Add New Truck', width: '500px',
       body: `<form id="addTruckForm" class="modal-form">
-        <div class="form-group"><label>Truck Number *</label><input type="text" id="atTruckNumber" class="form-control" placeholder="TN-2001" required></div>
-        <div class="form-row"><div class="form-group"><label>Driver Name</label><input type="text" id="atDriver" class="form-control" placeholder="Driver name"></div><div class="form-group"><label>Phone</label><input type="tel" id="atPhone" class="form-control" placeholder="+1-555-0300"></div></div>
+        <div class="form-group"><label>Truck Number *</label><input type="text" id="atTruckNumber" class="form-control" placeholder="TN-2001" style="text-transform:uppercase;" oninput="this.value = this.value.toUpperCase(); App.clearFieldError('atTruckNumber');" required></div>
+        <div class="form-row"><div class="form-group"><label>Driver Name</label><input type="text" id="atDriver" class="form-control" placeholder="Driver name"></div><div class="form-group"><label>Phone</label><input type="tel" id="atPhone" class="form-control" placeholder="+91 98765 43210" oninput="App.clearFieldError('atPhone');"></div></div>
         <div class="form-row"><div class="form-group"><label>Type</label><select id="atType" class="form-select"><option value="Prime Mover">Prime Mover</option><option value="Trailer">Trailer</option><option value="Chassis">Chassis</option><option value="Reach Stacker">Reach Stacker</option><option value="Forklift">Forklift</option><option value="Empty Handler">Empty Handler</option><option value="Other">Other</option></select></div><div class="form-group"><label>Status</label><select id="atStatus" class="form-select"><option value="Available">Available</option><option value="At Gate">At Gate</option><option value="Loading">Loading</option><option value="Unloading">Unloading</option><option value="In Transit">In Transit</option><option value="Waiting">Waiting</option><option value="Maintenance">Maintenance</option></select></div></div>
       </form>`,
       footer: `<button class="btn btn-secondary" onclick="document.getElementById('addTruckModal').remove()">Cancel</button><button class="btn btn-primary" onclick="App.submitAddTruck()">Add Truck</button>`
@@ -360,9 +418,19 @@ const App = {
   },
 
   async submitAddTruck() {
-    const truckNumber = document.getElementById('atTruckNumber')?.value.trim();
-    if (!truckNumber) { App.showToast('Truck number is required', 'danger'); return; }
+    const form = document.getElementById('addTruckForm');
+    App.clearFormErrors(form);
+    const truckNumber = document.getElementById('atTruckNumber')?.value.trim().toUpperCase();
     const driverPhone = document.getElementById('atPhone')?.value.trim();
+    if (!truckNumber) { App.showFieldError('atTruckNumber', 'Truck number is required'); return; }
+    if (!/^[A-Z][A-Z0-9-]{2,49}$/.test(truckNumber)) {
+      App.showFieldError('atTruckNumber', 'Uppercase letters, numbers, and hyphens only, e.g. TN-2001');
+      return;
+    }
+    if (driverPhone && !/^\+?[\d\s-]{7,20}$/.test(driverPhone)) {
+      App.showFieldError('atPhone', 'Enter a valid phone number');
+      return;
+    }
     const payload = {
       truck_number: truckNumber,
       truck_type: document.getElementById('atType')?.value || 'Other',
@@ -380,7 +448,18 @@ const App = {
       if (typeof loadTrucks === 'function') loadTrucks();
       if (typeof loadTruckKpis === 'function') loadTruckKpis();
     } catch (err) {
-      App.showToast(err.message || 'Failed to add truck', 'danger');
+      if (/truck number.*already exists/i.test(err.message || '')) {
+        App.showFieldError('atTruckNumber', err.message);
+        return;
+      }
+      if (/license plate.*already exists/i.test(err.message || '')) {
+        App.showToast(err.message, 'danger');
+        return;
+      }
+      App.applyFieldErrors(form, err, {
+        truck_number: 'atTruckNumber', driver_name: 'atDriver', driver_phone: 'atPhone',
+        truck_type: 'atType', status: 'atStatus',
+      });
     }
   },
 
@@ -388,7 +467,7 @@ const App = {
     App.createModal({
       id: 'addAlertModal', title: 'Report Security Incident', width: '500px',
       body: `<form id="addAlertForm" class="modal-form">
-        <div class="form-group"><label>Title *</label><input type="text" id="aaTitle" class="form-control" placeholder="Incident title" required></div>
+        <div class="form-group"><label>Title *</label><input type="text" id="aaTitle" class="form-control" placeholder="Incident title" oninput="App.clearFieldError('aaTitle');" required></div>
         <div class="form-group"><label>Description</label><textarea id="aaDesc" class="form-control" rows="3" placeholder="Incident details"></textarea></div>
         <div class="form-row"><div class="form-group"><label>Type</label><select id="aaType" class="form-select"><option value="Intrusion">Intrusion</option><option value="Perimeter Breach">Perimeter Breach</option><option value="Access Denied">Access Denied</option><option value="Suspicious Activity">Suspicious Activity</option><option value="Violation">Violation</option><option value="Theft">Theft</option><option value="Vandalism">Vandalism</option><option value="Fire">Fire</option><option value="Hazmat Incident">Hazmat Incident</option><option value="Other">Other</option></select></div><div class="form-group"><label>Severity</label><select id="aaSeverity" class="form-select"><option value="Medium">Medium</option><option value="Low">Low</option><option value="High">High</option><option value="Critical">Critical</option></select></div></div>
         <div class="form-group"><label>Zone *</label><select id="aaZone" class="form-select"><option value="Zone A - Berth 1-3">Zone A - Berth 1-3</option><option value="Zone B - Berth 4-6">Zone B - Berth 4-6</option><option value="Zone C - Gate 1-2">Zone C - Gate 1-2</option><option value="Zone D - Warehouse Row">Zone D - Warehouse Row</option><option value="Zone E - Tank Farm">Zone E - Tank Farm</option><option value="Zone F - Admin Area">Zone F - Admin Area</option><option value="Zone G - Cold Storage">Zone G - Cold Storage</option><option value="Zone H - Container Yard">Zone H - Container Yard</option></select></div>
@@ -398,8 +477,10 @@ const App = {
   },
 
   async submitReportIncident() {
+    const form = document.getElementById('addAlertForm');
+    App.clearFormErrors(form);
     const title = document.getElementById('aaTitle')?.value.trim();
-    if (!title) { App.showToast('Title is required', 'danger'); return; }
+    if (!title) { App.showFieldError('aaTitle', 'Title is required'); return; }
     const description = document.getElementById('aaDesc')?.value.trim();
     const payload = {
       incident_id: `INC-${Date.now()}`,
@@ -417,7 +498,10 @@ const App = {
       App.showToast(`Incident "${title}" reported`, 'success');
       if (typeof loadIncidents === 'function') loadIncidents();
     } catch (err) {
-      App.showToast(err.message || 'Failed to report incident', 'danger');
+      App.applyFieldErrors(form, err, {
+        title: 'aaTitle', description: 'aaDesc', incident_type: 'aaType',
+        severity: 'aaSeverity', zone: 'aaZone',
+      });
     }
   },
 
@@ -448,12 +532,16 @@ const App = {
   },
 
   async submitAddSchedule() {
+    const form = document.getElementById('addScheduleForm');
+    App.clearFormErrors(form);
     const title = document.getElementById('asTitle')?.value.trim();
     const equipmentId = document.getElementById('asEquipment')?.value;
     const scheduledDate = document.getElementById('asDate')?.value;
-    if (!title) { App.showToast('Title is required', 'danger'); return; }
-    if (!equipmentId) { App.showToast('Equipment is required', 'danger'); return; }
-    if (!scheduledDate) { App.showToast('Scheduled date is required', 'danger'); return; }
+    let hasError = false;
+    if (!title) { App.showFieldError('asTitle', 'Title is required'); hasError = true; }
+    if (!equipmentId) { App.showFieldError('asEquipment', 'Equipment is required'); hasError = true; }
+    if (!scheduledDate) { App.showFieldError('asDate', 'Scheduled date is required'); hasError = true; }
+    if (hasError) return;
     try {
       await Api.request('/maintenance/schedules', {
         method: 'POST',
@@ -470,7 +558,10 @@ const App = {
       App.showToast(`Schedule "${title}" created`, 'success');
       if (typeof loadSchedule === 'function') loadSchedule();
     } catch (err) {
-      App.showToast(err.message || 'Failed to create schedule', 'danger');
+      App.applyFieldErrors(form, err, {
+        title: 'asTitle', equipment_id: 'asEquipment', maintenance_type: 'asType',
+        priority: 'asPriority', scheduled_date: 'asDate',
+      });
     }
   },
 };

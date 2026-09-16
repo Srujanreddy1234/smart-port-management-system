@@ -331,7 +331,14 @@ const Api = {
       if ([502, 503, 504].includes(response.status) && typeof App !== 'undefined' && App.showToast) {
         App.showToast('The server was briefly unavailable -- some data may be incomplete. Try refreshing.', 'warning');
       }
-      throw new Error(body.message || 'Request failed');
+      const error = new Error(body.message || 'Request failed');
+      // Carry the backend's per-field validation messages (either shape
+      // it uses -- {errors:{field:[...]}} or {details:{field:[...]}})
+      // so callers can highlight the exact invalid field instead of only
+      // showing a generic toast.
+      error.fieldErrors = body.errors || body.details || null;
+      error.status = response.status;
+      throw error;
     }
 
     return body;

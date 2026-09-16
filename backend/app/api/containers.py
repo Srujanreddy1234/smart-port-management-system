@@ -7,6 +7,7 @@ from app.models import (
 )
 from app.utils.exceptions import AuthorizationError, NotFoundError, ValidationError as AppValidationError
 from app.utils.helpers import success_response
+from app.utils.validators import asset_id
 from sqlalchemy import func, or_, and_, desc, text
 from datetime import datetime, timedelta
 from marshmallow import Schema, fields, validate, ValidationError
@@ -17,7 +18,7 @@ containers_bp = Blueprint('containers', __name__, url_prefix='/api/v1/containers
 
 
 class ContainerSchema(Schema):
-    container_id = fields.Str(required=True, validate=validate.Length(max=50))
+    container_id = fields.Str(required=True, validate=[validate.Length(min=3, max=50), asset_id()])
     iso_code = fields.Str(validate=validate.Length(max=10))
     container_type = fields.Str(required=True, validate=validate.OneOf([t.value for t in ContainerType]))
     status = fields.Str(validate=validate.OneOf([s.value for s in ContainerStatus]))

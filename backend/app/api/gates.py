@@ -17,6 +17,7 @@ from app.models import (
 )
 from app.utils.exceptions import AuthorizationError, NotFoundError, ValidationError as AppValidationError
 from app.utils.helpers import success_response
+from app.utils.validators import asset_id, phone as phone_validator
 from sqlalchemy import func, and_
 from sqlalchemy.orm import joinedload
 from datetime import datetime, timedelta
@@ -29,7 +30,7 @@ SLOT_MINUTES = 30
 
 
 class GateSchema(Schema):
-    gate_code = fields.Str(required=True, validate=validate.Length(max=20))
+    gate_code = fields.Str(required=True, validate=[validate.Length(min=3, max=20), asset_id()])
     name = fields.Str(required=True, validate=validate.Length(max=255))
     gate_type = fields.Str(required=True, validate=validate.OneOf([t.value for t in GateType]))
     status = fields.Str(validate=validate.OneOf([s.value for s in GateStatus]))
@@ -44,8 +45,8 @@ class GateSchema(Schema):
 class BookingSchema(Schema):
     gate_id = fields.Int(required=True)
     driver_name = fields.Str(validate=validate.Length(max=255))
-    driver_phone = fields.Str(validate=validate.Length(max=20))
-    truck_number = fields.Str(validate=validate.Length(max=50))
+    driver_phone = fields.Str(validate=phone_validator())
+    truck_number = fields.Str(validate=[validate.Length(min=3, max=50), asset_id()])
     purpose = fields.Str(required=True, validate=validate.OneOf([p.value for p in BookingPurpose]))
     container_id = fields.Int()
     slot_start = fields.DateTime(required=True)

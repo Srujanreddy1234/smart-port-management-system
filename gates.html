@@ -338,14 +338,14 @@
       const gateOptions = gatesData.filter(g => g.status === 'Open').map(g => `<option value="${g.id}">${g.name}</option>`).join('');
       App.createModal({
         id: 'bookSlotModal', title: 'Book a Gate Time Slot', width: '500px',
-        body: `<form class="modal-form">
+        body: `<form id="bookSlotForm" class="modal-form">
           <div class="form-group"><label>Gate *</label><select id="bsGate" class="form-select">${gateOptions}</select></div>
           <div class="form-row">
             <div class="form-group"><label>Date *</label><input type="date" id="bsDate" class="form-control" value="${prefilledSlot ? prefilledSlot.split('T')[0] : new Date().toISOString().split('T')[0]}"></div>
             <div class="form-group"><label>Time *</label><input type="time" id="bsTime" class="form-control" value="${prefilledSlot ? prefilledSlot.split('T')[1].slice(0,5) : '09:00'}"></div>
           </div>
           <div class="form-row">
-            <div class="form-group"><label>Truck Number</label><input type="text" id="bsTruck" class="form-control" placeholder="TN-01-1234"></div>
+            <div class="form-group"><label>Truck Number</label><input type="text" id="bsTruck" class="form-control" placeholder="TN-1234" style="text-transform:uppercase;" oninput="this.value = this.value.toUpperCase(); App.clearFieldError('bsTruck');"></div>
             <div class="form-group"><label>Purpose</label><select id="bsPurpose" class="form-select">
               <option value="Container Pickup">Container Pickup</option>
               <option value="Container Delivery">Container Delivery</option>
@@ -355,28 +355,34 @@
               <option value="Other">Other</option>
             </select></div>
           </div>
-          <div id="bookSlotError" style="color:var(--danger);font-size:0.82rem;display:none;"></div>
         </form>`,
         footer: `<button class="btn btn-secondary" onclick="document.getElementById('bookSlotModal').remove()">Cancel</button><button class="btn btn-primary" onclick="submitBooking()">Book Slot</button>`
       });
     }
 
     async function submitBooking() {
+      const form = document.getElementById('bookSlotForm');
+      App.clearFormErrors(form);
       const gateId = document.getElementById('bsGate').value;
       const date = document.getElementById('bsDate').value;
       const time = document.getElementById('bsTime').value;
-      if (!gateId || !date || !time) {
-        document.getElementById('bookSlotError').textContent = 'Gate, date and time are required';
-        document.getElementById('bookSlotError').style.display = 'block';
-        return;
+      const truckNumber = document.getElementById('bsTruck').value.trim().toUpperCase();
+      let hasError = false;
+      if (!gateId) { App.showFieldError('bsGate', 'Select a gate'); hasError = true; }
+      if (!date) { App.showFieldError('bsDate', 'Date is required'); hasError = true; }
+      if (!time) { App.showFieldError('bsTime', 'Time is required'); hasError = true; }
+      if (truckNumber && !/^[A-Z][A-Z0-9-]{2,49}$/.test(truckNumber)) {
+        App.showFieldError('bsTruck', 'Uppercase letters, numbers, and hyphens only, e.g. TN-1234');
+        hasError = true;
       }
+      if (hasError) return;
       try {
         await Api.request('/gates/bookings', {
           method: 'POST',
           body: JSON.stringify({
             gate_id: parseInt(gateId),
             purpose: document.getElementById('bsPurpose').value,
-            truck_number: document.getElementById('bsTruck').value || undefined,
+            truck_number: truckNumber || undefined,
             slot_start: `${date}T${time}:00`,
           })
         });
@@ -384,8 +390,10 @@
         App.showToast('Time slot booked successfully', 'success');
         refreshEverything();
       } catch (err) {
-        document.getElementById('bookSlotError').textContent = err.message;
-        document.getElementById('bookSlotError').style.display = 'block';
+        App.applyFieldErrors(form, err, {
+          gate_id: 'bsGate', purpose: 'bsPurpose', truck_number: 'bsTruck',
+          slot_start: 'bsDate', driver_phone: 'bsTruck',
+        });
       }
     }
 
@@ -425,8 +433,8 @@
       const gate = gatesData.find(g => g.id === gateId);
       App.createModal({
         id: 'manageGateModal', title: gate ? `Edit ${gate.name}` : 'Add New Gate', width: '500px',
-        body: `<form class="modal-form">
-          ${!gate ? `<div class="form-group"><label>Gate Code *</label><input type="text" id="mgCode" class="form-control" placeholder="GATE-5"></div>
+        body: `<form id="manageGateForm" class="modal-form">
+          ${!gate ? `<div class="form-group"><label>Gate Code *</label><input type="text" id="mgCode" class="form-control" placeholder="GATE-5" style="text-transform:uppercase;" oninput="this.value = this.value.toUpperCase(); App.clearFieldError('mgCode');"></div>
           <div class="form-group"><label>Name *</label><input type="text" id="mgName" class="form-control" placeholder="Gate 5"></div>
           <div class="form-group"><label>Type *</label><select id="mgType" class="form-select">
             <option value="Container Terminal">Container Terminal</option>
@@ -442,20 +450,28 @@
             </select></div>
             <div class="form-group"><label>Capacity/hour</label><input type="number" id="mgCapacity" class="form-control" value="${gate ? gate.capacity_per_hour : 20}"></div>
           </div>
-          <div id="manageGateError" style="color:var(--danger);font-size:0.82rem;display:none;"></div>
         </form>`,
         footer: `<button class="btn btn-secondary" onclick="document.getElementById('manageGateModal').remove()">Cancel</button><button class="btn btn-primary" onclick="submitManageGate(${gateId || 'null'})">${gate ? 'Save' : 'Create'}</button>`
       });
     }
 
     async function submitManageGate(gateId) {
+      const form = document.getElementById('manageGateForm');
+      App.clearFormErrors(form);
       const payload = {
         status: document.getElementById('mgStatus').value,
         capacity_per_hour: parseInt(document.getElementById('mgCapacity').value) || 20,
       };
       if (!gateId) {
-        payload.gate_code = document.getElementById('mgCode').value;
-        payload.name = document.getElementById('mgName').value;
+        const gateCode = document.getElementById('mgCode').value.trim().toUpperCase();
+        const name = document.getElementById('mgName').value.trim();
+        let hasError = false;
+        if (!gateCode) { App.showFieldError('mgCode', 'Gate code is required'); hasError = true; }
+        else if (!/^[A-Z][A-Z0-9-]{2,19}$/.test(gateCode)) { App.showFieldError('mgCode', 'Uppercase letters, numbers, and hyphens only, e.g. GATE-5'); hasError = true; }
+        if (!name) { App.showFieldError('mgName', 'Name is required'); hasError = true; }
+        if (hasError) return;
+        payload.gate_code = gateCode;
+        payload.name = name;
         payload.gate_type = document.getElementById('mgType').value;
       }
       try {
@@ -468,8 +484,14 @@
         App.showToast('Gate saved', 'success');
         refreshEverything();
       } catch (err) {
-        document.getElementById('manageGateError').textContent = err.message;
-        document.getElementById('manageGateError').style.display = 'block';
+        if (/gate code.*already exists/i.test(err.message || '')) {
+          App.showFieldError('mgCode', err.message);
+          return;
+        }
+        App.applyFieldErrors(form, err, {
+          gate_code: 'mgCode', name: 'mgName', gate_type: 'mgType',
+          status: 'mgStatus', capacity_per_hour: 'mgCapacity',
+        });
       }
     }
 

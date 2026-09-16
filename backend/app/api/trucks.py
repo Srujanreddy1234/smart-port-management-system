@@ -4,6 +4,7 @@ from app.extensions import db
 from app.models import User, Truck, TruckStatus, TruckType, Container
 from app.utils.exceptions import AuthorizationError, NotFoundError, ValidationError as AppValidationError
 from app.utils.helpers import success_response
+from app.utils.validators import asset_id, license_plate as license_plate_validator, phone as phone_validator
 from sqlalchemy import func, or_, and_, desc, asc
 from datetime import datetime, timedelta
 from marshmallow import Schema, fields, validate, ValidationError
@@ -13,13 +14,13 @@ trucks_bp = Blueprint('trucks', __name__, url_prefix='/api/v1/trucks')
 
 
 class TruckSchema(Schema):
-    truck_number = fields.Str(required=True, validate=validate.Length(max=50))
+    truck_number = fields.Str(required=True, validate=[validate.Length(min=3, max=50), asset_id()])
     driver_name = fields.Str(validate=validate.Length(max=255))
-    driver_phone = fields.Str(validate=validate.Length(max=20))
+    driver_phone = fields.Str(validate=phone_validator())
     truck_type = fields.Str(required=True, validate=validate.OneOf([t.value for t in TruckType]))
     status = fields.Str(validate=validate.OneOf([s.value for s in TruckStatus]))
     capacity = fields.Int()
-    license_plate = fields.Str(validate=validate.Length(max=50))
+    license_plate = fields.Str(validate=license_plate_validator())
     chassis_number = fields.Str(validate=validate.Length(max=50))
     owner = fields.Str(validate=validate.Length(max=255))
     owner_contact = fields.Str(validate=validate.Length(max=255))

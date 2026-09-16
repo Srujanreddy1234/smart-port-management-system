@@ -5,6 +5,7 @@ from app.extensions import db
 from app.models import Ship, ShipStatus, VesselType, User, Container, Invoice
 from app.utils.exceptions import ValidationError as AppValidationError, NotFoundError, AuthorizationError
 from app.utils.helpers import success_response
+from app.utils.validators import asset_id
 from sqlalchemy import func, or_, desc, asc
 from datetime import datetime, timedelta
 
@@ -14,7 +15,7 @@ ships_bp = Blueprint('ships', __name__, url_prefix='/api/v1/ships')
 
 class ShipSchema(Schema):
     id = fields.Int(dump_only=True)
-    ship_id = fields.Str(required=True, validate=validate.Length(max=50))
+    ship_id = fields.Str(required=True, validate=[validate.Length(min=3, max=50), asset_id()])
     name = fields.Str(required=True, validate=validate.Length(max=255))
     vessel_type = fields.Str(required=True, validate=validate.OneOf([v.value for v in VesselType]))
     flag = fields.Str(required=True, validate=validate.Length(max=100))

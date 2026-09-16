@@ -9,6 +9,7 @@ from app.models import (
 from app.models.maintenance import MaintenanceSchedule
 from app.utils.exceptions import AuthorizationError, NotFoundError, ValidationError as AppValidationError
 from app.utils.helpers import success_response
+from app.utils.validators import asset_id
 from sqlalchemy import func, or_, and_, desc, asc
 from datetime import datetime, timedelta
 from marshmallow import Schema, fields, validate, ValidationError
@@ -18,7 +19,7 @@ maintenance_bp = Blueprint('maintenance', __name__, url_prefix='/api/v1/maintena
 
 
 class EquipmentSchema(Schema):
-    equipment_id = fields.Str(required=True, validate=validate.Length(max=50))
+    equipment_id = fields.Str(required=True, validate=[validate.Length(min=3, max=50), asset_id()])
     name = fields.Str(required=True, validate=validate.Length(max=255))
     equipment_type = fields.Str(required=True, validate=validate.OneOf([t.value for t in EquipmentType]))
     manufacturer = fields.Str(validate=validate.Length(max=255))
