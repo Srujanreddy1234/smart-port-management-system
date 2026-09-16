@@ -2,18 +2,27 @@ name: Keep Render service warm
 
 on:
   schedule:
-    # Every 10 minutes -- Render's free tier spins a service down after
-    # ~15 minutes of no inbound traffic, and the next real request then
-    # pays a ~30-60s cold-start penalty. A lightweight ping well inside
-    # that window keeps the instance warm for real users.
-    - cron: '*/10 * * * *'
+    # Every ~7 minutes, deliberately off the round-number marks (:00,
+    # :10, :20...). Render's free tier spins a service down after ~15
+    # minutes of no inbound traffic, and the next real request then
+    # pays a ~30-70s cold-start penalty -- a ping well inside that
+    # window keeps the instance warm. GitHub's own docs warn that
+    # scheduled workflows "may be delayed during periods of high
+    # load... including the start of every hour" -- landing on :00,
+    # :10, :20 etc. (as the previous */10 schedule did) is exactly the
+    # congestion window most likely to cause a missed or late run.
+    # Offsetting to :02, :09, :16... and shortening the gap gives more
+    # margin for an individual run being skipped or delayed.
+    - cron: '2-59/7 * * * *'
   workflow_dispatch: {}
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping health endpoint
+      - name: Ping health endpoint (retry once if the first ping is what wakes a sleeping instance)
         run: |
-          curl -sS -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n" \
-            https://smart-port-backend.onrender.com/health
+          curl -sS -o /dev/null -w "First ping: HTTP %{http_code} in %{time_total}s\n" \
+            --max-time 90 https://smart-port-backend.onrender.com/health || true
+          curl -sS -o /dev/null -w "Confirm ping: HTTP %{http_code} in %{time_total}s\n" \
+            --max-time 30 https://smart-port-backend.onrender.com/health
