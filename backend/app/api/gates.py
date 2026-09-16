@@ -18,6 +18,7 @@ from app.models import (
 from app.utils.exceptions import AuthorizationError, NotFoundError, ValidationError as AppValidationError
 from app.utils.helpers import success_response
 from sqlalchemy import func, and_
+from sqlalchemy.orm import joinedload
 from datetime import datetime, timedelta
 from marshmallow import Schema, fields, validate, ValidationError
 
@@ -269,7 +270,10 @@ def list_bookings():
     """Staff with gates.write see every booking (to manage the queue);
     everyone else only ever sees their own."""
     user = check_permission('gates.read')
-    query = GateBooking.query
+    # Eager-load the gate relationship -- to_dict() reads booking.gate for
+    # every row, which without this fires one extra query per booking
+    # instead of a single JOIN.
+    query = GateBooking.query.options(joinedload(GateBooking.gate))
 
     if not user.has_permission('gates.manage'):
         query = query.filter(GateBooking.booked_by_user_id == user.id)
