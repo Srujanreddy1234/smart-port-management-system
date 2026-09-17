@@ -46,9 +46,24 @@ def check_permission(permission):
 @trucks_bp.route('', methods=['GET'])
 @jwt_required()
 def list_trucks():
-    check_permission('trucks.read')
+    user = check_permission('trucks.read')
 
     query = Truck.query
+
+    # A Truck Operator should only ever see their own fleet, not every
+    # truck in the port. The Truck model has no direct owner_user_id FK,
+    # so the closest real link is contact info: a truck is "theirs" if
+    # its driver_phone or owner_contact matches a phone number on their
+    # own account.
+    if user.role.value == 'Truck Operator':
+        contacts = [c for c in (user.phone, user.mobile) if c]
+        if contacts:
+            query = query.filter(or_(
+                Truck.driver_phone.in_(contacts),
+                Truck.owner_contact.in_(contacts)
+            ))
+        else:
+            query = query.filter(db.false())
 
     search = request.args.get('search', '').strip()
     if search:

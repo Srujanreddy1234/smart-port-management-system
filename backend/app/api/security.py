@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.extensions import db
 from app.models import (
-    User, AuditLog,
+    User, AuditLog, Session,
     SecurityIncident, IncidentType, IncidentSeverity, IncidentStatus,
     SecurityZone, Alert, AlertType, Camera
 )
@@ -301,6 +301,45 @@ def acknowledge_alert(alert_id):
     db.session.commit()
 
     return success_response(alert.to_dict(), 'Alert acknowledged successfully')
+
+
+@security_bp.route('/stats', methods=['GET'])
+@jwt_required()
+def security_stats():
+    """Real numbers for the Security Center's stat cards -- previously
+    'Access Denied' and 'Personnel On-Site' were stuck placeholders and
+    'Active Cameras' wasn't wired to an endpoint at all."""
+    check_permission('security.read')
+
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+
+    active_cameras = Camera.query.filter_by(is_active=True).count()
+
+    alerts_today = SecurityIncident.query.filter(
+        SecurityIncident.detected_at >= today_start
+    ).count()
+
+    access_denied_today = SecurityIncident.query.filter(
+        SecurityIncident.incident_type == IncidentType.ACCESS_DENIED,
+        SecurityIncident.detected_at >= today_start,
+    ).count()
+
+    # No dedicated on-site personnel/headcount model exists in this
+    # system, so rather than fabricate a number, "on-site" is derived from
+    # the closest real signal available: distinct users with a currently
+    # valid (non-revoked, unexpired) login session right now.
+    personnel_on_site = db.session.query(func.count(func.distinct(Session.user_id))).filter(
+        Session.is_revoked.is_(False),
+        Session.expires_at > datetime.utcnow(),
+    ).scalar() or 0
+
+    return success_response({
+        'active_cameras': active_cameras,
+        'total_cameras': Camera.query.count(),
+        'alerts_today': alerts_today,
+        'access_denied_today': access_denied_today,
+        'personnel_on_site': personnel_on_site,
+    })
 
 
 @security_bp.route('/cameras', methods=['GET'])

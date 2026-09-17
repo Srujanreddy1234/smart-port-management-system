@@ -104,21 +104,21 @@
           <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> <span id="kpiShipsChange">--</span></div>
           <div class="kpi-bg"><i class="fas fa-ship"></i></div>
         </div>
-        <div class="card kpi-card glow-card">
+        <div class="card kpi-card glow-card" id="kpiContainersCard">
           <div class="kpi-icon" style="background:rgba(25,135,84,0.12);color:#75b798;"><i class="fas fa-boxes-stacked"></i></div>
           <div class="kpi-value" id="kpiContainers">--</div>
           <div class="kpi-label">Containers Handled</div>
           <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> <span id="kpiContainersChange">--</span></div>
           <div class="kpi-bg"><i class="fas fa-boxes-stacked"></i></div>
         </div>
-        <div class="card kpi-card glow-card">
+        <div class="card kpi-card glow-card" id="kpiTrucksCard">
           <div class="kpi-icon" style="background:rgba(255,193,7,0.12);color:#ffda6a;"><i class="fas fa-truck"></i></div>
           <div class="kpi-value" id="kpiTrucks">--</div>
           <div class="kpi-label">Trucks In Transit</div>
           <div class="kpi-change negative"><i class="fas fa-arrow-down"></i> <span id="kpiTrucksChange">--</span></div>
           <div class="kpi-bg"><i class="fas fa-truck"></i></div>
         </div>
-        <div class="card kpi-card glow-card">
+        <div class="card kpi-card glow-card" id="kpiAlertsCard">
           <div class="kpi-icon" style="background:rgba(220,53,69,0.12);color:#ea868f;"><i class="fas fa-shield-halved"></i></div>
           <div class="kpi-value" id="kpiAlerts">--</div>
           <div class="kpi-label">Active Alerts</div>
@@ -195,7 +195,7 @@
             <div style="height:240px;display:flex;align-items:center;justify-content:center;"><canvas id="containerDistChart"></canvas></div>
           </div>
         </div>
-        <div class="card">
+        <div class="card" id="truckTrafficCard">
           <div class="card-header">
             <h6><i class="fas fa-chart-bar" style="color:var(--warning);margin-right:8px;"></i>Truck Traffic — Hourly</h6>
           </div>
@@ -273,6 +273,7 @@
   <script src="js/charts.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
+      applyDashboardPermissions();
       await Store.init();
       loadKpis();
       loadCharts();
@@ -281,6 +282,18 @@
       loadBerthOccupancy();
       loadNotifications();
     });
+
+    // Hide the stat cards/charts/feeds the logged-in role isn't permitted to
+    // see, mirroring the sidebar's own permission checks (Api.hasPermission).
+    function applyDashboardPermissions() {
+      const hide = (id) => { const el = document.getElementById(id); if (el) el.style.display = 'none'; };
+      if (!Api.hasPermission('containers.read')) hide('kpiContainersCard');
+      if (!Api.hasPermission('trucks.read')) {
+        hide('kpiTrucksCard');
+        hide('truckTrafficCard');
+      }
+      if (!Api.hasPermission('security.read')) hide('kpiAlertsCard');
+    }
 
     async function loadNotifications() {
       try {
@@ -435,11 +448,16 @@
     }
 
     function loadRecentActivity() {
-      const activity = Store.get('activity_log');
+      let activity = Store.get('activity_log');
       const typeColorMap = { ship: 'primary', berth: 'success', container: 'info', truck: 'warning', billing: 'warning', security: 'danger', system: 'info' };
       const colorMap = { primary: 'rgba(13,110,253,0.12);color:#6ea8fe', success: 'rgba(25,135,84,0.12);color:#75b798', danger: 'rgba(220,53,69,0.12);color:#ea868f', warning: 'rgba(255,193,7,0.12);color:#ffda6a', info: 'rgba(13,202,240,0.12);color:#66d9f0' };
       const body = document.getElementById('recentActivityBody');
       if (!body) return;
+      // Don't leak security-incident items into the feed for roles without
+      // security.read -- mirrors the KPI-card gating above.
+      if (activity && !Api.hasPermission('security.read')) {
+        activity = activity.filter(a => a.type !== 'security');
+      }
       if (!activity || activity.length === 0) { body.innerHTML = '<p class="text-muted">No recent activity</p>'; return; }
       body.innerHTML = activity.slice(0, 10).map(a => {
         const colorKey = typeColorMap[a.type] || 'info';

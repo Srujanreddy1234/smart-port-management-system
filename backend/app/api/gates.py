@@ -336,8 +336,20 @@ def create_booking():
     if existing >= per_slot_capacity:
         raise AppValidationError('That time slot is fully booked -- please choose another.')
 
+    # Resolve the truck number the driver typed (or picked from their own
+    # registered trucks) into a real Truck row so check-in/complete can
+    # update that truck's current_gate_id -- without this, "trucks at
+    # gate" counts (which are derived from Truck.current_gate_id, see
+    # _gate_congestion above) never move no matter how many bookings or
+    # check-ins happen.
+    truck = None
+    truck_number = data.get('truck_number')
+    if truck_number:
+        truck = Truck.query.filter(func.lower(Truck.truck_number) == truck_number.lower()).first()
+
     booking = GateBooking(
         gate_id=gate.id,
+        truck_id=truck.id if truck else None,
         booked_by_user_id=user.id,
         driver_name=data.get('driver_name') or user.get_full_name(),
         driver_phone=data.get('driver_phone') or user.phone,

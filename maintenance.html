@@ -394,10 +394,10 @@
         document.getElementById('scheduleTableBody').innerHTML = items.map(s => `
           <tr>
             <td>${s.scheduled_date ? Utils.formatDate(s.scheduled_date) : '—'}</td>
-            <td>Equipment #${s.equipment_id}</td>
+            <td>${s.equipment_name ? Utils.escapeHtml(s.equipment_name) + (s.equipment_code ? ' <small style="color:var(--text-muted);">(' + Utils.escapeHtml(s.equipment_code) + ')</small>' : '') : 'Equipment #' + s.equipment_id}</td>
             <td><span class="badge ${TYPE_BADGE[s.maintenance_type] || 'bg-info'}">${s.maintenance_type}</span></td>
             <td><span class="status-badge ${PRIORITY_BADGE[s.priority] || 'status-info'}">${s.priority}</span></td>
-            <td>${s.assigned_technician_id ? 'Tech #' + s.assigned_technician_id : '—'}</td>
+            <td>${s.assigned_technician_name ? Utils.escapeHtml(s.assigned_technician_name) : '—'}</td>
             <td><span class="status-badge ${STATUS_BADGE[s.status] || 'status-info'}">${s.status}</span></td>
           </tr>
         `).join('');

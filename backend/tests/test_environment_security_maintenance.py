@@ -44,6 +44,34 @@ def test_security_incidents_and_alerts(client, admin_headers):
     assert res.status_code == 200
 
 
+def test_security_stats_reflects_real_data(client, admin_headers, admin_user):
+    """Regression test: the Security Center's 'Access Denied' and
+    'Personnel On-Site' cards were stuck placeholders, and 'Active
+    Cameras' had no endpoint wired up at all."""
+    from app.models import Camera, SecurityZone
+
+    db_camera_active = Camera(camera_id="CAM-T1", name="Gate Cam", zone=SecurityZone.ZONE_C, is_active=True)
+    db_camera_inactive = Camera(camera_id="CAM-T2", name="Yard Cam", zone=SecurityZone.ZONE_C, is_active=False)
+    from app.extensions import db as _db
+    _db.session.add_all([db_camera_active, db_camera_inactive])
+    _db.session.commit()
+
+    res = client.post("/api/v1/security", json={
+        "incident_id": "INC-ACCESS-1", "incident_type": "Access Denied",
+        "zone": "Zone A - Berth 1-3", "severity": "Low", "title": "Badge denied",
+    }, headers=admin_headers)
+    assert res.status_code == 201, res.get_json()
+
+    res = client.get("/api/v1/security/stats", headers=admin_headers)
+    assert res.status_code == 200
+    stats = res.get_json()["data"]
+    assert stats["active_cameras"] == 1
+    assert stats["total_cameras"] == 2
+    assert stats["access_denied_today"] == 1
+    # admin_user has a valid session from logging in via admin_headers.
+    assert stats["personnel_on_site"] >= 1
+
+
 def test_security_access_logs_reflects_real_audit_trail(client, admin_headers, admin_user):
     res = client.get("/api/v1/security/access-logs", headers=admin_headers)
     assert res.status_code == 200
@@ -65,9 +93,24 @@ def test_maintenance_equipment_and_schedule(client, admin_headers):
         "title": "Routine check", "scheduled_date": datetime.utcnow().isoformat(),
     }, headers=admin_headers)
     assert res.status_code == 201, res.get_json()
+    schedule_id = res.get_json()["data"]["id"]
+
+    # Regression test: the schedule list must surface the real equipment
+    # name and assigned technician's name, not just their bare ids (which
+    # rendered as a blank dash / generic "Equipment #12" in the UI).
+    from app.models import User, MaintenanceSchedule
+    from app.extensions import db as _db
+    tech = User.query.filter_by(email="admin@test.local").first()
+    schedule = MaintenanceSchedule.query.get(schedule_id)
+    schedule.assigned_technician_id = tech.id
+    _db.session.commit()
 
     res = client.get("/api/v1/maintenance/schedules", headers=admin_headers)
     assert res.status_code == 200
+    listed = next(s for s in res.get_json()["data"]["items"] if s["id"] == schedule_id)
+    assert listed["equipment_name"] == "Test Crane"
+    assert listed["equipment_code"] == "EQ-TEST-1"
+    assert listed["assigned_technician_name"] == tech.get_full_name()
 
 
 def test_maintenance_cost_by_month_is_real_not_fabricated(client, admin_headers, db):

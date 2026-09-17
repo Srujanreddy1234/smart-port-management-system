@@ -118,6 +118,7 @@
               <option value="Shipping Company">Shipping Company</option>
               <option value="Truck Operator">Truck Operator</option>
               <option value="Customer">Customer</option>
+              <option value="Public">Public</option>
             </select>
             <select class="form-select" id="statusFilter" style="width:auto;font-size:0.82rem;">
               <option value="">All Statuses</option>
@@ -202,7 +203,7 @@
             <div style="display:flex;gap:4px;">
               <button class="btn btn-sm btn-secondary" onclick="viewUser(${u.id})" title="View"><i class="fas fa-eye"></i></button>
               <button class="btn btn-sm btn-secondary" onclick="editUser(${u.id})" title="Edit"><i class="fas fa-pen"></i></button>
-              ${u.status === 'Active' ? `<button class="btn btn-sm btn-warning" onclick="toggleUserStatus(${u.id}, 'suspended')" title="Suspend"><i class="fas fa-ban"></i></button>` : `<button class="btn btn-sm btn-success" onclick="toggleUserStatus(${u.id}, 'active')" title="Activate"><i class="fas fa-check"></i></button>`}
+              ${u.status === 'Active' ? `<button class="btn btn-sm btn-warning" onclick="toggleUserStatus(${u.id}, 'Inactive')" title="Deactivate"><i class="fas fa-ban"></i></button>` : `<button class="btn btn-sm btn-success" onclick="toggleUserStatus(${u.id}, 'Active')" title="Activate"><i class="fas fa-check"></i></button>`}
             </div>
           </td>
         </tr>
@@ -352,7 +353,7 @@
     async function toggleUserStatus(userId, newStatus) {
       try {
         await Api.request(`/users/${userId}`, { method: 'PUT', body: JSON.stringify({ status: newStatus }) });
-        App.showToast(`User ${newStatus}`, 'success');
+        App.showToast(`User marked ${newStatus}`, 'success');
         loadUsers(usersPage);
         loadUserStats();
       } catch (err) {

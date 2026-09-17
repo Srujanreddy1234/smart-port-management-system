@@ -354,7 +354,7 @@ def seed_historical(db, User, UserRole, UserStatus, Permission, Role,
             inv.amount_paid = inv.total_amount
             inv.balance_due = 0
 
-    print('Creating environmental readings (noise only -- weather and air quality')
+    print('Creating environmental readings (noise + water quality -- weather and air quality')
     print('come from real historical data via datasets/scripts/import_to_database.py)...')
     stations = MonitoringStation.query.all()
     station_ids = [s.id for s in stations]
@@ -375,6 +375,43 @@ def seed_historical(db, User, UserRole, UserStatus, Permission, Role,
                     recorded_at=current,
                 )
                 db.session.add(n)
+
+            current += timedelta(days=1)
+
+    # WaterQualityReading has no free real-time-monitoring public data
+    # source (unlike weather/air quality via Open-Meteo), so -- like
+    # NoiseReading above -- it's seeded with plausible synthetic values
+    # rather than left at zero rows. Scoped to the actual water-quality
+    # monitoring station (MS-002) rather than every station.
+    water_stations = [s for s in stations if s.station_type == 'water_quality']
+    for station in water_stations:
+        current = seven_years_ago
+        while current <= now:
+            if random.random() < 0.3:
+                wq = WaterQualityReading(
+                    station_id=station.id,
+                    ph=random.uniform(7.5, 8.4),
+                    dissolved_oxygen=random.uniform(4.5, 8.0),
+                    bod=random.uniform(1.0, 5.0),
+                    cod=random.uniform(10, 40),
+                    tss=random.uniform(10, 60),
+                    tds=random.uniform(30000, 36000),
+                    oil_grease=random.uniform(0.5, 4.0),
+                    ammonia=random.uniform(0.05, 0.5),
+                    nitrate=random.uniform(0.1, 2.0),
+                    phosphate=random.uniform(0.02, 0.3),
+                    temperature=random.uniform(26, 32),
+                    turbidity=random.uniform(2, 20),
+                    conductivity=random.uniform(45000, 55000),
+                    salinity=random.uniform(32, 36),
+                    fecal_coliform=random.uniform(0, 200),
+                    total_coliform=random.uniform(0, 500),
+                    phenols=random.uniform(0, 0.01),
+                    cyanide=random.uniform(0, 0.005),
+                    sulfide=random.uniform(0, 0.05),
+                    recorded_at=current,
+                )
+                db.session.add(wq)
 
             current += timedelta(days=1)
 

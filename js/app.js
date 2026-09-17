@@ -237,7 +237,7 @@ const App = {
     const modal = App.createModal({
       id: 'editProfileModal', title: 'Edit Profile', width: '500px',
       body: `<form id="editProfileForm" class="modal-form">
-        <div class="form-group"><label>Full Name</label><input type="text" id="epFirstName" class="form-control" value="${user.first_name || ''}"></div>
+        <div class="form-group"><label>Full Name</label><input type="text" id="epFullName" class="form-control" value="${Utils.escapeHtml(`${user.first_name || ''} ${user.last_name || ''}`.trim())}"></div>
         <div class="form-group"><label>Email</label><input type="email" id="epEmail" class="form-control" value="${user.email || ''}" readonly></div>
         <div class="form-group"><label>Phone</label><input type="tel" id="epPhone" class="form-control" value="${user.phone || ''}"></div>
         <div class="form-group"><label>Department</label><input type="text" id="epDepartment" class="form-control" value="${user.department || ''}"></div>
@@ -251,8 +251,24 @@ const App = {
   async saveProfile() {
     const user = Store.getUser();
     if (!user) return;
+    // The form shows a single "Full Name" field for editing convenience,
+    // but the backend stores first_name/last_name separately -- split on
+    // the first space so an edit here doesn't silently blank out
+    // last_name (previously this only ever sent first_name, so a saved
+    // edit to "Full Name" clobbered first_name with the whole string
+    // while last_name was never included, and other flows that DID send
+    // an empty last_name would wipe it to '').
+    const fullNameInput = (document.getElementById('epFullName')?.value || '').trim();
+    let firstName = user.first_name;
+    let lastName = user.last_name;
+    if (fullNameInput) {
+      const parts = fullNameInput.split(/\s+/);
+      firstName = parts.shift();
+      lastName = parts.length ? parts.join(' ') : (user.last_name || '');
+    }
     const payload = {
-      first_name: document.getElementById('epFirstName')?.value || user.first_name,
+      first_name: firstName,
+      last_name: lastName,
       phone: document.getElementById('epPhone')?.value || user.phone,
       department: document.getElementById('epDepartment')?.value || user.department,
       designation: document.getElementById('epDesignation')?.value || user.designation,
@@ -460,6 +476,167 @@ const App = {
         truck_number: 'atTruckNumber', driver_name: 'atDriver', driver_phone: 'atPhone',
         truck_type: 'atType', status: 'atStatus',
       });
+    }
+  },
+
+  // ---------------------------------------------------------------------
+  // Generic View / Edit / Track modals for Ships, Containers, and Trucks.
+  // Each row's action buttons used to just flash a toast; these fetch the
+  // real record from the existing REST endpoints and, for Edit, save back
+  // through the existing PUT endpoints.
+  // ---------------------------------------------------------------------
+  RECORD_CONFIG: {
+    ship: {
+      endpoint: '/ships', label: 'Vessel', titleField: 'name', reloadFn: 'loadShips',
+      viewFields: [
+        ['ship_id', 'Ship ID'], ['name', 'Name'], ['vessel_type', 'Type'], ['flag', 'Flag'],
+        ['status', 'Status'], ['current_berth', 'Current Berth'], ['agent', 'Agent'],
+        ['agent_contact', 'Agent Contact'], ['imo_number', 'IMO Number'], ['mmsi', 'MMSI'],
+        ['eta', 'ETA'], ['etd', 'ETD'], ['containers_onboard', 'Containers Onboard'],
+      ],
+      editFields: [
+        { key: 'status', label: 'Status', type: 'select', options: ['Scheduled', 'Approaching', 'In Channel', 'Anchored', 'At Berth', 'Loading', 'Unloading', 'Departing', 'Departed', 'Diverted', 'Delayed'] },
+        { key: 'current_berth', label: 'Current Berth', type: 'text' },
+        { key: 'agent', label: 'Agent', type: 'text' },
+        { key: 'agent_contact', label: 'Agent Contact', type: 'text' },
+      ],
+      trackFields: [['status', 'Status'], ['current_berth', 'Current Berth'], ['eta', 'ETA'], ['etd', 'ETD']],
+    },
+    container: {
+      endpoint: '/containers', label: 'Container', titleField: 'container_id', reloadFn: 'loadContainers',
+      viewFields: [
+        ['container_id', 'Container ID'], ['container_type', 'Type'], ['status', 'Status'],
+        ['owner', 'Owner'], ['weight', 'Weight (kg)'], ['origin_port', 'Origin'],
+        ['destination_port', 'Destination'], ['current_location', 'Current Location'],
+        ['customs_status', 'Customs Status'], ['seal_number', 'Seal Number'],
+      ],
+      editFields: [
+        { key: 'status', label: 'Status', type: 'select', options: ['Empty', 'Loaded', 'In Transit', 'At Port', 'Delivered', 'Customs Hold', 'Damaged', 'Lost'] },
+        { key: 'current_location', label: 'Current Location', type: 'text' },
+        { key: 'destination_port', label: 'Destination Port', type: 'text' },
+        { key: 'customs_status', label: 'Customs Status', type: 'text' },
+      ],
+      trackFields: [['status', 'Status'], ['current_location', 'Current Location'], ['origin_port', 'Origin'], ['destination_port', 'Destination']],
+    },
+    truck: {
+      endpoint: '/trucks', label: 'Truck', titleField: 'truck_number', reloadFn: 'loadTrucks',
+      viewFields: [
+        ['truck_number', 'Truck Number'], ['driver_name', 'Driver'], ['driver_phone', 'Driver Phone'],
+        ['truck_type', 'Type'], ['status', 'Status'], ['license_plate', 'License Plate'],
+        ['owner', 'Owner'], ['current_location', 'Current Location'],
+      ],
+      editFields: [
+        { key: 'status', label: 'Status', type: 'select', options: ['Available', 'Assigned', 'Loading', 'Unloading', 'In Transit', 'At Gate', 'Waiting', 'Maintenance', 'Offline'] },
+        { key: 'driver_name', label: 'Driver Name', type: 'text' },
+        { key: 'driver_phone', label: 'Driver Phone', type: 'text' },
+        { key: 'current_location', label: 'Current Location', type: 'text' },
+      ],
+      trackFields: [['status', 'Status'], ['current_location', 'Current Location'], ['gate_in_time', 'Gate In'], ['gate_out_time', 'Gate Out']],
+    },
+  },
+
+  async _fetchRecord(kind, id) {
+    const cfg = App.RECORD_CONFIG[kind];
+    const res = await Api.request(`${cfg.endpoint}/${id}`);
+    return res.data;
+  },
+
+  _fmtVal(v) {
+    if (v === null || v === undefined || v === '') return '—';
+    return Utils.escapeHtml(String(v));
+  },
+
+  async showViewRecordModal(kind, id) {
+    const cfg = App.RECORD_CONFIG[kind];
+    let record;
+    try {
+      record = await App._fetchRecord(kind, id);
+    } catch (err) {
+      App.showToast(err.message || `Failed to load ${cfg.label.toLowerCase()}`, 'danger');
+      return;
+    }
+    const rows = cfg.viewFields.map(([key, label]) =>
+      `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-color);">
+        <span style="color:var(--text-muted);">${Utils.escapeHtml(label)}</span>
+        <strong>${App._fmtVal(record[key])}</strong>
+      </div>`
+    ).join('');
+    App.createModal({
+      id: 'viewRecordModal',
+      title: `${cfg.label} Details — ${Utils.escapeHtml(String(record[cfg.titleField] ?? id))}`,
+      width: '520px',
+      body: `<div>${rows}</div>`,
+      footer: `<button class="btn btn-secondary" onclick="document.getElementById('viewRecordModal').remove()">Close</button>`
+    });
+  },
+
+  async showTrackRecordModal(kind, id) {
+    const cfg = App.RECORD_CONFIG[kind];
+    let record;
+    try {
+      record = await App._fetchRecord(kind, id);
+    } catch (err) {
+      App.showToast(err.message || `Failed to load ${cfg.label.toLowerCase()}`, 'danger');
+      return;
+    }
+    const rows = cfg.trackFields.map(([key, label]) =>
+      `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-color);">
+        <span style="color:var(--text-muted);">${Utils.escapeHtml(label)}</span>
+        <strong>${App._fmtVal(record[key])}</strong>
+      </div>`
+    ).join('');
+    App.createModal({
+      id: 'trackRecordModal',
+      title: `Track ${cfg.label} — ${Utils.escapeHtml(String(record[cfg.titleField] ?? id))}`,
+      width: '480px',
+      body: `<div>${rows}</div>`,
+      footer: `<button class="btn btn-secondary" onclick="document.getElementById('trackRecordModal').remove()">Close</button>`
+    });
+  },
+
+  async showEditRecordModal(kind, id) {
+    const cfg = App.RECORD_CONFIG[kind];
+    let record;
+    try {
+      record = await App._fetchRecord(kind, id);
+    } catch (err) {
+      App.showToast(err.message || `Failed to load ${cfg.label.toLowerCase()}`, 'danger');
+      return;
+    }
+    const fieldsHtml = cfg.editFields.map(f => {
+      const inputId = `erf_${f.key}`;
+      const current = record[f.key] ?? '';
+      if (f.type === 'select') {
+        const opts = f.options.map(o => `<option value="${Utils.escapeHtml(o)}" ${o === current ? 'selected' : ''}>${Utils.escapeHtml(o)}</option>`).join('');
+        return `<div class="form-group"><label>${Utils.escapeHtml(f.label)}</label><select id="${inputId}" class="form-select">${opts}</select></div>`;
+      }
+      return `<div class="form-group"><label>${Utils.escapeHtml(f.label)}</label><input type="text" id="${inputId}" class="form-control" value="${Utils.escapeHtml(String(current))}"></div>`;
+    }).join('');
+
+    App.createModal({
+      id: 'editRecordModal',
+      title: `Edit ${cfg.label} — ${Utils.escapeHtml(String(record[cfg.titleField] ?? id))}`,
+      width: '500px',
+      body: `<form id="editRecordForm" class="modal-form">${fieldsHtml}</form>`,
+      footer: `<button class="btn btn-secondary" onclick="document.getElementById('editRecordModal').remove()">Cancel</button><button class="btn btn-primary" onclick="App.submitEditRecord('${kind}', ${id})">Save Changes</button>`
+    });
+  },
+
+  async submitEditRecord(kind, id) {
+    const cfg = App.RECORD_CONFIG[kind];
+    const payload = {};
+    cfg.editFields.forEach(f => {
+      const el = document.getElementById(`erf_${f.key}`);
+      if (el) payload[f.key] = el.value;
+    });
+    try {
+      await Api.request(`${cfg.endpoint}/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+      const modal = document.getElementById('editRecordModal');
+      if (modal) modal.remove();
+      App.showToast(`${cfg.label} updated`, 'success');
+      if (typeof window[cfg.reloadFn] === 'function') window[cfg.reloadFn]();
+    } catch (err) {
+      App.showToast(err.message || `Failed to update ${cfg.label.toLowerCase()}`, 'danger');
     }
   },
 

@@ -7,6 +7,7 @@ from app.utils.exceptions import ValidationError as AppValidationError, NotFound
 from app.utils.helpers import success_response
 from app.utils.validators import asset_id
 from sqlalchemy import func, or_, desc
+from sqlalchemy.orm import joinedload
 from datetime import datetime
 
 
@@ -61,7 +62,10 @@ def list_berths():
     sort_by = request.args.get('sort_by', 'code')
     sort_order = request.args.get('sort_order', 'asc')
 
-    query = Berth.query
+    # Eager-load current_ship -- to_dict() now reads it for every row to
+    # surface which vessel is docked, which without this fires one extra
+    # query per berth instead of a single JOIN.
+    query = Berth.query.options(joinedload(Berth.current_ship))
 
     if search:
         query = query.filter(or_(

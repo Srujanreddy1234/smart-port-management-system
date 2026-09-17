@@ -96,7 +96,12 @@ def calculate_wind_chill(temp_c, wind_speed_kmh):
 
 def fetch_year(year):
     start_date = f"{year}-01-01"
-    end_date = f"{year}-12-31"
+    # The archive API 400s if asked for dates beyond what's actually been
+    # observed yet -- cap the current (in-progress) year at today instead
+    # of Dec 31, so re-running this for the current year to pick up fresh
+    # months doesn't fail outright.
+    today = datetime.date.today()
+    end_date = today.isoformat() if year == today.year else f"{year}-12-31"
 
     params = {
         "latitude": LATITUDE,

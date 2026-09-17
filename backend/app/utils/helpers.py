@@ -228,3 +228,64 @@ def register_cli_commands(app):
         print(f'Demo credentials (password: {"admin123" if password == "admin123" else "<value of SEED_ADMIN_PASSWORD>"}):')
         for email, first, last, role, dept, desig, eid in users_data:
             print(f'  {email} ({role.value})')
+
+    @app.cli.command('backfill-water-quality')
+    def backfill_water_quality():
+        """Populate WaterQualityReading, which -- unlike weather/air quality
+        (real ERA5/CAMS data via datasets/scripts/import_to_database.py) or
+        noise (seeded by seed_historical.py's main flow) -- has never been
+        populated at all in some environments. Safe to run against a
+        database that already has users/ships/etc: unlike `seed-data`, it
+        only touches the water_quality monitoring station's readings, and
+        is a no-op if that station already has any rows.
+        """
+        from app.extensions import db
+        from app.models import MonitoringStation, WaterQualityReading
+        from datetime import datetime, timedelta
+        import random
+
+        random.seed(42)
+        station = MonitoringStation.query.filter_by(station_type='water_quality').first()
+        if not station:
+            print('No water_quality monitoring station found -- nothing to backfill.')
+            return
+
+        existing = WaterQualityReading.query.filter_by(station_id=station.id).count()
+        if existing > 0:
+            print(f'WaterQualityReading already has {existing} rows for station {station.station_id} -- skipping.')
+            return
+
+        now = datetime.utcnow()
+        seven_years_ago = now - timedelta(days=7 * 365)
+        current = seven_years_ago
+        created = 0
+        while current <= now:
+            if random.random() < 0.3:
+                db.session.add(WaterQualityReading(
+                    station_id=station.id,
+                    ph=random.uniform(7.5, 8.4),
+                    dissolved_oxygen=random.uniform(4.5, 8.0),
+                    bod=random.uniform(1.0, 5.0),
+                    cod=random.uniform(10, 40),
+                    tss=random.uniform(10, 60),
+                    tds=random.uniform(30000, 36000),
+                    oil_grease=random.uniform(0.5, 4.0),
+                    ammonia=random.uniform(0.05, 0.5),
+                    nitrate=random.uniform(0.1, 2.0),
+                    phosphate=random.uniform(0.02, 0.3),
+                    temperature=random.uniform(26, 32),
+                    turbidity=random.uniform(2, 20),
+                    conductivity=random.uniform(45000, 55000),
+                    salinity=random.uniform(32, 36),
+                    fecal_coliform=random.uniform(0, 200),
+                    total_coliform=random.uniform(0, 500),
+                    phenols=random.uniform(0, 0.01),
+                    cyanide=random.uniform(0, 0.005),
+                    sulfide=random.uniform(0, 0.05),
+                    recorded_at=current,
+                ))
+                created += 1
+            current += timedelta(days=1)
+
+        db.session.commit()
+        print(f'Backfilled {created} WaterQualityReading rows for station {station.station_id}.')

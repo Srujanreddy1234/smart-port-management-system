@@ -168,6 +168,8 @@ class MaintenanceSchedule(db.Model):
         return {
             'id': self.id,
             'equipment_id': self.equipment_id,
+            'equipment_name': self.equipment.name if self.equipment else None,
+            'equipment_code': self.equipment.equipment_id if self.equipment else None,
             'maintenance_type': self.maintenance_type.value,
             'priority': self.priority.value,
             'status': self.status.value,
@@ -177,6 +179,7 @@ class MaintenanceSchedule(db.Model):
             'estimated_duration_hours': self.estimated_duration_hours,
             'actual_duration_hours': self.actual_duration_hours,
             'assigned_technician_id': self.assigned_technician_id,
+            'assigned_technician_name': self.assigned_technician.get_full_name() if self.assigned_technician else None,
             'supervisor_id': self.supervisor_id,
             'started_at': self.started_at.isoformat() if self.started_at else None,
             'completed_at': self.completed_at.isoformat() if self.completed_at else None,

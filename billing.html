@@ -16,31 +16,31 @@
 </head>
 <body>
   <div class="app-wrapper">
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <i class="fas fa-anchor"></i>
-          <span>Smart Port</span>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-icon"><i class="fas fa-anchor"></i></div>
+        <div class="sidebar-brand-text">
+          <h5>Smart Port</h5>
+          <small>Thoothukudi</small>
         </div>
-        <button class="sidebar-toggle" aria-label="Toggle sidebar">
-          <i class="fas fa-bars"></i>
-        </button>
       </div>
       <nav class="sidebar-nav"></nav>
       <div class="sidebar-footer">
-        <div class="sidebar-user-info">
+        <div class="sidebar-user">
           <div class="sidebar-user-avatar"></div>
-          <h6 class="sidebar-user-name">User Name</h6>
-          <small class="sidebar-user-role">Role</small>
+          <div class="sidebar-user-info">
+            <h6>Loading...</h6>
+            <small></small>
+          </div>
         </div>
-        <div class="sidebar-version">v1.0.0</div>
       </div>
     </aside>
-    <div class="sidebar-overlay"></div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <main class="main-content">
       <header class="topbar">
         <div class="topbar-left">
+          <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
           <h1 class="page-title">Billing & Invoices</h1>
         </div>
         <div class="topbar-right">
@@ -53,11 +53,9 @@
             <span class="badge-count" style="display:none;">3</span>
           </button>
           <div class="notif-dropdown" id="notifDropdown"></div>
-          <div class="topbar-user">
-            <div class="avatar"></div>
-            <span class="username">User</span>
-            <i class="fas fa-chevron-down"></i>
-          </div>
+          <a href="profile.html" class="topbar-btn" style="text-decoration:none;">
+            <div class="avatar avatar-sm" style="background:var(--gradient-primary);font-size:0.7rem;"></div>
+          </a>
         </div>
       </header>
 

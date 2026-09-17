@@ -64,7 +64,10 @@ def aqi_to_category(aqi):
 
 def fetch_year(year):
     start_date = f"{year}-01-01"
-    end_date = f"{year}-12-31"
+    # See download_weather_data.py's fetch_year() for why the current year
+    # is capped at today instead of Dec 31.
+    today = datetime.date.today()
+    end_date = today.isoformat() if year == today.year else f"{year}-12-31"
 
     params = {
         "latitude": LATITUDE,

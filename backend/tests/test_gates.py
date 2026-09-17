@@ -142,6 +142,42 @@ def test_staff_can_manage_gates_and_any_booking(client, db, staff_headers):
     assert res.get_json()["data"]["status"] == "Completed"
 
 
+def test_checkin_resolves_truck_number_and_updates_trucks_at_gate(client, db, staff_headers):
+    """Regression test: booking a slot with a truck_number that matches a
+    registered Truck must resolve to that truck's id so check-in updates
+    Truck.current_gate_id -- otherwise the 'trucks at gate' live count
+    (derived from Truck.current_gate_id in _gate_congestion) stays stuck
+    at 0 no matter how many trucks check in."""
+    from app.models import Truck, TruckType, TruckStatus
+
+    truck = Truck(truck_number="TN-99-0001", truck_type=TruckType.TRAILER, status=TruckStatus.AVAILABLE)
+    db.session.add(truck)
+    db.session.commit()
+
+    make_user(db, "driver5@test.local", UserRole.TRUCK_OPERATOR)
+    driver_headers = auth_headers(client, "driver5@test.local")
+    gate = _make_gate(db)
+
+    res = client.post("/api/v1/gates/bookings", json={
+        "gate_id": gate.id, "purpose": "Container Pickup",
+        "truck_number": "TN-99-0001", "slot_start": _next_slot(),
+    }, headers=driver_headers)
+    assert res.status_code == 201
+    booking = res.get_json()["data"]
+    assert booking["truck_id"] == truck.id
+
+    res = client.post(f"/api/v1/gates/bookings/{booking['id']}/check-in", headers=staff_headers)
+    assert res.status_code == 200
+
+    db.session.refresh(truck)
+    assert truck.current_gate_id == gate.id
+    assert truck.status.value == "At Gate"
+
+    res = client.get("/api/v1/gates", headers=staff_headers)
+    live_gate = next(g for g in res.get_json()["data"] if g["id"] == gate.id)
+    assert live_gate["live"]["trucks_at_gate"] == 1
+
+
 def test_availability_reflects_bookings(client, db, admin_headers):
     make_user(db, "driver4@test.local", UserRole.TRUCK_OPERATOR)
     driver_headers = auth_headers(client, "driver4@test.local")

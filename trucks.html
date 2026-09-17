@@ -93,7 +93,7 @@
             <p class="page-subtitle">Fleet management and dispatch tracking</p>
           </div>
           <div class="page-header-right">
-            <button class="btn btn-primary" onclick="App.showAddTruckModal()">
+            <button class="btn btn-primary" id="addTruckBtn" onclick="App.showAddTruckModal()">
               <i class="fas fa-plus me-2"></i>Add Truck
             </button>
           </div>
@@ -109,21 +109,28 @@
             <label class="filter-label">Status:</label>
             <select class="filter-select" id="statusFilter">
               <option value="">All</option>
-              <option value="loading">Loading</option>
-              <option value="in-transit">In Transit</option>
-              <option value="delivered">Delivered</option>
-              <option value="waiting">Waiting</option>
-              <option value="returned">Returned</option>
+              <option value="Available">Available</option>
+              <option value="Assigned">Assigned</option>
+              <option value="Loading">Loading</option>
+              <option value="Unloading">Unloading</option>
+              <option value="In Transit">In Transit</option>
+              <option value="At Gate">At Gate</option>
+              <option value="Waiting">Waiting</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="Offline">Offline</option>
             </select>
           </div>
           <div class="filter-group">
             <label class="filter-label">Type:</label>
             <select class="filter-select" id="typeFilter">
               <option value="">All</option>
-              <option value="flatbed">Flatbed</option>
-              <option value="container">Container</option>
-              <option value="tanker">Tanker</option>
-              <option value="refrigerated">Refrigerated</option>
+              <option value="Prime Mover">Prime Mover</option>
+              <option value="Trailer">Trailer</option>
+              <option value="Chassis">Chassis</option>
+              <option value="Reach Stacker">Reach Stacker</option>
+              <option value="Forklift">Forklift</option>
+              <option value="Empty Handler">Empty Handler</option>
+              <option value="Other">Other</option>
             </select>
           </div>
         </div>
@@ -312,9 +319,9 @@
         '<td>' + (t.gate_out_time ? Utils.formatDateTime(t.gate_out_time) : '—') + '</td>' +
         '<td>' + (t.gate_in_time ? Utils.formatDateTime(t.gate_in_time) : '—') + '</td>' +
         '<td><div class="action-btns">' +
-          '<button class="btn btn-icon btn-view" title="View Details" onclick="App.showToast(\'Feature coming soon\',\'info\')"><i class="fas fa-eye"></i></button>' +
-          '<button class="btn btn-icon btn-edit" title="Edit" onclick="App.showToast(\'Feature coming soon\',\'info\')"><i class="fas fa-pen"></i></button>' +
-          '<button class="btn btn-icon btn-track" title="Track" onclick="App.showToast(\'Feature coming soon\',\'info\')"><i class="fas fa-location-dot"></i></button>' +
+          '<button class="btn btn-icon btn-view" title="View Details" onclick="App.showViewRecordModal(\'truck\', ' + t.id + ')"><i class="fas fa-eye"></i></button>' +
+          '<button class="btn btn-icon btn-edit" title="Edit" onclick="App.showEditRecordModal(\'truck\', ' + t.id + ')"><i class="fas fa-pen"></i></button>' +
+          '<button class="btn btn-icon btn-track" title="Track" onclick="App.showTrackRecordModal(\'truck\', ' + t.id + ')"><i class="fas fa-location-dot"></i></button>' +
         '</div></td>' +
       '</tr>';
     }
@@ -322,8 +329,8 @@
     function getFilterValues() {
       return {
         search: document.getElementById('truckSearch').value.toLowerCase(),
-        status: document.getElementById('statusFilter').value.toLowerCase(),
-        type: document.getElementById('typeFilter').value.toLowerCase()
+        status: document.getElementById('statusFilter').value,
+        type: document.getElementById('typeFilter').value
       };
     }
 
@@ -332,8 +339,8 @@
       filteredTrucks = trucksData.filter(function(t) {
         var text = (t.truck_number + ' ' + (t.driver_name || '') + ' ' + (t.license_plate || '')).toLowerCase();
         var matchSearch = !f.search || text.includes(f.search);
-        var matchStatus = !f.status || (STATUS_BADGE[t.status] || '') === 'status-' + f.status.replace('in-transit', 'transit');
-        var matchType = !f.type || (TYPE_LABEL[t.truck_type] || '') === f.type;
+        var matchStatus = !f.status || t.status === f.status;
+        var matchType = !f.type || t.truck_type === f.type;
         return matchSearch && matchStatus && matchType;
       });
       currentPage = 1;
@@ -440,6 +447,16 @@
     document.getElementById('truckSearch').addEventListener('input', applyTruckFilters);
     document.getElementById('statusFilter').addEventListener('change', applyTruckFilters);
     document.getElementById('typeFilter').addEventListener('change', applyTruckFilters);
+
+    // Truck Operators manage their own trucks (added by staff/admin when
+    // registering their fleet) -- they don't self-register new trucks.
+    if (Api.getUserRole() === 'Truck Operator') {
+      const addBtn = document.getElementById('addTruckBtn');
+      if (addBtn) addBtn.style.display = 'none';
+      const pageTitle = document.querySelector('.page-title');
+      if (pageTitle) pageTitle.textContent = 'My Trucks';
+    }
+
     loadTrucks();
     loadTruckKpis();
 

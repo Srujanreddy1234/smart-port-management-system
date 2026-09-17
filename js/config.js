@@ -100,6 +100,7 @@ const ROLE_NAV_ITEMS = {
     ]},
     { section: 'Administration', items: [
       { href: 'admin.html', icon: 'fa-user-shield', label: 'Admin Panel' },
+      { href: 'roles.html', icon: 'fa-user-lock', label: 'Roles & Permissions' },
       { href: 'profile.html', icon: 'fa-user-circle', label: 'User Profile' },
     ]},
   ],
@@ -125,6 +126,7 @@ const ROLE_NAV_ITEMS = {
     ]},
     { section: 'Administration', items: [
       { href: 'admin.html', icon: 'fa-user-shield', label: 'Admin Panel' },
+      { href: 'roles.html', icon: 'fa-user-lock', label: 'Roles & Permissions' },
       { href: 'profile.html', icon: 'fa-user-circle', label: 'User Profile' },
     ]},
   ],
@@ -140,6 +142,7 @@ const ROLE_NAV_ITEMS = {
     { section: 'Management', items: [
       { href: 'security.html', icon: 'fa-shield-halved', label: 'Security Center' },
       { href: 'maintenance.html', icon: 'fa-wrench', label: 'Equipment Maint.' },
+      { href: 'environment.html', icon: 'fa-leaf', label: 'Environmental' },
     ]},
     { section: 'Analytics', items: [
       { href: 'reports.html', icon: 'fa-chart-line', label: 'Reports' },
@@ -162,6 +165,10 @@ const ROLE_NAV_ITEMS = {
     ]},
     { section: 'Management', items: [
       { href: 'maintenance.html', icon: 'fa-wrench', label: 'Maintenance' },
+      { href: 'security.html', icon: 'fa-shield-halved', label: 'Security Center' },
+    ]},
+    { section: 'Analytics', items: [
+      { href: 'reports.html', icon: 'fa-chart-line', label: 'Reports' },
     ]},
     { section: 'Account', items: [
       { href: 'profile.html', icon: 'fa-user-circle', label: 'Profile' },
@@ -174,6 +181,10 @@ const ROLE_NAV_ITEMS = {
       { href: 'ships.html', icon: 'fa-ship', label: 'Ships' },
       { href: 'trucks.html', icon: 'fa-truck', label: 'Trucks' },
       { href: 'gates.html', icon: 'fa-route', label: 'Gate Routing' },
+      { href: 'security.html', icon: 'fa-shield-halved', label: 'Security Center' },
+    ]},
+    { section: 'Analytics', items: [
+      { href: 'reports.html', icon: 'fa-chart-line', label: 'Reports' },
     ]},
     { section: 'Account', items: [
       { href: 'profile.html', icon: 'fa-user-circle', label: 'Profile' },
@@ -184,8 +195,12 @@ const ROLE_NAV_ITEMS = {
     { section: 'My Operations', items: [
       { href: 'ships.html', icon: 'fa-ship', label: 'My Ships' },
       { href: 'containers.html', icon: 'fa-boxes-stacked', label: 'My Containers' },
+      { href: 'trucks.html', icon: 'fa-truck', label: 'Trucks' },
       { href: 'berths.html', icon: 'fa-anchor', label: 'Berth Status' },
       { href: 'gates.html', icon: 'fa-route', label: 'Gate Routing' },
+    ]},
+    { section: 'Analytics', items: [
+      { href: 'reports.html', icon: 'fa-chart-line', label: 'Reports' },
     ]},
     { section: 'Account', items: [
       { href: 'profile.html', icon: 'fa-user-circle', label: 'Profile' },
@@ -209,6 +224,9 @@ const ROLE_NAV_ITEMS = {
       { href: 'containers.html', icon: 'fa-boxes-stacked', label: 'Containers' },
       { href: 'ships.html', icon: 'fa-ship', label: 'Vessels' },
       { href: 'gates.html', icon: 'fa-route', label: 'Gate Routing' },
+    ]},
+    { section: 'Analytics', items: [
+      { href: 'reports.html', icon: 'fa-chart-line', label: 'Reports' },
     ]},
     { section: 'Account', items: [
       { href: 'profile.html', icon: 'fa-user-circle', label: 'Profile' },
@@ -286,7 +304,7 @@ const Api = {
     return ROLE_NAV_ITEMS[role] || ROLE_NAV_ITEMS['Public'];
   },
 
-  async request(path, options = {}, _isRetry = false) {
+  async request(path, options = {}, _isRetry = false, _isRefreshRetry = false) {
     const token = this.getToken();
     const headers = {
       'Content-Type': 'application/json',
@@ -304,7 +322,7 @@ const Api = {
       // pages permanently showing blank data on a single hiccup.
       if (!_isRetry) {
         await new Promise(r => setTimeout(r, 1200));
-        return this.request(path, options, true);
+        return this.request(path, options, true, _isRefreshRetry);
       }
       if (typeof App !== 'undefined' && App.showToast) {
         App.showToast('Connection issue reaching the server. Please try again.', 'danger');
@@ -316,12 +334,40 @@ const Api = {
     // same one-time-retry treatment as a network failure.
     if ([502, 503, 504].includes(response.status) && !_isRetry) {
       await new Promise(r => setTimeout(r, 1200));
-      return this.request(path, options, true);
+      return this.request(path, options, true, _isRefreshRetry);
     }
 
     const body = await response.json().catch(() => ({}));
 
     if (response.status === 401) {
+      // Access tokens expire (short-lived); rather than forcing a full
+      // logout on every expiry, use the stored refresh_token to mint a new
+      // access token and retry the original request once. Skip this for
+      // the auth endpoints themselves (login/refresh/logout) to avoid
+      // infinite loops, and only try once per original request.
+      const isAuthEndpoint = path.startsWith('/auth/refresh') || path.startsWith('/auth/login') || path.startsWith('/auth/logout');
+      const refreshToken = localStorage.getItem('refresh_token');
+      if (!_isRefreshRetry && !isAuthEndpoint && refreshToken) {
+        try {
+          const refreshRes = await fetch(`${API_BASE_URL}/auth/refresh`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${refreshToken}`
+            }
+          });
+          if (refreshRes.ok) {
+            const refreshBody = await refreshRes.json().catch(() => ({}));
+            const newAccessToken = refreshBody.data && refreshBody.data.access_token;
+            if (newAccessToken) {
+              localStorage.setItem('access_token', newAccessToken);
+              return this.request(path, options, _isRetry, true);
+            }
+          }
+        } catch (e) {
+          // fall through to logout below
+        }
+      }
       this.clearSession();
       window.location.href = 'login.html';
       throw new Error(body.message || 'Session expired');

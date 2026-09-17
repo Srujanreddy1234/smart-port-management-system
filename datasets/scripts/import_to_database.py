@@ -49,8 +49,11 @@ DATASETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 #                sea-surface-temp/sea-level are partially null in 2022-2023
 #                (imported as NULL, not fabricated). All 4 available years
 #                (2022-2025) are imported.
-WEATHER_YEARS = [2020, 2021, 2022, 2023, 2024, 2025]
-AIR_QUALITY_YEARS = [2023, 2024, 2025]
+#   2026 is a partial (in-progress) year for weather/air_quality -- the
+#   download scripts cap it at "today" rather than Dec 31, so it's imported
+#   like any other year and simply has fewer hours than a full year.
+WEATHER_YEARS = [2020, 2021, 2022, 2023, 2024, 2025, 2026]
+AIR_QUALITY_YEARS = [2023, 2024, 2025, 2026]
 MARINE_YEARS = [2022, 2023, 2024, 2025]
 
 
@@ -259,7 +262,7 @@ def write_manifest(weather_count, aq_count, marine_count, traffic_count):
                 "records_imported": weather_count,
                 "model": "WeatherReading",
                 "station": "MS-004",
-                "notes": "ERA5 reanalysis via Open-Meteo; fully populated for every downloaded year (2018-2025). A 6-year window is imported.",
+                "notes": "ERA5 reanalysis via Open-Meteo; fully populated for every downloaded year (2020-2025), plus the current in-progress year (2026, partial through today).",
             },
             "air_quality": {
                 "years_imported": AIR_QUALITY_YEARS,
@@ -288,6 +291,18 @@ def write_manifest(weather_count, aq_count, marine_count, traffic_count):
     }
     out_path = os.path.join(DATASETS_DIR, "processed", "import_manifest.json")
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    # Preserve any keys this run doesn't produce (e.g. "storage_audit", a
+    # point-in-time measurement recorded manually against production) --
+    # re-running this script to pick up a new year's data shouldn't
+    # silently erase that record.
+    if os.path.exists(out_path):
+        try:
+            with open(out_path) as f:
+                existing = json.load(f)
+            for key, value in existing.items():
+                manifest.setdefault(key, value)
+        except (json.JSONDecodeError, OSError):
+            pass
     with open(out_path, "w") as f:
         json.dump(manifest, f, indent=2)
     print(f"\nManifest written to {out_path}")

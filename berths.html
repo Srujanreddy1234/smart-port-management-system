@@ -128,12 +128,10 @@
               <option value="Occupied">Occupied</option>
               <option value="Maintenance">Maintenance</option>
               <option value="Reserved">Reserved</option>
+              <option value="Out of Service">Out of Service</option>
             </select>
             <select class="form-select" id="zoneFilter" style="width:auto;font-size:0.82rem;">
               <option value="">All Zones</option>
-              <option value="Main">Main</option>
-              <option value="East">East</option>
-              <option value="West">West</option>
             </select>
           </div>
         </div>
@@ -191,7 +189,7 @@
           <td>${b.max_containers ? b.max_containers.toLocaleString() : '—'}</td>
           <td>${b.has_crane ? '<i class="fas fa-check-circle" style="color:var(--success);"></i>' : '<i class="fas fa-times-circle" style="color:var(--text-muted);"></i>'}</td>
           <td>${b.zone || '—'}</td>
-          <td>${b.current_ship_id ? '<span class="badge badge-warning">Occupied</span>' : '<span class="badge badge-success">Empty</span>'}</td>
+          <td>${b.current_ship ? `<strong>${Utils.escapeHtml(b.current_ship.name)}</strong> <small style="color:var(--text-muted);">(${Utils.escapeHtml(b.current_ship.ship_id)})</small>` : '<span class="text-muted">—</span>'}</td>
           <td>
             <div style="display:flex;gap:4px;">
               ${b.status === 'Available' && !b.current_ship_id ? `<button class="btn btn-sm btn-primary" onclick="showAssignModal(${b.id})" title="Assign Ship"><i class="fas fa-link"></i></button>` : ''}
@@ -203,6 +201,8 @@
       `).join('');
     }
 
+    let zoneFilterPopulated = false;
+
     async function loadBerths() {
       try {
         const status = document.getElementById('statusFilter').value;
@@ -213,6 +213,20 @@
         const res = await Api.request(url);
         allBerths = res.data.items || [];
         renderBerths(allBerths);
+        // Populate the zone dropdown from the real zones present in the
+        // data (rather than a guessed/hardcoded list) the first time we
+        // see an unfiltered set of berths.
+        if (!zoneFilterPopulated && !status && !zone) {
+          const zoneSelect = document.getElementById('zoneFilter');
+          const zones = [...new Set(allBerths.map(b => b.zone).filter(Boolean))].sort();
+          zones.forEach(z => {
+            const opt = document.createElement('option');
+            opt.value = z;
+            opt.textContent = z;
+            zoneSelect.appendChild(opt);
+          });
+          zoneFilterPopulated = true;
+        }
       } catch (err) {
         App.showToast('Failed to load berths: ' + err.message, 'danger');
       }

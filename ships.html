@@ -267,7 +267,11 @@
       if (!tbody) return;
       const start = (currentPage - 1) * rowsPerPage;
       const pageData = data.slice(start, start + rowsPerPage);
-      const totalItems = data.length;
+      // When no client-side filter is active, report the real DB total
+      // (same Ship.query.count() the Dashboard uses) rather than just how
+      // many rows this page happened to fetch.
+      const filtersActive = data.length !== shipsData.length;
+      const totalItems = (!filtersActive && shipsTotalCount != null) ? shipsTotalCount : data.length;
       const totalPages = Math.ceil(totalItems / rowsPerPage) || 1;
 
       if (pageData.length === 0) {
@@ -284,9 +288,9 @@
             <td>${s.agent || '—'}</td>
             <td>
               <div style="display:flex;gap:4px;">
-                <button class="btn btn-sm btn-secondary" title="View Details" onclick="App.showToast('Viewing ${s.name}','info')"><i class="fas fa-eye"></i></button>
-                <button class="btn btn-sm btn-secondary" title="Edit" onclick="App.showToast('Editing ${s.name}','info')"><i class="fas fa-pen"></i></button>
-                <button class="btn btn-sm btn-secondary" title="Track" onclick="App.showToast('Tracking ${s.name}','info')"><i class="fas fa-location-dot"></i></button>
+                <button class="btn btn-sm btn-secondary" title="View Details" onclick="App.showViewRecordModal('ship', ${s.id})"><i class="fas fa-eye"></i></button>
+                <button class="btn btn-sm btn-secondary" title="Edit" onclick="App.showEditRecordModal('ship', ${s.id})"><i class="fas fa-pen"></i></button>
+                <button class="btn btn-sm btn-secondary" title="Track" onclick="App.showTrackRecordModal('ship', ${s.id})"><i class="fas fa-location-dot"></i></button>
               </div>
             </td>
           </tr>`).join('');
@@ -322,9 +326,17 @@
       });
     }
 
+    // Real, unfiltered ship count from the same Ship.query.count() the
+    // /ships list and /dashboard/kpis endpoints both use -- kept separate
+    // from shipsData.length, which is only however many rows fit in one
+    // page fetch (previously the "Total Ships" card and table footer read
+    // that capped local array length instead, so they disagreed with the
+    // Dashboard's Active Vessels count).
+    let shipsTotalCount = null;
+
     function loadKpis() {
       const stats = Store.getShipStats();
-      updateKpiValue('Total Ships', stats.total);
+      updateKpiValue('Total Ships', shipsTotalCount != null ? shipsTotalCount : stats.total);
       updateKpiValue('At Berth', stats.by_status['At Berth'] || 0);
       updateKpiValue('Anchored', stats.by_status['Anchored'] || 0);
       updateKpiValue('In Channel', stats.by_status['In Channel'] || 0);
@@ -335,9 +347,11 @@
       try {
         const res = await Api.request('/ships?page=1&per_page=50');
         shipsData = res.data.items || [];
+        shipsTotalCount = res.data.total != null ? res.data.total : shipsData.length;
         filteredData = [...shipsData];
         currentPage = 1;
         renderShips(filteredData);
+        loadKpis();
       } catch (err) {
         shipsData = Store.get('ships');
         filteredData = [...shipsData];

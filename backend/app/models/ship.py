@@ -173,6 +173,12 @@ class Berth(db.Model):
             'terminal': self.terminal,
             'notes': self.notes,
             'current_ship_id': self.current_ship_id,
+            'current_ship': {
+                'id': self.current_ship.id,
+                'name': self.current_ship.name,
+                'ship_id': self.current_ship.ship_id,
+                'vessel_type': self.current_ship.vessel_type.value,
+            } if self.current_ship_id and self.current_ship else None,
             'occupied_since': self.occupied_since.isoformat() if self.occupied_since else None,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()

@@ -68,6 +68,36 @@ def test_trucks_crud(client, admin_headers):
     assert res.status_code == 200
 
 
+def test_truck_operator_only_sees_own_trucks(client, db, admin_headers):
+    """Regression test: a Truck Operator's fleet list must be scoped to
+    their own trucks (matched by phone via driver_phone/owner_contact --
+    the Truck model has no direct owner_user_id FK), not the whole port's
+    fleet."""
+    from tests.conftest import make_user, auth_headers
+    from app.models import Truck, TruckType, UserRole
+
+    mine = Truck(truck_number="TRK-MINE-1", truck_type=TruckType.TRAILER, driver_phone="+91-9000000001")
+    other = Truck(truck_number="TRK-OTHER-1", truck_type=TruckType.TRAILER, driver_phone="+91-9000000002")
+    db.session.add_all([mine, other])
+    db.session.commit()
+
+    operator = make_user(db, "operator@test.local", UserRole.TRUCK_OPERATOR)
+    operator.phone = "+91-9000000001"
+    db.session.commit()
+    headers = auth_headers(client, "operator@test.local")
+
+    res = client.get("/api/v1/trucks?per_page=100", headers=headers)
+    assert res.status_code == 200
+    numbers = [t["truck_number"] for t in res.get_json()["data"]["items"]]
+    assert "TRK-MINE-1" in numbers
+    assert "TRK-OTHER-1" not in numbers
+
+    # Admin still sees the whole fleet.
+    res = client.get("/api/v1/trucks?per_page=100", headers=admin_headers)
+    numbers = [t["truck_number"] for t in res.get_json()["data"]["items"]]
+    assert "TRK-MINE-1" in numbers and "TRK-OTHER-1" in numbers
+
+
 def test_berths_crud_and_assignment(client, admin_headers):
     res = client.post("/api/v1/berths", json={
         "berth_id": "BTH-TEST-1", "name": "Test Berth", "code": "TB1",
@@ -84,6 +114,18 @@ def test_berths_crud_and_assignment(client, admin_headers):
 
     res = client.post(f"/api/v1/berths/{berth_id}/assign", json={"ship_id": ship_id}, headers=admin_headers)
     assert res.status_code == 200, res.get_json()
+
+    # Regression test: an occupied berth's serialization must surface which
+    # ship is actually docked there, not just the bare current_ship_id.
+    res = client.get(f"/api/v1/berths/{berth_id}", headers=admin_headers)
+    assert res.status_code == 200
+    berth_data = res.get_json()["data"]
+    assert berth_data["current_ship"] is not None
+    assert berth_data["current_ship"]["name"] == "MV Berth Test"
+
+    res = client.get("/api/v1/berths?per_page=50", headers=admin_headers)
+    listed = next(b for b in res.get_json()["data"]["items"] if b["id"] == berth_id)
+    assert listed["current_ship"]["ship_id"] == "SH-TEST-2"
 
     res = client.get("/api/v1/berths/available", headers=admin_headers)
     assert res.status_code == 200

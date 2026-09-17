@@ -11,6 +11,7 @@ from app.utils.exceptions import AuthorizationError, NotFoundError, ValidationEr
 from app.utils.helpers import success_response
 from app.utils.validators import asset_id
 from sqlalchemy import func, or_, and_, desc, asc
+from sqlalchemy.orm import joinedload
 from datetime import datetime, timedelta
 from marshmallow import Schema, fields, validate, ValidationError
 
@@ -227,7 +228,14 @@ def delete_equipment(equipment_id):
 def list_maintenance_schedules():
     check_permission('maintenance.read')
 
-    query = MaintenanceSchedule.query
+    # Eager-load equipment/assigned_technician -- to_dict() now reads both
+    # for every row to surface the real equipment name and technician name
+    # instead of a blank dash, which without this fires two extra queries
+    # per schedule instead of one JOIN each.
+    query = MaintenanceSchedule.query.options(
+        joinedload(MaintenanceSchedule.equipment),
+        joinedload(MaintenanceSchedule.assigned_technician),
+    )
 
     search = request.args.get('search', '').strip()
     if search:
