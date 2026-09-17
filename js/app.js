@@ -190,7 +190,7 @@ const App = {
     const token = Api.getToken();
     if (!token) return;
     try {
-      this._sseConnection = new EventSource(`${API_BASE_URL}/events/stream`);
+      this._sseConnection = new EventSource(`${API_BASE_URL}/events/stream?token=${encodeURIComponent(token)}`);
       this._sseConnection.onmessage = (e) => {
         try {
           const event = JSON.parse(e.data);

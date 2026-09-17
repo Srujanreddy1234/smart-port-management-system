@@ -79,7 +79,7 @@ def list_users():
     if department:
         query = query.filter(User.department == department)
 
-    sort_column = getattr(User, sort_by, User.created_at)
+    sort_column = getattr(User, sort_by, User.created_at) if sort_by in User.__table__.columns.keys() else User.created_at
     if sort_order == 'desc':
         query = query.order_by(desc(sort_column))
     else:

@@ -99,7 +99,7 @@ def list_incidents():
 
     sort_by = request.args.get('sort_by', 'detected_at')
     sort_order = request.args.get('sort_order', 'desc')
-    sort_column = getattr(SecurityIncident, sort_by, SecurityIncident.detected_at)
+    sort_column = getattr(SecurityIncident, sort_by, SecurityIncident.detected_at) if sort_by in SecurityIncident.__table__.columns.keys() else SecurityIncident.detected_at
     if sort_order == 'desc':
         query = query.order_by(desc(sort_column))
     else:
@@ -263,7 +263,7 @@ def list_alerts():
 
     sort_by = request.args.get('sort_by', 'created_at')
     sort_order = request.args.get('sort_order', 'desc')
-    sort_column = getattr(Alert, sort_by, Alert.created_at)
+    sort_column = getattr(Alert, sort_by, Alert.created_at) if sort_by in Alert.__table__.columns.keys() else Alert.created_at
     if sort_order == 'desc':
         query = query.order_by(desc(sort_column))
     else:
@@ -330,7 +330,7 @@ def list_cameras():
 
     sort_by = request.args.get('sort_by', 'created_at')
     sort_order = request.args.get('sort_order', 'desc')
-    sort_column = getattr(Camera, sort_by, Camera.created_at)
+    sort_column = getattr(Camera, sort_by, Camera.created_at) if sort_by in Camera.__table__.columns.keys() else Camera.created_at
     if sort_order == 'desc':
         query = query.order_by(desc(sort_column))
     else:

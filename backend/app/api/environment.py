@@ -74,7 +74,7 @@ def list_stations():
 
     sort_by = request.args.get('sort_by', 'created_at')
     sort_order = request.args.get('sort_order', 'desc')
-    sort_column = getattr(MonitoringStation, sort_by, MonitoringStation.created_at)
+    sort_column = getattr(MonitoringStation, sort_by, MonitoringStation.created_at) if sort_by in MonitoringStation.__table__.columns.keys() else MonitoringStation.created_at
     if sort_order == 'desc':
         query = query.order_by(desc(sort_column))
     else:
@@ -207,7 +207,7 @@ def list_air_quality_readings():
 
     sort_by = request.args.get('sort_by', 'recorded_at')
     sort_order = request.args.get('sort_order', 'desc')
-    sort_column = getattr(AirQualityReading, sort_by, AirQualityReading.recorded_at)
+    sort_column = getattr(AirQualityReading, sort_by, AirQualityReading.recorded_at) if sort_by in AirQualityReading.__table__.columns.keys() else AirQualityReading.recorded_at
     if sort_order == 'desc':
         query = query.order_by(desc(sort_column))
     else:
@@ -282,7 +282,7 @@ def list_water_quality_readings():
 
     sort_by = request.args.get('sort_by', 'recorded_at')
     sort_order = request.args.get('sort_order', 'desc')
-    sort_column = getattr(WaterQualityReading, sort_by, WaterQualityReading.recorded_at)
+    sort_column = getattr(WaterQualityReading, sort_by, WaterQualityReading.recorded_at) if sort_by in WaterQualityReading.__table__.columns.keys() else WaterQualityReading.recorded_at
     if sort_order == 'desc':
         query = query.order_by(desc(sort_column))
     else:
@@ -364,7 +364,7 @@ def list_noise_readings():
 
     sort_by = request.args.get('sort_by', 'recorded_at')
     sort_order = request.args.get('sort_order', 'desc')
-    sort_column = getattr(NoiseReading, sort_by, NoiseReading.recorded_at)
+    sort_column = getattr(NoiseReading, sort_by, NoiseReading.recorded_at) if sort_by in NoiseReading.__table__.columns.keys() else NoiseReading.recorded_at
     if sort_order == 'desc':
         query = query.order_by(desc(sort_column))
     else:
@@ -461,7 +461,7 @@ def list_weather_readings():
 
     sort_by = request.args.get('sort_by', 'recorded_at')
     sort_order = request.args.get('sort_order', 'desc')
-    sort_column = getattr(WeatherReading, sort_by, WeatherReading.recorded_at)
+    sort_column = getattr(WeatherReading, sort_by, WeatherReading.recorded_at) if sort_by in WeatherReading.__table__.columns.keys() else WeatherReading.recorded_at
     if sort_order == 'desc':
         query = query.order_by(desc(sort_column))
     else:
@@ -501,7 +501,7 @@ def list_environmental_alerts():
 
     sort_by = request.args.get('sort_by', 'triggered_at')
     sort_order = request.args.get('sort_order', 'desc')
-    sort_column = getattr(EnvironmentalAlert, sort_by, EnvironmentalAlert.triggered_at)
+    sort_column = getattr(EnvironmentalAlert, sort_by, EnvironmentalAlert.triggered_at) if sort_by in EnvironmentalAlert.__table__.columns.keys() else EnvironmentalAlert.triggered_at
     if sort_order == 'desc':
         query = query.order_by(desc(sort_column))
     else:

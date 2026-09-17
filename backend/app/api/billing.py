@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow import Schema, fields, validate, ValidationError
 from app.extensions import db
 from app.models import User, Ship, Berth
+from app.models.user import UserRole
 from app.models.billing import Invoice, InvoiceStatus, BillingLine, BillingCategory, PaymentMethod
 from app.models.event_log import EventType, EventSeverity
 from app.api.sse import publish_event
@@ -52,6 +53,21 @@ def check_permission(permission):
     return user
 
 
+OWNER_SCOPED_ROLES = (UserRole.SHIPPING_COMPANY, UserRole.CUSTOMER)
+
+
+def _is_owner_scoped(user):
+    """Shipping Company / Customer accounts only see invoices for ships
+    where they're the listed shipping agent -- not every invoice."""
+    return user.role in OWNER_SCOPED_ROLES
+
+
+def _scope_invoices_to_owner(query, user):
+    if _is_owner_scoped(user):
+        query = query.join(Ship, Invoice.ship_id == Ship.id).filter(Ship.agent_email == user.email)
+    return query
+
+
 def _generate_invoice_number():
     now = datetime.utcnow()
     prefix = now.strftime('INV-%Y%m')
@@ -66,7 +82,7 @@ def _generate_invoice_number():
 @billing_bp.route('', methods=['GET'])
 @jwt_required()
 def list_invoices():
-    check_permission('reports.read')
+    user = check_permission('reports.read')
 
     page = request.args.get('page', 1, type=int)
     per_page = min(request.args.get('per_page', 20, type=int), 100)
@@ -74,7 +90,7 @@ def list_invoices():
     ship_id = request.args.get('ship_id', type=int)
     search = request.args.get('search', '').strip()
 
-    query = Invoice.query
+    query = _scope_invoices_to_owner(Invoice.query, user)
 
     if status:
         try:
@@ -108,10 +124,14 @@ def list_invoices():
 @billing_bp.route('/<int:invoice_id>', methods=['GET'])
 @jwt_required()
 def get_invoice(invoice_id):
-    check_permission('reports.read')
+    user = check_permission('reports.read')
     invoice = Invoice.query.get(invoice_id)
     if not invoice:
         raise NotFoundError('Invoice not found')
+    if _is_owner_scoped(user):
+        ship = Ship.query.get(invoice.ship_id)
+        if not ship or ship.agent_email != user.email:
+            raise NotFoundError('Invoice not found')
     return success_response(invoice.to_dict())
 
 
@@ -177,6 +197,35 @@ def create_invoice():
 
     db.session.commit()
     return success_response(invoice.to_dict(), 'Invoice created', 201)
+
+
+@billing_bp.route('/<int:invoice_id>', methods=['PUT'])
+@jwt_required()
+def update_invoice(invoice_id):
+    check_permission('reports.write')
+    invoice = Invoice.query.get(invoice_id)
+    if not invoice:
+        raise NotFoundError('Invoice not found')
+    if invoice.status not in [InvoiceStatus.DRAFT, InvoiceStatus.SENT]:
+        raise AppValidationError('Only draft or sent invoices can be edited')
+
+    data = request.get_json() or {}
+    if 'due_date' in data and data['due_date']:
+        invoice.due_date = datetime.fromisoformat(data['due_date'].replace('Z', '+00:00'))
+    if 'tax_rate' in data:
+        invoice.tax_rate = float(data['tax_rate'])
+    if 'discount' in data:
+        invoice.discount = float(data['discount'])
+    if 'notes' in data:
+        invoice.notes = data['notes']
+    if 'terms' in data:
+        invoice.terms = data['terms']
+
+    invoice.calculate_totals()
+    invoice.updated_at = datetime.utcnow()
+    db.session.commit()
+
+    return success_response(invoice.to_dict(), 'Invoice updated')
 
 
 @billing_bp.route('/<int:invoice_id>/lines', methods=['POST'])

@@ -40,9 +40,18 @@ berth_schema = BerthSchema()
 berth_list_schema = BerthSchema(many=True)
 
 
+def check_permission(permission):
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user or not user.has_permission(permission):
+        raise AuthorizationError(f'Permission required: {permission}')
+    return user
+
+
 @berths_bp.route('', methods=['GET'])
 @jwt_required()
 def list_berths():
+    check_permission('berths.read')
     page = request.args.get('page', 1, type=int)
     per_page = min(request.args.get('per_page', 20, type=int), 100)
     search = request.args.get('search', '').strip()
@@ -73,7 +82,11 @@ def list_berths():
     if terminal:
         query = query.filter(Berth.terminal == terminal)
 
-    sort_column = getattr(Berth, sort_by, Berth.code)
+    allowed_sort_columns = {
+        'berth_id', 'code', 'name', 'status', 'zone', 'terminal',
+        'max_length', 'max_beam', 'max_draft', 'max_tonnage', 'created_at',
+    }
+    sort_column = getattr(Berth, sort_by, Berth.code) if sort_by in allowed_sort_columns else Berth.code
     if sort_order == 'desc':
         query = query.order_by(desc(sort_column))
     else:
@@ -95,6 +108,7 @@ def list_berths():
 @berths_bp.route('/<int:berth_id>', methods=['GET'])
 @jwt_required()
 def get_berth(berth_id):
+    check_permission('berths.read')
     berth = Berth.query.get(berth_id)
     if not berth:
         raise NotFoundError('Berth not found')
@@ -191,6 +205,7 @@ def delete_berth(berth_id):
 @berths_bp.route('/stats', methods=['GET'])
 @jwt_required()
 def get_berth_stats():
+    check_permission('berths.read')
     total = Berth.query.count()
     by_status = db.session.query(Berth.status, func.count(Berth.id)).group_by(Berth.status).all()
     by_zone = db.session.query(Berth.zone, func.count(Berth.id)).filter(Berth.zone.isnot(None)).group_by(Berth.zone).all()
@@ -314,6 +329,7 @@ def release_berth(berth_id):
 @berths_bp.route('/available', methods=['GET'])
 @jwt_required()
 def get_available_berths():
+    check_permission('berths.read')
     length = request.args.get('length', type=float)
     beam = request.args.get('beam', type=float)
     draft = request.args.get('draft', type=float)

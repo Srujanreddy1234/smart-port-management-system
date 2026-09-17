@@ -80,7 +80,7 @@ def list_trucks():
 
     sort_by = request.args.get('sort_by', 'created_at')
     sort_order = request.args.get('sort_order', 'desc')
-    sort_column = getattr(Truck, sort_by, Truck.created_at)
+    sort_column = getattr(Truck, sort_by, Truck.created_at) if sort_by in Truck.__table__.columns.keys() else Truck.created_at
     if sort_order == 'desc':
         query = query.order_by(desc(sort_column))
     else:

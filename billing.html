@@ -215,11 +215,11 @@
           </div>
           <div class="form-group">
             <label>Notes</label>
-            <textarea name="notes" class="form-control" rows="2">${data.notes || ''}</textarea>
+            <textarea name="notes" class="form-control" rows="2">${Utils.escapeHtml(data.notes || '')}</textarea>
           </div>
           <div class="form-group">
             <label>Terms</label>
-            <textarea name="terms" class="form-control" rows="2">${data.terms || 'Payment due within 30 days.'}</textarea>
+            <textarea name="terms" class="form-control" rows="2">${Utils.escapeHtml(data.terms || 'Payment due within 30 days.')}</textarea>
           </div>
           <div class="line-items-section">
             <div class="d-flex justify-between align-center mb-2">
@@ -243,9 +243,9 @@
       return `
         <div class="line-item-row" style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
           <select name="category" class="form-select" style="min-width:180px;" required>${categories.map(c => `<option value="${c}" ${li.category === c ? 'selected' : ''}>${c.replace(/_/g, ' ')}</option>`).join('')}</select>
-          <input type="text" name="description" class="form-control" placeholder="Description" style="flex:1;min-width:200px;" value="${li.description || ''}" required>
+          <input type="text" name="description" class="form-control" placeholder="Description" style="flex:1;min-width:200px;" value="${Utils.escapeHtml(li.description || '')}" required>
           <input type="number" name="quantity" class="form-control" placeholder="Qty" value="${li.quantity || 1}" step="0.01" min="0" style="width:80px;">
-          <input type="text" name="unit" class="form-control" placeholder="Unit" value="${li.unit || ''}" style="width:100px;">
+          <input type="text" name="unit" class="form-control" placeholder="Unit" value="${Utils.escapeHtml(li.unit || '')}" style="width:100px;">
           <input type="number" name="unit_price" class="form-control" placeholder="Unit Price" value="${li.unit_price || 0}" step="0.01" min="0" style="width:120px;" required>
           <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.line-item-row').remove()"><i class="fas fa-trash"></i></button>
         </div>
@@ -341,8 +341,8 @@
       tbody.innerHTML = this.invoices.map(inv => `
         <tr>
           <td><strong>${inv.invoice_number}</strong></td>
-          <td>${inv.ship_name || ''}</td>
-          <td>${inv.berth_name || '-'}</td>
+          <td>${Utils.escapeHtml(inv.ship_name || '')}</td>
+          <td>${Utils.escapeHtml(inv.berth_name || '-')}</td>
           <td>${inv.billing_period_start ? new Date(inv.billing_period_start).toLocaleDateString() : ''} - ${inv.billing_period_end ? new Date(inv.billing_period_end).toLocaleDateString() : ''}</td>
           <td>${inv.due_date ? new Date(inv.due_date).toLocaleDateString() : ''}</td>
           <td>₹${Utils.formatNumber(inv.total_amount)}</td>
@@ -408,8 +408,8 @@
             <div class="col-md-6"><strong>Status:</strong> <span class="badge badge-${this.getStatusBadgeClass(inv.status)}">${inv.status.replace(/_/g, ' ')}</span></div>
           </div>
           <div class="row mb-3">
-            <div class="col-md-6"><strong>Ship:</strong> ${inv.ship_name}</div>
-            <div class="col-md-6"><strong>Berth:</strong> ${inv.berth_name || '-'}</div>
+            <div class="col-md-6"><strong>Ship:</strong> ${Utils.escapeHtml(inv.ship_name)}</div>
+            <div class="col-md-6"><strong>Berth:</strong> ${Utils.escapeHtml(inv.berth_name || '-')}</div>
           </div>
           <div class="row mb-3">
             <div class="col-md-4"><strong>Period:</strong> ${inv.billing_period_start ? new Date(inv.billing_period_start).toLocaleDateString() : ''} - ${inv.billing_period_end ? new Date(inv.billing_period_end).toLocaleDateString() : ''}</div>
@@ -417,7 +417,7 @@
             <div class="col-md-4"><strong>Issued:</strong> ${inv.created_at ? new Date(inv.created_at).toLocaleString() : ''}</div>
           </div>
           <div class="row mb-3">
-            <div class="col-md-12"><strong>Terms:</strong> ${inv.terms || '-'}</div>
+            <div class="col-md-12"><strong>Terms:</strong> ${Utils.escapeHtml(inv.terms || '-')}</div>
           </div>
           <h6>Line Items</h6>
           <div class="table-responsive">
@@ -427,9 +427,9 @@
                 ${(inv.line_items || []).map(li => `
                   <tr>
                     <td>${li.category.replace(/_/g, ' ')}</td>
-                    <td>${li.description}</td>
+                    <td>${Utils.escapeHtml(li.description)}</td>
                     <td>${li.quantity}</td>
-                    <td>${li.unit || ''}</td>
+                    <td>${Utils.escapeHtml(li.unit || '')}</td>
                     <td>₹${Utils.formatNumber(li.unit_price)}</td>
                     <td>₹${Utils.formatNumber(li.amount)}</td>
                   </tr>

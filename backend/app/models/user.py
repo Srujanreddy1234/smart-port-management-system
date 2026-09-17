@@ -50,6 +50,8 @@ class User(db.Model):
     locked_until = db.Column(db.DateTime)
     password_changed_at = db.Column(db.DateTime)
     must_change_password = db.Column(db.Boolean, default=False)
+    reset_token = db.Column(db.String(255), index=True)
+    reset_token_expires = db.Column(db.DateTime)
     two_factor_enabled = db.Column(db.Boolean, default=False)
     two_factor_secret = db.Column(db.String(255))
     email_verified = db.Column(db.Boolean, default=False)

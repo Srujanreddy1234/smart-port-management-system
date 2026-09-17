@@ -46,6 +46,54 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  const forgotLink = document.getElementById('forgotPasswordLink');
+  const forgotModalEl = document.getElementById('forgotPasswordModal');
+  const forgotEmailInput = document.getElementById('forgotPasswordEmail');
+  const forgotMsgEl = document.getElementById('forgotPasswordMessage');
+  const forgotSubmitBtn = document.getElementById('forgotPasswordSubmit');
+  let forgotModal = null;
+
+  if (forgotLink && forgotModalEl) {
+    forgotLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      forgotEmailInput.value = document.getElementById('email').value.trim();
+      forgotMsgEl.style.display = 'none';
+      forgotModal = forgotModal || new bootstrap.Modal(forgotModalEl);
+      forgotModal.show();
+    });
+  }
+
+  if (forgotSubmitBtn) {
+    forgotSubmitBtn.addEventListener('click', async () => {
+      const email = forgotEmailInput.value.trim();
+      if (!email) {
+        forgotMsgEl.style.display = 'block';
+        forgotMsgEl.style.background = 'rgba(220,53,69,0.1)';
+        forgotMsgEl.style.color = '#ea868f';
+        forgotMsgEl.textContent = 'Please enter your email address.';
+        return;
+      }
+      const original = forgotSubmitBtn.innerHTML;
+      forgotSubmitBtn.disabled = true;
+      forgotSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+      try {
+        await Api.forgotPassword(email);
+        forgotMsgEl.style.display = 'block';
+        forgotMsgEl.style.background = 'rgba(25,135,84,0.1)';
+        forgotMsgEl.style.color = '#75b798';
+        forgotMsgEl.textContent = 'If that email exists, a reset link has been sent.';
+      } catch (err) {
+        forgotMsgEl.style.display = 'block';
+        forgotMsgEl.style.background = 'rgba(220,53,69,0.1)';
+        forgotMsgEl.style.color = '#ea868f';
+        forgotMsgEl.textContent = err.message || 'Something went wrong. Please try again.';
+      } finally {
+        forgotSubmitBtn.disabled = false;
+        forgotSubmitBtn.innerHTML = original;
+      }
+    });
+  }
+
   const googleBtn = document.getElementById('googleSignInBtn');
   if (googleBtn) {
     fetch(`${API_BASE_URL}/auth/google/status`)

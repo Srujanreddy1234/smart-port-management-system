@@ -2,11 +2,21 @@ import json
 import queue
 import time
 from flask import Blueprint, Response, request, current_app
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, decode_token
 from app.extensions import db, limiter
+from app.models import User
 from app.models.event_log import EventLog, EventType, EventSeverity
+from app.utils.exceptions import AuthorizationError, AuthenticationError
 
 sse_bp = Blueprint('sse', __name__, url_prefix='/api/v1/events')
+
+
+def check_permission(permission):
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user or not user.has_permission(permission):
+        raise AuthorizationError(f'Permission required: {permission}')
+    return user
 
 # In-memory subscriber queues keyed by user_id
 _subscribers = {}
@@ -56,10 +66,22 @@ def publish_event(event_type, title, description=None, entity_type=None, entity_
 
 
 @sse_bp.route('/stream', methods=['GET'])
-@jwt_required(optional=True)
 @limiter.limit("30 per minute")
 def stream():
-    """SSE stream endpoint. Returns text/event-stream."""
+    """SSE stream endpoint. Returns text/event-stream.
+
+    EventSource cannot set an Authorization header, so the access token is
+    passed as a query param instead and validated explicitly here.
+    """
+    token = request.args.get('token', '')
+    try:
+        decoded = decode_token(token)
+    except Exception:
+        raise AuthenticationError('A valid access token is required to open the event stream')
+    user = User.query.get(decoded.get('sub'))
+    if not user:
+        raise AuthenticationError('A valid access token is required to open the event stream')
+
     def generate():
         q = queue.Queue(maxsize=MAX_QUEUE_SIZE)
         _subscribers[id(q)] = q
@@ -97,6 +119,7 @@ def stream():
 def get_recent_events():
     """Get recent events for polling fallback."""
     from app.utils.helpers import success_response
+    check_permission('security.read')
     limit = min(request.args.get('limit', 50, type=int), 200)
     offset = request.args.get('offset', 0, type=int)
 

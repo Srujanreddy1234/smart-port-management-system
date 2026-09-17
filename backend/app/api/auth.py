@@ -5,7 +5,8 @@ from flask_jwt_extended import (
 )
 from marshmallow import Schema, fields, validate, ValidationError
 from werkzeug.security import check_password_hash
-from app.extensions import db, limiter, oauth
+from app.extensions import db, limiter, oauth, mail
+from flask_mail import Message
 from app.models import User, Session, AuditLog, UserRole, UserStatus
 from app.services.auth_service import AuthService
 from app.utils.exceptions import ValidationError as AppValidationError, AuthenticationError, AuthorizationError
@@ -383,9 +384,27 @@ def forgot_password():
         user.reset_token = reset_token
         user.reset_token_expires = datetime.utcnow() + timedelta(hours=1)
         db.session.commit()
-        
-        # TODO: Send email with reset token
-        current_app.logger.info(f"Password reset token for {user.email}: {reset_token}")
+
+        reset_url = f"{current_app.config['FRONTEND_URL']}/reset-password.html?token={reset_token}"
+        if current_app.config.get('MAIL_USERNAME'):
+            try:
+                msg = Message(
+                    subject='Reset your Smart Port password',
+                    recipients=[user.email],
+                    body=(
+                        f"Hi {user.first_name},\n\n"
+                        f"Click the link below to reset your Smart Port Management System password. "
+                        f"This link expires in 1 hour.\n\n{reset_url}\n\n"
+                        f"If you didn't request this, you can safely ignore this email."
+                    ),
+                )
+                mail.send(msg)
+            except Exception:
+                current_app.logger.exception(f"Failed to send password reset email to {user.email}")
+        else:
+            current_app.logger.warning(
+                f"MAIL_USERNAME not configured -- password reset link for {user.email}: {reset_url}"
+            )
 
     return success_response(None, 'If the email exists, a reset link has been sent')
 

@@ -186,10 +186,10 @@
         <tr>
           <td>
             <div style="display:flex;align-items:center;gap:8px;">
-              <div class="avatar avatar-sm" style="background:${Utils.getAvatarColor(u.full_name)};font-size:0.65rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;">${Utils.getInitials(u.full_name)}</div>
+              <div class="avatar avatar-sm" style="background:${Utils.getAvatarColor(u.full_name)};font-size:0.65rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;">${Utils.escapeHtml(Utils.getInitials(u.full_name))}</div>
               <div>
-                <div style="font-weight:500;font-size:0.85rem;">${u.full_name}</div>
-                <div style="font-size:0.75rem;color:var(--text-muted);">${u.employee_id || ''}</div>
+                <div style="font-weight:500;font-size:0.85rem;">${Utils.escapeHtml(u.full_name)}</div>
+                <div style="font-size:0.75rem;color:var(--text-muted);">${Utils.escapeHtml(u.employee_id || '')}</div>
               </div>
             </div>
           </td>
@@ -258,14 +258,14 @@
           title: 'User Details',
           body: `
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-              <div><strong>Name:</strong> ${u.full_name}</div>
-              <div><strong>Email:</strong> ${u.email}</div>
+              <div><strong>Name:</strong> ${Utils.escapeHtml(u.full_name)}</div>
+              <div><strong>Email:</strong> ${Utils.escapeHtml(u.email)}</div>
               <div><strong>Role:</strong> ${getRoleBadge(u.role)}</div>
               <div><strong>Status:</strong> ${getStatusBadge(u.status)}</div>
-              <div><strong>Employee ID:</strong> ${u.employee_id || '—'}</div>
-              <div><strong>Department:</strong> ${u.department || '—'}</div>
-              <div><strong>Designation:</strong> ${u.designation || '—'}</div>
-              <div><strong>Phone:</strong> ${u.phone || '—'}</div>
+              <div><strong>Employee ID:</strong> ${Utils.escapeHtml(u.employee_id || '—')}</div>
+              <div><strong>Department:</strong> ${Utils.escapeHtml(u.department || '—')}</div>
+              <div><strong>Designation:</strong> ${Utils.escapeHtml(u.designation || '—')}</div>
+              <div><strong>Phone:</strong> ${Utils.escapeHtml(u.phone || '—')}</div>
               <div><strong>Last Login:</strong> ${u.last_login_at ? Utils.formatDateTime(u.last_login_at) : 'Never'}</div>
               <div><strong>Created:</strong> ${Utils.formatDateTime(u.created_at)}</div>
             </div>

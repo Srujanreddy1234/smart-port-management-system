@@ -140,6 +140,11 @@ def download_report(report_id):
 @reports_bp.route('/<int:report_id>/file', methods=['GET'])
 @jwt_required()
 def download_report_file(report_id):
+    current_user_id = get_jwt_identity()
+    current_user = User.query.get(current_user_id)
+    if not current_user or not current_user.has_permission('reports.read'):
+        raise AuthorizationError('Insufficient permissions')
+
     report = Report.query.get(report_id)
     if not report:
         raise NotFoundError('Report not found')

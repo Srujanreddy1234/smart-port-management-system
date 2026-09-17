@@ -299,7 +299,7 @@
         list.innerHTML = items.map(a => `
           <div class="notification-item unread">
             <div class="notification-icon ${colorMap[a.color] || 'info'}"><i class="fas ${a.icon || iconMap[a.type] || 'fa-bell'}"></i></div>
-            <div class="notification-body"><h6>${a.title}</h6><p>${a.description || ''}</p><small>${Utils.timeAgo(a.timestamp)}</small></div>
+            <div class="notification-body"><h6>${Utils.escapeHtml(a.title)}</h6><p>${Utils.escapeHtml(a.description || '')}</p><small>${Utils.timeAgo(a.timestamp)}</small></div>
           </div>`).join('');
         if (badge) { badge.textContent = items.length; badge.style.display = 'block'; }
       } catch (err) {
@@ -312,7 +312,7 @@
         list.innerHTML = alerts.map(a => `
           <div class="notification-item unread">
             <div class="notification-icon ${colorMap[a.severity] || 'info'}"><i class="fas fa-bell"></i></div>
-            <div class="notification-body"><h6>${a.title}</h6><p>${a.description || ''}</p><small>${Utils.timeAgo(a.detected_at)}</small></div>
+            <div class="notification-body"><h6>${Utils.escapeHtml(a.title)}</h6><p>${Utils.escapeHtml(a.description || '')}</p><small>${Utils.timeAgo(a.detected_at)}</small></div>
           </div>`).join('');
         if (badge) { badge.textContent = alerts.length; badge.style.display = 'block'; }
       }
@@ -445,7 +445,7 @@
         const colorKey = typeColorMap[a.type] || 'info';
         return `<div class="activity-item">
           <div class="activity-icon" style="background:${colorMap[colorKey]};"><i class="fas fa-circle"></i></div>
-          <div class="activity-body"><h6>${a.action}</h6><p>${a.description || ''}</p><small>${Utils.timeAgo(a.timestamp)}</small></div>
+          <div class="activity-body"><h6>${Utils.escapeHtml(a.action)}</h6><p>${Utils.escapeHtml(a.description || '')}</p><small>${Utils.timeAgo(a.timestamp)}</small></div>
         </div>`;
       }).join('');
     }

@@ -107,7 +107,7 @@ def list_containers():
     # Sorting
     sort_by = request.args.get('sort_by', 'created_at')
     sort_order = request.args.get('sort_order', 'desc')
-    sort_column = getattr(Container, sort_by, Container.created_at)
+    sort_column = getattr(Container, sort_by, Container.created_at) if sort_by in Container.__table__.columns.keys() else Container.created_at
     query = query.order_by(sort_column.desc() if sort_order == 'desc' else sort_column.asc())
     
     # Pagination

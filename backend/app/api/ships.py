@@ -45,9 +45,18 @@ ship_schema = ShipSchema()
 ship_list_schema = ShipSchema(many=True)
 
 
+def check_permission(permission):
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user or not user.has_permission(permission):
+        raise AuthorizationError(f'Permission required: {permission}')
+    return user
+
+
 @ships_bp.route('', methods=['GET'])
 @jwt_required()
 def list_ships():
+    check_permission('ships.read')
     page = request.args.get('page', 1, type=int)
     per_page = min(request.args.get('per_page', 20, type=int), 100)
     search = request.args.get('search', '').strip()
@@ -82,7 +91,7 @@ def list_ships():
     if berth:
         query = query.filter(Ship.current_berth == berth)
 
-    sort_column = getattr(Ship, sort_by, Ship.created_at)
+    sort_column = getattr(Ship, sort_by, Ship.created_at) if sort_by in Ship.__table__.columns.keys() else Ship.created_at
     if sort_order == 'desc':
         query = query.order_by(desc(sort_column))
     else:
@@ -104,6 +113,7 @@ def list_ships():
 @ships_bp.route('/<int:ship_id>', methods=['GET'])
 @jwt_required()
 def get_ship(ship_id):
+    check_permission('ships.read')
     ship = Ship.query.get(ship_id)
     if not ship:
         raise NotFoundError('Ship not found')
@@ -245,6 +255,7 @@ def record_departure(ship_id):
 @ships_bp.route('/stats', methods=['GET'])
 @jwt_required()
 def get_ship_stats():
+    check_permission('ships.read')
     total = Ship.query.count()
     by_status = db.session.query(Ship.status, func.count(Ship.id)).group_by(Ship.status).all()
     by_type = db.session.query(Ship.vessel_type, func.count(Ship.id)).group_by(Ship.vessel_type).all()
@@ -261,6 +272,7 @@ def get_ship_stats():
 @ships_bp.route('/arrivals-chart', methods=['GET'])
 @jwt_required()
 def get_arrivals_chart():
+    check_permission('ships.read')
     days = request.args.get('days', 30, type=int)
     end_date = datetime.utcnow()
     start_date = end_date - timedelta(days=days)

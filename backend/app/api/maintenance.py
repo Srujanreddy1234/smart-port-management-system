@@ -121,7 +121,7 @@ def list_equipment():
 
     sort_by = request.args.get('sort_by', 'created_at')
     sort_order = request.args.get('sort_order', 'desc')
-    sort_column = getattr(Equipment, sort_by, Equipment.created_at)
+    sort_column = getattr(Equipment, sort_by, Equipment.created_at) if sort_by in Equipment.__table__.columns.keys() else Equipment.created_at
     if sort_order == 'desc':
         query = query.order_by(desc(sort_column))
     else:
@@ -266,7 +266,7 @@ def list_maintenance_schedules():
 
     sort_by = request.args.get('sort_by', 'scheduled_date')
     sort_order = request.args.get('sort_order', 'desc')
-    sort_column = getattr(MaintenanceSchedule, sort_by, MaintenanceSchedule.scheduled_date)
+    sort_column = getattr(MaintenanceSchedule, sort_by, MaintenanceSchedule.scheduled_date) if sort_by in MaintenanceSchedule.__table__.columns.keys() else MaintenanceSchedule.scheduled_date
     if sort_order == 'desc':
         query = query.order_by(desc(sort_column))
     else:

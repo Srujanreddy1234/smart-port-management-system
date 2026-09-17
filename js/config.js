@@ -358,6 +358,20 @@ const Api = {
     });
   },
 
+  forgotPassword(email) {
+    return this.request('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email })
+    });
+  },
+
+  resetPassword(token, password, confirmPassword) {
+    return this.request('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, password, confirm_password: confirmPassword })
+    });
+  },
+
   requireAuth() {
     if (!this.getToken()) {
       window.location.href = 'login.html';

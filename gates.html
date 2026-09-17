@@ -302,10 +302,10 @@
         const canComplete = canManage && b.status === 'Checked In';
         return `
         <tr>
-          <td>${b.gate ? b.gate.name : '—'}</td>
-          <td>${b.driver_name || '—'}</td>
-          <td>${b.truck_number || '—'}</td>
-          <td>${b.purpose}</td>
+          <td>${Utils.escapeHtml(b.gate ? b.gate.name : '—')}</td>
+          <td>${Utils.escapeHtml(b.driver_name || '—')}</td>
+          <td>${Utils.escapeHtml(b.truck_number || '—')}</td>
+          <td>${Utils.escapeHtml(b.purpose)}</td>
           <td>${new Date(b.slot_start).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</td>
           <td>${statusBadge(b.status)}</td>
           <td>
