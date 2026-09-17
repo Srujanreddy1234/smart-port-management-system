@@ -10,35 +10,51 @@ on:
 jobs:
   e2e:
     name: Playwright suite against production
-    # Skips cleanly (not a failure) until E2E_PASSWORD is added under
-    # Settings -> Secrets and variables -> Actions.
-    if: secrets.E2E_PASSWORD != ''
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: e2e
     steps:
+      # The `secrets` context can't be referenced in a job/step `if:` at
+      # all (GitHub Actions rejects the whole workflow file if you try),
+      # so "skip until the secret exists" has to be a runtime check
+      # inside a step, gating the steps after it via its output.
+      - name: Check E2E secret is configured
+        id: check
+        run: |
+          if [ -n "${{ secrets.E2E_PASSWORD }}" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::E2E_PASSWORD not set -- skipping this run. Add it under Settings > Secrets and variables > Actions to enable this job."
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.check.outputs.configured == 'true'
 
       - uses: actions/setup-node@v4
+        if: steps.check.outputs.configured == 'true'
         with:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: e2e/package-lock.json
 
       - name: Install dependencies
+        if: steps.check.outputs.configured == 'true'
         run: npm ci
 
       - name: Install Playwright browsers
+        if: steps.check.outputs.configured == 'true'
         run: npx playwright install --with-deps chromium
 
       - name: Run E2E suite
+        if: steps.check.outputs.configured == 'true'
         env:
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
         run: npx playwright test
 
       - name: Upload HTML report
-        if: always()
+        if: always() && steps.check.outputs.configured == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report

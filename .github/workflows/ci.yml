@@ -72,13 +72,23 @@ jobs:
   deploy:
     name: Deploy to Render
     needs: [backend-tests, frontend-syntax-check]
-    # Skips cleanly (not a failure) until RENDER_API_KEY/RENDER_SERVICE_ID
-    # are added under Settings -> Secrets and variables -> Actions.
-    if: >
-      github.ref == 'refs/heads/main' && github.event_name == 'push' &&
-      secrets.RENDER_API_KEY != '' && secrets.RENDER_SERVICE_ID != ''
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
+      # The `secrets` context can't be referenced in a job/step `if:` at
+      # all (GitHub Actions rejects the whole workflow file if you try),
+      # so "skip until secrets exist" has to be done as a runtime check
+      # inside a step instead, gating the steps after it via its output.
+      - name: Check Render secrets are configured
+        id: check
+        run: |
+          if [ -n "${{ secrets.RENDER_API_KEY }}" ] && [ -n "${{ secrets.RENDER_SERVICE_ID }}" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::RENDER_API_KEY/RENDER_SERVICE_ID not set -- skipping deploy trigger. Add them under Settings > Secrets and variables > Actions to enable this step."
+          fi
+
       # Render's GitHub-push auto-deploy hook has been observed to silently
       # stop firing (a real incident: the live site sat 3 commits behind for
       # over a day with no failed-deploy signal anywhere). Triggering the
@@ -86,6 +96,7 @@ jobs:
       # is never silently un-deployed again -- this call succeeding or
       # failing is a real, visible signal in the Actions tab.
       - name: Trigger Render deploy via API
+        if: steps.check.outputs.configured == 'true'
         run: |
           response=$(curl -sS -w "\n%{http_code}" -X POST \
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
