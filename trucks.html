@@ -6,7 +6,7 @@
   <title>Truck Operations — AI PORT</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/layout.css">
@@ -482,16 +482,16 @@
             {
               label: 'Arrivals',
               data: arrivals,
-              backgroundColor: 'rgba(75, 192, 192, 0.8)',
-              borderColor: 'rgba(75, 192, 192, 1)',
+              backgroundColor: 'rgba(23,23,23,0.85)',
+              borderColor: 'rgba(23,23,23,1)',
               borderWidth: 1,
               borderRadius: 4
             },
             {
               label: 'Departures',
               data: departures,
-              backgroundColor: 'rgba(255, 193, 7, 0.8)',
-              borderColor: 'rgba(255, 193, 7, 1)',
+              backgroundColor: 'rgba(163,163,163,0.85)',
+              borderColor: 'rgba(163,163,163,1)',
               borderWidth: 1,
               borderRadius: 4
             }
@@ -527,7 +527,7 @@
         var byType = res.data.by_type || {};
         var labels = Object.keys(byType);
         var values = Object.values(byType);
-        var palette = ['rgba(54,162,235,0.85)', 'rgba(75,192,192,0.85)', 'rgba(255,206,86,0.85)', 'rgba(255,99,132,0.85)', 'rgba(153,102,255,0.85)', 'rgba(255,159,64,0.85)', 'rgba(201,203,207,0.85)'];
+        var palette = ['rgba(23,23,23,0.85)', 'rgba(22,163,74,0.85)', 'rgba(202,138,4,0.85)', 'rgba(220,38,38,0.85)', 'rgba(37,99,235,0.85)', 'rgba(115,115,115,0.85)', 'rgba(64,64,64,0.85)'];
         const typesCtx = document.getElementById('truckTypesChart').getContext('2d');
         new Chart(typesCtx, {
           type: 'doughnut',

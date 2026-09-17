@@ -1,42 +1,80 @@
 :root {
-  --primary: #0d6efd;
-  --primary-dark: #0a58ca;
-  --primary-light: #6ea8fe;
-  --secondary: #6c757d;
-  --success: #198754;
-  --info: #0dcaf0;
-  --warning: #ffc107;
-  --danger: #dc3545;
-  --dark: #1a1d29;
-  --darker: #12141e;
-  --light: #232738;
-  --lighter: #2a2e3f;
-  --card-bg: #1e2130;
-  --card-border: #2a2e3f;
-  --text-primary: #e4e7f1;
-  --text-secondary: #8b92a5;
-  --text-muted: #5f6680;
-  --border-color: #2a2e3f;
-  --sidebar-bg: #151826;
+  /* Monochrome light palette (shadcn/ui-style spec) */
+  --color-canvas: #f5f5f5;
+  --color-paper: #ffffff;
+  --color-surface-alt: #fafafa;
+  --color-ink: #0a0a0a;
+  --color-ink-soft: #171717;
+  --color-mid-gray: #737373;
+  --color-hairline: #e5e5e5;
+  --color-ember: #e7000b;
+
+  /* Functional status colors (kept, not part of the monochrome spec) --
+     operators scan these at a glance across ships/security/containers,
+     so success/warning/danger/info stay distinct. The spec's single red
+     accent (--color-ember) is reserved for destructive actions only. */
+  --success: #16a34a;
+  --success-bg: #dcfce7;
+  --success-text: #166534;
+  --info: #2563eb;
+  --info-bg: #dbeafe;
+  --info-text: #1e40af;
+  --warning: #ca8a04;
+  --warning-bg: #fef9c3;
+  --warning-text: #854d0e;
+  --danger: #dc2626;
+  --danger-bg: #fee2e2;
+  --danger-text: #991b1b;
+
+  /* App tokens mapped onto the new palette -- existing CSS/JS reference
+     these names, so values changed here, not the variable names. */
+  --primary: var(--color-ink-soft);
+  --primary-dark: var(--color-ink);
+  --primary-light: #404040;
+  --secondary: var(--color-mid-gray);
+  --dark: var(--color-ink);
+  --darker: #000000;
+  --light: var(--color-canvas);
+  --lighter: var(--color-hairline);
+  --card-bg: var(--color-paper);
+  --card-border: var(--color-hairline);
+  --text-primary: var(--color-ink);
+  --text-secondary: var(--color-mid-gray);
+  --text-muted: #a3a3a3;
+  --border-color: var(--color-hairline);
+  --sidebar-bg: var(--color-surface-alt);
   --sidebar-width: 260px;
   --sidebar-collapsed: 72px;
   --topbar-height: 64px;
-  --font-family: 'Poppins', sans-serif;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
-  --shadow-xl: 0 12px 48px rgba(0,0,0,0.6);
+  --font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Whisper-quiet elevation: a 1px hairline + two barely-visible offset
+     layers, never a dramatic drop shadow. */
+  --shadow-sm: 0 0 0 1px rgba(23,23,23,0.05), 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);
+  --shadow-md: 0 0 0 1px rgba(23,23,23,0.05), 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+  --shadow-lg: 0 0 0 1px rgba(23,23,23,0.05), 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+  --shadow-xl: 0 0 0 1px rgba(23,23,23,0.05), 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+
+  /* 18px on every interactive element (buttons/inputs/badges) for pill
+     geometry, 24px on containers (cards) -- nothing in between. */
   --radius-sm: 6px;
   --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-lg: 18px;
   --radius-xl: 24px;
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-fast: all 0.15s ease;
-  --gradient-primary: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
-  --gradient-success: linear-gradient(135deg, #198754 0%, #20c997 100%);
-  --gradient-danger: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
-  --gradient-warning: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
-  --gradient-info: linear-gradient(135deg, #0dcaf0 0%, #6610f2 100%);
+
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: all 0.12s ease;
+
+  /* No chromatic gradients under the monochrome spec -- these are now
+     solid fills so existing `background: var(--gradient-*)` usages
+     (brand icon, CTA banners, avatar fallbacks) still resolve to a
+     sensible flat color instead of a hue gradient. */
+  --gradient-primary: var(--color-ink-soft);
+  --gradient-success: var(--success);
+  --gradient-danger: var(--danger);
+  --gradient-warning: var(--warning);
+  --gradient-info: var(--info);
+
   --z-sidebar: 1000;
   --z-topbar: 999;
   --z-modal: 1100;

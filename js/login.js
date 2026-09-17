@@ -68,8 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const email = forgotEmailInput.value.trim();
       if (!email) {
         forgotMsgEl.style.display = 'block';
-        forgotMsgEl.style.background = 'rgba(220,53,69,0.1)';
-        forgotMsgEl.style.color = '#ea868f';
+        forgotMsgEl.style.background = '#fee2e2';
+        forgotMsgEl.style.color = '#991b1b';
         forgotMsgEl.textContent = 'Please enter your email address.';
         return;
       }
@@ -79,13 +79,13 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         await Api.forgotPassword(email);
         forgotMsgEl.style.display = 'block';
-        forgotMsgEl.style.background = 'rgba(25,135,84,0.1)';
-        forgotMsgEl.style.color = '#75b798';
+        forgotMsgEl.style.background = '#dcfce7';
+        forgotMsgEl.style.color = '#166534';
         forgotMsgEl.textContent = 'If that email exists, a reset link has been sent.';
       } catch (err) {
         forgotMsgEl.style.display = 'block';
-        forgotMsgEl.style.background = 'rgba(220,53,69,0.1)';
-        forgotMsgEl.style.color = '#ea868f';
+        forgotMsgEl.style.background = '#fee2e2';
+        forgotMsgEl.style.color = '#991b1b';
         forgotMsgEl.textContent = err.message || 'Something went wrong. Please try again.';
       } finally {
         forgotSubmitBtn.disabled = false;
@@ -128,7 +128,7 @@ function showError(form, message) {
   if (!errorEl) {
     errorEl = document.createElement('div');
     errorEl.className = 'login-error';
-    errorEl.style.cssText = 'color:#ea868f;font-size:0.875rem;margin-bottom:1rem;padding:8px 12px;background:rgba(220,53,69,0.1);border-radius:6px;border:1px solid rgba(220,53,69,0.2);';
+    errorEl.style.cssText = 'color:#991b1b;font-size:0.875rem;margin-bottom:1rem;padding:8px 12px;background:#fee2e2;border-radius:6px;border:1px solid rgba(220,38,38,0.2);';
     form.insertBefore(errorEl, form.querySelector('.btn-login'));
   }
   errorEl.textContent = message;

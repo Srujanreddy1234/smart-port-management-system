@@ -96,14 +96,7 @@ const Utils = {
   },
 
   getAvatarColor(name) {
-    const colors = [
-      'linear-gradient(135deg, #0d6efd, #6610f2)',
-      'linear-gradient(135deg, #198754, #20c997)',
-      'linear-gradient(135deg, #dc3545, #e83e8c)',
-      'linear-gradient(135deg, #ffc107, #fd7e14)',
-      'linear-gradient(135deg, #0dcaf0, #6610f2)',
-      'linear-gradient(135deg, #6f42c1, #d63384)'
-    ];
+    const colors = ['#171717', '#262626', '#404040', '#525252', '#0a0a0a', '#333333'];
     let hash = 0;
     for (let i = 0; i < (name || '').length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
     return colors[Math.abs(hash) % colors.length];

@@ -11,7 +11,7 @@ html {
 
 body {
   font-family: var(--font-family);
-  background: var(--dark);
+  background: var(--color-canvas);
   color: var(--text-primary);
   line-height: 1.6;
   overflow-x: hidden;
@@ -24,26 +24,26 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--darker);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-color);
+  background: var(--color-hairline);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: var(--color-mid-gray);
 }
 
 a {
-  color: var(--primary-light);
+  color: var(--color-ink-soft);
   text-decoration: none;
   transition: var(--transition-fast);
 }
 
 a:hover {
-  color: var(--primary);
+  color: var(--color-ink);
 }
 
 img {
@@ -52,6 +52,6 @@ img {
 }
 
 ::selection {
-  background: var(--primary);
-  color: #fff;
+  background: var(--color-ink-soft);
+  color: var(--color-surface-alt);
 }

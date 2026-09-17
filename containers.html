@@ -6,7 +6,7 @@
   <title>Container Operations — AI PORT</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/layout.css">
@@ -414,9 +414,9 @@
         const byType = {};
         containers.forEach(c => { byType[c.type] = (byType[c.type] || 0) + 1; });
         const ctx1 = document.getElementById('containerFlowChart');
-        if (ctx1) new Chart(ctx1.getContext('2d'), { type: 'bar', data: { labels: Object.keys(byType), datasets: [{ label: 'Containers', data: Object.values(byType), backgroundColor: 'rgba(13,110,253,0.7)', borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } } } });
+        if (ctx1) new Chart(ctx1.getContext('2d'), { type: 'bar', data: { labels: Object.keys(byType), datasets: [{ label: 'Containers', data: Object.values(byType), backgroundColor: 'rgba(23,23,23,0.8)', borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } } } });
         const ctx2 = document.getElementById('containerTypesChart');
-        if (ctx2) new Chart(ctx2.getContext('2d'), { type: 'doughnut', data: { labels: Object.keys(byType), datasets: [{ data: Object.values(byType), backgroundColor: ['rgba(13,110,253,0.8)','rgba(25,135,84,0.8)','rgba(255,193,7,0.8)','rgba(220,53,69,0.8)','rgba(102,16,242,0.8)'] }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '55%', plugins: { legend: { position: 'right' } } } });
+        if (ctx2) new Chart(ctx2.getContext('2d'), { type: 'doughnut', data: { labels: Object.keys(byType), datasets: [{ data: Object.values(byType), backgroundColor: ['rgba(23,23,23,0.85)','rgba(22,163,74,0.8)','rgba(202,138,4,0.8)','rgba(220,38,38,0.8)','rgba(37,99,235,0.8)'] }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '55%', plugins: { legend: { position: 'right' } } } });
       }
     }
 

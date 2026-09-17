@@ -5,60 +5,60 @@ const ChartFactory = {
     plugins: {
       legend: {
         labels: {
-          color: '#8b92a5',
-          font: { family: "'Poppins', sans-serif", size: 12 },
+          color: '#737373',
+          font: { family: "'Inter', sans-serif", size: 12 },
           padding: 16
         }
       },
       tooltip: {
-        backgroundColor: '#1a1d29',
-        titleColor: '#e4e7f1',
-        bodyColor: '#8b92a5',
-        borderColor: '#2a2e3f',
-        borderWidth: 1,
+        backgroundColor: '#171717',
+        titleColor: '#fafafa',
+        bodyColor: '#d4d4d4',
+        borderColor: 'transparent',
+        borderWidth: 0,
         cornerRadius: 8,
         padding: 12,
-        titleFont: { family: "'Poppins', sans-serif", weight: 600 },
-        bodyFont: { family: "'Poppins', sans-serif" }
+        titleFont: { family: "'Inter', sans-serif", weight: 600 },
+        bodyFont: { family: "'Inter', sans-serif" }
       }
     },
     scales: {
       x: {
-        grid: { color: 'rgba(42,46,63,0.5)', drawBorder: false },
-        ticks: { color: '#5f6680', font: { family: "'Poppins', sans-serif", size: 11 } }
+        grid: { color: 'rgba(10,10,10,0.06)', drawBorder: false },
+        ticks: { color: '#737373', font: { family: "'Inter', sans-serif", size: 11 } }
       },
       y: {
-        grid: { color: 'rgba(42,46,63,0.5)', drawBorder: false },
-        ticks: { color: '#5f6680', font: { family: "'Poppins', sans-serif", size: 11 } }
+        grid: { color: 'rgba(10,10,10,0.06)', drawBorder: false },
+        ticks: { color: '#737373', font: { family: "'Inter', sans-serif", size: 11 } }
       }
     }
   },
 
   colors: {
-    primary: 'rgba(13,110,253,0.8)',
-    primaryBg: 'rgba(13,110,253,0.1)',
-    success: 'rgba(25,135,84,0.8)',
-    successBg: 'rgba(25,135,84,0.1)',
-    danger: 'rgba(220,53,69,0.8)',
-    dangerBg: 'rgba(220,53,69,0.1)',
-    warning: 'rgba(255,193,7,0.8)',
-    warningBg: 'rgba(255,193,7,0.1)',
-    info: 'rgba(13,202,240,0.8)',
-    infoBg: 'rgba(13,202,240,0.1)',
-    purple: 'rgba(102,16,242,0.8)',
-    purpleBg: 'rgba(102,16,242,0.1)',
-    teal: 'rgba(32,201,151,0.8)',
-    tealBg: 'rgba(32,201,151,0.1)',
+    primary: 'rgba(23,23,23,0.85)',
+    primaryBg: 'rgba(23,23,23,0.1)',
+    success: 'rgba(22,163,74,0.8)',
+    successBg: 'rgba(22,163,74,0.1)',
+    danger: 'rgba(220,38,38,0.8)',
+    dangerBg: 'rgba(220,38,38,0.1)',
+    warning: 'rgba(202,138,4,0.8)',
+    warningBg: 'rgba(202,138,4,0.1)',
+    info: 'rgba(37,99,235,0.8)',
+    infoBg: 'rgba(37,99,235,0.1)',
+    purple: 'rgba(115,115,115,0.8)',
+    purpleBg: 'rgba(115,115,115,0.1)',
+    teal: 'rgba(64,64,64,0.8)',
+    tealBg: 'rgba(64,64,64,0.1)',
     gradient1: (ctx) => {
       const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 300);
-      g.addColorStop(0, 'rgba(13,110,253,0.3)');
-      g.addColorStop(1, 'rgba(13,110,253,0.0)');
+      g.addColorStop(0, 'rgba(23,23,23,0.18)');
+      g.addColorStop(1, 'rgba(23,23,23,0.0)');
       return g;
     },
     gradient2: (ctx) => {
       const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 300);
-      g.addColorStop(0, 'rgba(25,135,84,0.3)');
-      g.addColorStop(1, 'rgba(25,135,84,0.0)');
+      g.addColorStop(0, 'rgba(22,163,74,0.18)');
+      g.addColorStop(1, 'rgba(22,163,74,0.0)');
       return g;
     }
   },

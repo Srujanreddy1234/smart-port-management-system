@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard — AI PORT</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="css/variables.css" rel="stylesheet">
@@ -98,28 +98,28 @@
 
       <div class="dashboard-kpi-grid">
         <div class="card kpi-card glow-card">
-          <div class="kpi-icon" style="background:rgba(13,110,253,0.12);color:#6ea8fe;"><i class="fas fa-ship"></i></div>
+          <div class="kpi-icon" style="background:var(--color-canvas);color:var(--color-ink-soft);"><i class="fas fa-ship"></i></div>
           <div class="kpi-value" id="kpiShips">--</div>
           <div class="kpi-label">Active Vessels</div>
           <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> <span id="kpiShipsChange">--</span></div>
           <div class="kpi-bg"><i class="fas fa-ship"></i></div>
         </div>
         <div class="card kpi-card glow-card" id="kpiContainersCard">
-          <div class="kpi-icon" style="background:rgba(25,135,84,0.12);color:#75b798;"><i class="fas fa-boxes-stacked"></i></div>
+          <div class="kpi-icon" style="background:var(--color-canvas);color:var(--color-ink-soft);"><i class="fas fa-boxes-stacked"></i></div>
           <div class="kpi-value" id="kpiContainers">--</div>
           <div class="kpi-label">Containers Handled</div>
           <div class="kpi-change positive"><i class="fas fa-arrow-up"></i> <span id="kpiContainersChange">--</span></div>
           <div class="kpi-bg"><i class="fas fa-boxes-stacked"></i></div>
         </div>
         <div class="card kpi-card glow-card" id="kpiTrucksCard">
-          <div class="kpi-icon" style="background:rgba(255,193,7,0.12);color:#ffda6a;"><i class="fas fa-truck"></i></div>
+          <div class="kpi-icon" style="background:var(--color-canvas);color:var(--color-ink-soft);"><i class="fas fa-truck"></i></div>
           <div class="kpi-value" id="kpiTrucks">--</div>
           <div class="kpi-label">Trucks In Transit</div>
           <div class="kpi-change negative"><i class="fas fa-arrow-down"></i> <span id="kpiTrucksChange">--</span></div>
           <div class="kpi-bg"><i class="fas fa-truck"></i></div>
         </div>
         <div class="card kpi-card glow-card" id="kpiAlertsCard">
-          <div class="kpi-icon" style="background:rgba(220,53,69,0.12);color:#ea868f;"><i class="fas fa-shield-halved"></i></div>
+          <div class="kpi-icon" style="background:var(--danger-bg);color:var(--danger-text);"><i class="fas fa-shield-halved"></i></div>
           <div class="kpi-value" id="kpiAlerts">--</div>
           <div class="kpi-label">Active Alerts</div>
           <div class="kpi-change negative"><i class="fas fa-arrow-up"></i> <span id="kpiAlertsChange">--</span></div>
@@ -218,12 +218,12 @@
           <div class="card-header"><h6><i class="fas fa-bolt" style="color:var(--warning);margin-right:8px;"></i>Quick Actions</h6></div>
           <div class="card-body">
             <div class="quick-actions-grid">
-              <a href="ships.html" class="quick-action-btn"><i class="fas fa-ship" style="color:var(--primary-light);"></i><span>Register Ship</span></a>
-              <a href="containers.html" class="quick-action-btn"><i class="fas fa-box" style="color:var(--success);"></i><span>Track Container</span></a>
-              <a href="trucks.html" class="quick-action-btn"><i class="fas fa-truck" style="color:var(--warning);"></i><span>Dispatch Truck</span></a>
-              <a href="security.html" class="quick-action-btn"><i class="fas fa-video" style="color:var(--danger);"></i><span>View Cameras</span></a>
-              <a href="reports.html" class="quick-action-btn"><i class="fas fa-file-pdf" style="color:#ea868f;"></i><span>Gen. Report</span></a>
-              <a href="environment.html" class="quick-action-btn"><i class="fas fa-leaf" style="color:#75b798;"></i><span>Env. Data</span></a>
+              <a href="ships.html" class="quick-action-btn"><i class="fas fa-ship" style="color:var(--color-ink-soft);"></i><span>Register Ship</span></a>
+              <a href="containers.html" class="quick-action-btn"><i class="fas fa-box" style="color:var(--color-ink-soft);"></i><span>Track Container</span></a>
+              <a href="trucks.html" class="quick-action-btn"><i class="fas fa-truck" style="color:var(--color-ink-soft);"></i><span>Dispatch Truck</span></a>
+              <a href="security.html" class="quick-action-btn"><i class="fas fa-video" style="color:var(--color-ink-soft);"></i><span>View Cameras</span></a>
+              <a href="reports.html" class="quick-action-btn"><i class="fas fa-file-pdf" style="color:var(--color-ink-soft);"></i><span>Gen. Report</span></a>
+              <a href="environment.html" class="quick-action-btn"><i class="fas fa-leaf" style="color:var(--color-ink-soft);"></i><span>Env. Data</span></a>
             </div>
           </div>
         </div>
@@ -428,7 +428,7 @@
       try {
         const truckCtx = document.getElementById('truckTrafficChart');
         if (truckCtx) {
-          ChartFactory.createBarChart('truckTrafficChart', Object.keys(truckByStatus), [{ label: 'Trucks', data: Object.values(truckByStatus), backgroundColor: 'rgba(255,193,7,0.7)' }]);
+          ChartFactory.createBarChart('truckTrafficChart', Object.keys(truckByStatus), [{ label: 'Trucks', data: Object.values(truckByStatus), backgroundColor: 'rgba(23,23,23,0.75)' }]);
         }
       } catch (e) {}
     }
@@ -450,7 +450,7 @@
     function loadRecentActivity() {
       let activity = Store.get('activity_log');
       const typeColorMap = { ship: 'primary', berth: 'success', container: 'info', truck: 'warning', billing: 'warning', security: 'danger', system: 'info' };
-      const colorMap = { primary: 'rgba(13,110,253,0.12);color:#6ea8fe', success: 'rgba(25,135,84,0.12);color:#75b798', danger: 'rgba(220,53,69,0.12);color:#ea868f', warning: 'rgba(255,193,7,0.12);color:#ffda6a', info: 'rgba(13,202,240,0.12);color:#66d9f0' };
+      const colorMap = { primary: 'var(--color-canvas);color:var(--color-ink-soft)', success: 'var(--success-bg);color:var(--success-text)', danger: 'var(--danger-bg);color:var(--danger-text)', warning: 'var(--warning-bg);color:var(--warning-text)', info: 'var(--info-bg);color:var(--info-text)' };
       const body = document.getElementById('recentActivityBody');
       if (!body) return;
       // Don't leak security-incident items into the feed for roles without

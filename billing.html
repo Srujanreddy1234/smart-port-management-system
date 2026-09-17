@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Billing & Invoices — AI PORT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/main.css">
@@ -71,30 +72,30 @@
           </div>
         </div>
 
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon bg-blue"><i class="fas fa-file-invoice-dollar"></i></div>
+        <div class="stats-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+          <div class="card stat-card glow-card">
+            <div class="stat-icon" style="background:var(--color-canvas);color:var(--color-ink-soft);"><i class="fas fa-file-invoice-dollar"></i></div>
             <div class="stat-info">
               <span class="stat-value" id="totalInvoices">--</span>
               <span class="stat-label">Total Invoices</span>
             </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon bg-green"><i class="fas fa-money-bill-wave"></i></div>
+          <div class="card stat-card glow-card">
+            <div class="stat-icon" style="background:var(--success-bg);color:var(--success-text);"><i class="fas fa-money-bill-wave"></i></div>
             <div class="stat-info">
               <span class="stat-value" id="totalRevenue">--</span>
               <span class="stat-label">Total Revenue</span>
             </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon bg-orange"><i class="fas fa-clock"></i></div>
+          <div class="card stat-card glow-card">
+            <div class="stat-icon" style="background:var(--warning-bg);color:var(--warning-text);"><i class="fas fa-clock"></i></div>
             <div class="stat-info">
               <span class="stat-value" id="totalOutstanding">--</span>
               <span class="stat-label">Outstanding</span>
             </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon bg-purple"><i class="fas fa-check-circle"></i></div>
+          <div class="card stat-card glow-card">
+            <div class="stat-icon" style="background:var(--success-bg);color:var(--success-text);"><i class="fas fa-check-circle"></i></div>
             <div class="stat-info">
               <span class="stat-value" id="totalCollected">--</span>
               <span class="stat-label">Collected</span>
@@ -362,7 +363,7 @@
     },
 
     getStatusBadgeClass(status) {
-      const map = { DRAFT: 'secondary', SENT: 'info', PAID: 'success', PARTIALLY_PAID: 'warning', OVERDUE: 'danger', CANCELLED: 'dark' };
+      const map = { 'Draft': 'secondary', 'Sent': 'info', 'Paid': 'success', 'Partially Paid': 'warning', 'Overdue': 'danger', 'Cancelled': 'dark', 'Refunded': 'dark' };
       return map[status] || 'secondary';
     },
 
