@@ -1,10 +1,11 @@
 name: E2E tests (production)
 
 on:
-  schedule:
-    # Nightly at 03:30 UTC (~9:00 AM IST), an off-peak hour, offset from
-    # the top of the hour for the same reason keep-alive.yml is.
-    - cron: '30 3 * * *'
+  # Manual only for now -- the nightly schedule is disabled until
+  # E2E_PASSWORD is added as a repo secret. Re-enable by uncommenting
+  # the schedule block below once that's set up.
+  # schedule:
+  #   - cron: '30 3 * * *'
   workflow_dispatch: {}
 
 jobs:
