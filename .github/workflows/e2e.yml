@@ -15,6 +15,15 @@ jobs:
       run:
         working-directory: e2e
     steps:
+      # Checkout must come first and run unconditionally -- the job's
+      # working-directory default is "e2e", which doesn't exist on the
+      # runner until the repo is checked out. Every later step's `cd e2e`
+      # (including the secret-check step) fails outright otherwise, which
+      # is exactly what was happening here: the check step itself was
+      # erroring before it ever got to test the secret, so the job showed
+      # as a hard failure every night instead of skipping cleanly.
+      - uses: actions/checkout@v4
+
       # The `secrets` context can't be referenced in a job/step `if:` at
       # all (GitHub Actions rejects the whole workflow file if you try),
       # so "skip until the secret exists" has to be a runtime check
@@ -28,9 +37,6 @@ jobs:
             echo "configured=false" >> "$GITHUB_OUTPUT"
             echo "::warning::E2E_PASSWORD not set -- skipping this run. Add it under Settings > Secrets and variables > Actions to enable this job."
           fi
-
-      - uses: actions/checkout@v4
-        if: steps.check.outputs.configured == 'true'
 
       - uses: actions/setup-node@v4
         if: steps.check.outputs.configured == 'true'
