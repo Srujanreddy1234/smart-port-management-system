@@ -23,7 +23,7 @@ test.describe('Ship registration', () => {
 
     await expect(page.locator('#rsShipId')).toHaveClass(/is-invalid/);
     const border = await page.locator('#rsShipId').evaluate((el) => getComputedStyle(el).borderColor);
-    expect(border).toBe('rgb(220, 53, 69)');
+    expect(border).toBe('rgb(220, 38, 38)');
     // The modal must still be open -- nothing was actually submitted.
     await expect(page.locator('#registerShipModal')).toBeVisible();
   });

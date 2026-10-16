@@ -2,6 +2,10 @@ const ApiStore = {
   _cache: {},
   _cacheTimestamps: {},
   _cacheTTL: 5 * 60 * 1000,
+  // In-flight fetches keyed by resource: App.init() and each page's own
+  // Store.init() both request every resource at the same moment, so
+  // without this every list was downloaded twice per page load.
+  _inflight: {},
 
   _headers() {
     const token = Api.getToken();
@@ -91,16 +95,22 @@ const ApiStore = {
     };
     const endpoint = endpoints[key];
     if (!endpoint) return this._cache[key] || [];
-    try {
-      const res = await this._apiRequest(endpoint);
-      const items = res.data?.items || res.data || [];
-      this._cache[key] = items;
-      this._cacheTimestamps[key] = Date.now();
-      this._persistToSession(key);
-      return items;
-    } catch {
-      return this._cache[key] || [];
-    }
+    if (this._inflight[key]) return this._inflight[key];
+    this._inflight[key] = (async () => {
+      try {
+        const res = await this._apiRequest(endpoint);
+        const items = res.data?.items || res.data || [];
+        this._cache[key] = items;
+        this._cacheTimestamps[key] = Date.now();
+        this._persistToSession(key);
+        return items;
+      } catch {
+        return this._cache[key] || [];
+      } finally {
+        delete this._inflight[key];
+      }
+    })();
+    return this._inflight[key];
   },
 
   set(key, value) {

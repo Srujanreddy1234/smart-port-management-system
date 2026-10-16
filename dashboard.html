@@ -274,13 +274,15 @@
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       applyDashboardPermissions();
-      await Store.init();
+      // KPIs and notifications come from their own endpoints -- start
+      // them now instead of waiting for every full list to download.
       loadKpis();
+      loadNotifications();
+      await Store.init();
       loadCharts();
       loadVesselStatus();
       loadRecentActivity();
       loadBerthOccupancy();
-      loadNotifications();
     });
 
     // Hide the stat cards/charts/feeds the logged-in role isn't permitted to

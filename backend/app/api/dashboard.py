@@ -10,7 +10,7 @@ from app.models import (
 )
 from app.utils.exceptions import AuthorizationError
 from app.utils.helpers import success_response
-from sqlalchemy import func, and_, or_, desc
+from sqlalchemy import func, and_, or_, desc, case
 from datetime import datetime, timedelta
 
 
@@ -51,32 +51,54 @@ def get_kpis():
     last_month_end = this_month_start - timedelta(seconds=1)
     last_month_start = last_month_end.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
-    total_ships = Ship.query.count()
-    ships_docked = Ship.query.filter(Ship.status == ShipStatus.AT_BERTH).count()
-    ships_waiting = Ship.query.filter(Ship.status.in_([ShipStatus.ANCHORED, ShipStatus.APPROACHING, ShipStatus.IN_CHANNEL])).count()
-    ships_arrived_this_week = Ship.query.filter(Ship.ata.isnot(None), Ship.ata >= week_ago).count()
+    # One round trip per table (conditional counts) instead of one query
+    # per number -- each round trip to Supabase costs ~0.3s from Render,
+    # and the old ~27 sequential queries took this endpoint to ~8s.
+    def counts(model, *conditions):
+        cols = [func.count()] + [func.count(case((c, 1))) for c in conditions]
+        return db.session.query(*cols).select_from(model).one()
 
-    total_containers = Container.query.count()
-    containers_loaded = Container.query.filter(Container.status == ContainerStatus.LOADED).count()
-    containers_in_transit = Container.query.filter(Container.status == ContainerStatus.IN_TRANSIT).count()
-    containers_added_this_week = Container.query.filter(Container.created_at >= week_ago).count()
+    throughput_statuses = [ContainerStatus.LOADED, ContainerStatus.DELIVERED]
 
-    total_trucks = Truck.query.count()
-    trucks_in_transit = Truck.query.filter(Truck.status == TruckStatus.IN_TRANSIT).count()
-    trucks_loading = Truck.query.filter(Truck.status == TruckStatus.LOADING).count()
-    trucks_gated_in_this_week = Truck.query.filter(Truck.gate_in_time.isnot(None), Truck.gate_in_time >= week_ago).count()
+    total_ships, ships_docked, ships_waiting, ships_arrived_this_week = counts(
+        Ship,
+        Ship.status == ShipStatus.AT_BERTH,
+        Ship.status.in_([ShipStatus.ANCHORED, ShipStatus.APPROACHING, ShipStatus.IN_CHANNEL]),
+        and_(Ship.ata.isnot(None), Ship.ata >= week_ago),
+    )
 
-    active_alerts = SecurityIncident.query.filter(SecurityIncident.status == IncidentStatus.ACTIVE).count()
-    critical_alerts = SecurityIncident.query.filter(
-        SecurityIncident.severity == IncidentSeverity.CRITICAL,
-        SecurityIncident.status == IncidentStatus.ACTIVE
-    ).count()
-    alerts_today = SecurityIncident.query.filter(SecurityIncident.detected_at >= today_start).count()
+    (total_containers, containers_loaded, containers_in_transit, containers_added_this_week,
+     throughput_this_month, throughput_last_month) = counts(
+        Container,
+        Container.status == ContainerStatus.LOADED,
+        Container.status == ContainerStatus.IN_TRANSIT,
+        Container.created_at >= week_ago,
+        and_(Container.status.in_(throughput_statuses), Container.created_at >= this_month_start),
+        and_(Container.status.in_(throughput_statuses),
+             Container.created_at >= last_month_start, Container.created_at <= last_month_end),
+    )
 
-    operational_equipment = Equipment.query.filter(Equipment.status == EquipmentStatus.OPERATIONAL).count()
-    maintenance_equipment = Equipment.query.filter(Equipment.status == EquipmentStatus.MAINTENANCE).count()
-    total_equipment = Equipment.query.count()
-    equipment_added_this_month = Equipment.query.filter(Equipment.created_at >= this_month_start).count()
+    total_trucks, trucks_in_transit, trucks_loading, trucks_gated_in_this_week = counts(
+        Truck,
+        Truck.status == TruckStatus.IN_TRANSIT,
+        Truck.status == TruckStatus.LOADING,
+        and_(Truck.gate_in_time.isnot(None), Truck.gate_in_time >= week_ago),
+    )
+
+    _, active_alerts, critical_alerts, alerts_today = counts(
+        SecurityIncident,
+        SecurityIncident.status == IncidentStatus.ACTIVE,
+        and_(SecurityIncident.severity == IncidentSeverity.CRITICAL,
+             SecurityIncident.status == IncidentStatus.ACTIVE),
+        SecurityIncident.detected_at >= today_start,
+    )
+
+    total_equipment, operational_equipment, maintenance_equipment, equipment_added_this_month = counts(
+        Equipment,
+        Equipment.status == EquipmentStatus.OPERATIONAL,
+        Equipment.status == EquipmentStatus.MAINTENANCE,
+        Equipment.created_at >= this_month_start,
+    )
 
     latest_aqi = AirQualityReading.query.order_by(desc(AirQualityReading.recorded_at)).first()
     aqi_value = latest_aqi.aqi if latest_aqi else None
@@ -94,22 +116,13 @@ def get_kpis():
         'condition': latest_weather.weather_condition if latest_weather else None
     }
 
-    revenue_this_month = db.session.query(func.coalesce(func.sum(Invoice.amount_paid), 0.0)).filter(
-        Invoice.payment_date.isnot(None), Invoice.payment_date >= this_month_start
-    ).scalar()
-    revenue_last_month = db.session.query(func.coalesce(func.sum(Invoice.amount_paid), 0.0)).filter(
-        Invoice.payment_date.isnot(None), Invoice.payment_date >= last_month_start, Invoice.payment_date <= last_month_end
-    ).scalar()
+    revenue_this_month, revenue_last_month = db.session.query(
+        func.coalesce(func.sum(case((Invoice.payment_date >= this_month_start, Invoice.amount_paid))), 0.0),
+        func.coalesce(func.sum(case((and_(Invoice.payment_date >= last_month_start,
+                                          Invoice.payment_date <= last_month_end), Invoice.amount_paid))), 0.0),
+    ).filter(Invoice.payment_date.isnot(None)).one()
     revenue_growth = ((revenue_this_month - revenue_last_month) / revenue_last_month * 100) if revenue_last_month else 0.0
 
-    throughput_this_month = Container.query.filter(
-        Container.status.in_([ContainerStatus.LOADED, ContainerStatus.DELIVERED]),
-        Container.created_at >= this_month_start
-    ).count()
-    throughput_last_month = Container.query.filter(
-        Container.status.in_([ContainerStatus.LOADED, ContainerStatus.DELIVERED]),
-        Container.created_at >= last_month_start, Container.created_at <= last_month_end
-    ).count()
     throughput_growth = ((throughput_this_month - throughput_last_month) / throughput_last_month * 100) if throughput_last_month else 0.0
 
     kpis = {

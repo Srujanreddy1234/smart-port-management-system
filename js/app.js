@@ -1,7 +1,9 @@
 const App = {
   async init() {
     if (!Api.requireAuth()) return;
-    await ApiStore.init();
+    // Build the sidebar/topbar first -- none of it needs fetched data.
+    // Awaiting ApiStore.init() before this left the sidebar empty for
+    // 5-10s on the free-tier server, making the site look feature-less.
     this.buildSidebar();
     this.initSidebar();
     this.initTopbar();
@@ -12,6 +14,7 @@ const App = {
     this.updateClock();
     this.initSSE();
     setInterval(() => this.updateClock(), 1000);
+    await ApiStore.init();
   },
 
   buildSidebar() {
