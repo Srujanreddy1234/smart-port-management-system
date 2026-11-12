@@ -70,8 +70,10 @@ SQLite, no external services required).
 
 - **Database:** Supabase Free PostgreSQL. Migrations are managed with
   Alembic (`flask db upgrade`) — never edit the schema by hand.
-- **Hosting:** Render Free Web Service, `gunicorn wsgi:app --workers 2
-  --worker-class gthread --threads 4`. Required env vars: `SECRET_KEY`,
+- **Hosting:** Render Web Service, `flask db upgrade && gunicorn wsgi:app
+  --workers 2 --worker-class gthread --threads 4`. The Procfile applies Alembic
+  migrations before starting the web workers so a deploy cannot serve login
+  requests against an outdated schema. Required env vars: `SECRET_KEY`,
   `JWT_SECRET_KEY`, `DATABASE_URL`, `SEED_ADMIN_PASSWORD`, `CORS_ORIGINS`,
   `FRONTEND_URL`, `FLASK_ENV=production`, `FLASK_APP=wsgi.py`,
   `PYTHON_VERSION=3.11.9` (pins the runtime to one with prebuilt wheels for
